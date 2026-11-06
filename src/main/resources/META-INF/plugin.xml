@@ -1,0 +1,111 @@
+<!-- Modified from go-language-helper (cag11), commit 556c274, Apache-2.0: extension registrations -->
+<idea-plugin>
+    <id>io.github.xefise.golsp</id>
+    <name>Go (gopls)</name>
+    <vendor>Xefise</vendor>
+    <description><![CDATA[
+        <p>Go support for WebStorm and other JetBrains IDEs without the official Go plugin:
+        language features via gopls (LSP4IJ), debugging via Delve DAP, run configurations and a test runner.</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.redhat.devtools.lsp4ij</depends>
+
+    <incompatible-with>org.jetbrains.plugins.go</incompatible-with>
+    <incompatible-with>io.github.cag11.go-language-helper</incompatible-with>
+    <incompatible-with>io.genai.go</incompatible-with>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="golsp.go"
+                  implementationClass="io.github.xefise.golsp.lang.GoFileType"
+                  fieldName="INSTANCE"
+                  language="golsp.go"
+                  extensions="go"/>
+        <lang.parserDefinition language="golsp.go"
+                               implementationClass="io.github.xefise.golsp.lang.GoParserDefinition"/>
+        <fileType name="golsp.gomod"
+                  implementationClass="io.github.xefise.golsp.lang.GoModFileType"
+                  fieldName="INSTANCE"
+                  language="golsp.gomod"
+                  fileNames="go.mod"/>
+        <fileType name="golsp.gowork"
+                  implementationClass="io.github.xefise.golsp.lang.GoWorkFileType"
+                  fieldName="INSTANCE"
+                  language="golsp.gowork"
+                  fileNames="go.work"/>
+        <fileType name="golsp.gosum"
+                  implementationClass="io.github.xefise.golsp.lang.GoSumFileType"
+                  fieldName="INSTANCE"
+                  fileNames="go.sum;go.work.sum"/>
+        <lang.parserDefinition language="golsp.gomod"
+                               implementationClass="io.github.xefise.golsp.lang.GoModParserDefinition"/>
+        <lang.parserDefinition language="golsp.gowork"
+                               implementationClass="io.github.xefise.golsp.lang.GoWorkParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="golsp.go"
+                                       implementationClass="io.github.xefise.golsp.lang.GoSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="golsp.gomod"
+                                       implementationClass="io.github.xefise.golsp.lang.GoModSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="golsp.gowork"
+                                       implementationClass="io.github.xefise.golsp.lang.GoWorkSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="io.github.xefise.golsp.lang.GoColorSettingsPage"/>
+        <lang.commenter language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoCommenter"/>
+        <lang.commenter language="golsp.gomod" implementationClass="io.github.xefise.golsp.lang.GoModCommenter"/>
+        <lang.commenter language="golsp.gowork" implementationClass="io.github.xefise.golsp.lang.GoModCommenter"/>
+        <lang.braceMatcher language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoBraceMatcher"/>
+        <lang.braceMatcher language="golsp.gomod" implementationClass="io.github.xefise.golsp.lang.GoModBraceMatcher"/>
+        <lang.braceMatcher language="golsp.gowork" implementationClass="io.github.xefise.golsp.lang.GoWorkBraceMatcher"/>
+        <lang.quoteHandler language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoQuoteHandler"/>
+        <lang.quoteHandler language="golsp.gomod" implementationClass="io.github.xefise.golsp.lang.GoModQuoteHandler"/>
+        <lang.quoteHandler language="golsp.gowork" implementationClass="io.github.xefise.golsp.lang.GoWorkQuoteHandler"/>
+
+        <!-- LSP4IJ binds these to TEXT/textmate only; a custom language has to register them itself. -->
+        <lang.foldingBuilder language="golsp.go"
+                             implementationClass="com.redhat.devtools.lsp4ij.features.foldingRange.LSPFoldingRangeBuilder"
+                             order="first"/>
+        <codeInsight.parameterInfo language="golsp.go"
+                                   implementationClass="com.redhat.devtools.lsp4ij.features.signatureHelp.LSPParameterInfoHandler"/>
+        <lang.psiStructureViewFactory language="golsp.go"
+                                      implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
+        <codeBlockProvider language="golsp.go"
+                           implementationClass="com.redhat.devtools.lsp4ij.features.codeBlockProvider.LSPCodeBlockProvider"
+                           order="first"/>
+        <callHierarchyProvider language="golsp.go"
+                               implementationClass="com.redhat.devtools.lsp4ij.features.callHierarchy.LSPCallHierarchyProvider"/>
+        <typeHierarchyProvider language="golsp.go"
+                               implementationClass="com.redhat.devtools.lsp4ij.features.typeHierarchy.LSPTypeHierarchyProvider"/>
+        <lang.importOptimizer language="golsp.go"
+                              implementationClass="io.github.xefise.golsp.lsp.GoImportOptimizer"/>
+        <formatOnSaveOptions.defaultsProvider implementation="io.github.xefise.golsp.lsp.GoActionsOnSaveDefaults"/>
+        <configurationType implementation="io.github.xefise.golsp.run.GoApplicationConfigurationType"/>
+        <runConfigurationProducer implementation="io.github.xefise.golsp.run.GoApplicationRunConfigurationProducer"/>
+        <runLineMarkerContributor language="golsp.go"
+                                  implementationClass="io.github.xefise.golsp.run.GoApplicationRunLineMarkerContributor"/>
+        <postStartupActivity implementation="io.github.xefise.golsp.toolchain.GoToolchainStartupActivity"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
+        <server id="gopls"
+                name="Go (gopls)"
+                factoryClass="io.github.xefise.golsp.lsp.GoplsLanguageServerFactory">
+            <description><![CDATA[Go language server <a href="https://go.dev/gopls">gopls</a>.]]></description>
+        </server>
+        <languageMapping language="golsp.go" serverId="gopls" languageId="go"/>
+        <languageMapping language="golsp.gomod" serverId="gopls" languageId="go.mod"/>
+        <languageMapping language="golsp.gowork" serverId="gopls" languageId="go.work"/>
+        <semanticTokensColorsProvider serverId="gopls"
+                                      class="io.github.xefise.golsp.lsp.GoSemanticTokensColorsProvider"/>
+        <debugAdapterServer id="go-delve"
+                            name="Go (Delve)"
+                            factoryClass="io.github.xefise.golsp.debug.GoDelveDescriptorFactory"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="io.github.xefise.golsp.toolchain.GoToolchainTrustListener"
+                  topic="com.intellij.ide.trustedProjects.TrustedProjectsListener"/>
+    </applicationListeners>
+
+    <projectListeners>
+        <listener class="io.github.xefise.golsp.lsp.GoplsToolchainListener"
+                  topic="io.github.xefise.golsp.toolchain.GoToolchainListener"/>
+    </projectListeners>
+</idea-plugin>

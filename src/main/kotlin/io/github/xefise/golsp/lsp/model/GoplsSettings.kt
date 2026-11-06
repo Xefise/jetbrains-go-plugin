@@ -1,0 +1,33 @@
+package io.github.xefise.golsp.lsp.model
+
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+
+/** Settings answered to gopls' `workspace/configuration` request for the "gopls" section. */
+object GoplsSettings {
+    const val SECTION: String = "gopls"
+
+    // gopls keys are flat names; vscode-go's "ui."/"build." prefixes are only its own grouping.
+    fun defaults(): JsonObject = JsonObject().apply {
+        addProperty("semanticTokens", true)
+        add("directoryFilters", JsonArray().apply { add("-**/node_modules") })
+        // Tests run from our own gutter markers; gopls' test code lenses would duplicate them.
+        add("codelenses", JsonObject().apply { addProperty("test", false) })
+    }
+
+    /** `{"gopls": defaults}` with [user] (the whole settings object) deep-merged on top; user values win. */
+    fun build(user: JsonObject?): JsonObject {
+        val result = JsonObject().apply { add(SECTION, defaults()) }
+        return if (user == null) result else deepMerge(result, user)
+    }
+
+    fun deepMerge(base: JsonObject, override: JsonObject): JsonObject {
+        val merged = base.deepCopy()
+        for ((key, value) in override.entrySet()) {
+            val existing: JsonElement? = merged.get(key)
+            merged.add(key, if (existing is JsonObject && value is JsonObject) deepMerge(existing, value) else value.deepCopy())
+        }
+        return merged
+    }
+}

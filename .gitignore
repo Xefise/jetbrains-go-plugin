@@ -1,0 +1,10 @@
+.DS_Store
+.gradle
+.idea
+.intellijPlatform
+.kotlin
+build
+.claude/
+CLAUDE.md
+local.properties
+__debug_bin*

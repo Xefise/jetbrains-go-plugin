@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="hello" type="GoLspApplication" factoryName="GoLspApplication">
+    <option name="packageDirectory" value="$PROJECT_DIR$" />
+    <option name="programArguments" value="" />
+    <method v="2" />
+  </configuration>
+</component>

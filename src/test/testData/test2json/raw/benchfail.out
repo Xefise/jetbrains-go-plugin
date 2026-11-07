@@ -1,0 +1,13 @@
+goos: darwin
+goarch: arm64
+pkg: example.com/gotests/benchfail
+cpu: Apple M1 Pro
+=== RUN   BenchmarkPasses
+BenchmarkPasses
+BenchmarkPasses-8   	      10	         8.300 ns/op
+=== NAME  
+=== RUN   BenchmarkFails
+BenchmarkFails
+    benchfail_test.go:12: benchmark failure
+--- FAIL: BenchmarkFails
+FAIL

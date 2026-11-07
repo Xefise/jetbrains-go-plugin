@@ -58,6 +58,8 @@ class GoApplicationDebugIntegrationTest : GoIntegrationTestCase() {
         val session = startDebug()
         withConsoleOnFailure {
             waitUntil("breakpoint in worker", DEBUG_TIMEOUT_SECONDS) { session.isSuspended && session.currentPosition != null }
+            // On EDT LSP4IJ hands out a placeholder file and resolves the real one in the background.
+            waitUntil("stop position to resolve to a local file") { session.currentPosition?.file?.isInLocalFileSystem == true }
         }
         assertEquals(main, session.currentPosition!!.file)
         assertEquals(breakpointLine, session.currentPosition!!.line)

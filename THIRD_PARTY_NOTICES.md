@@ -38,7 +38,7 @@ This project contains code modified from the following sources. Each ported file
 - Licence: Apache License 2.0 — full text in [`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt)
 - Copyright: Copyright 2013-2016 Sergey Ignatov, Alexander Zolotov, Florin Patan
 - Original files: `src/com/goide/runconfig/GoConsoleFilter.java`
-- Mapping to modified files in this project (under `src/main/kotlin/io/github/xefise/golsp/run/`):
+- Mapping to modified files in this project (under `src/main/kotlin/io/github/xefise/golsp/execution/`):
   - `GoConsoleFilter.java` → `GoConsoleFilter.kt` (path resolution), `model/GoConsoleLinks.kt` (line matching)
 - Changes: ported to Kotlin; matching split into a platform-free model; App Engine paths, GOPATH/import-path
   resolution and `go get` links removed; resolution against the run's working and package directories added;
@@ -58,3 +58,25 @@ This project contains code modified from the following sources. Each ported file
     `src/main/kotlin/io/github/xefise/golsp/execution/model/DotEnvParser.kt`
 - Changes: ported to Kotlin; parses text instead of reading a file (file reading and its errors moved to
   `execution/GoEnvFileLoader.kt`, written from scratch).
+
+## Go
+
+- Source: https://github.com/golang/go
+- Version: go1.27.3
+- Licence: BSD 3-Clause — full text in [`licenses/BSD-3-Clause-Go.txt`](licenses/BSD-3-Clause-Go.txt)
+- Copyright: Copyright 2009 The Go Authors
+- Original files: `src/testing/match.go` (`rewrite`, `isSpace`)
+- Mapping to modified files in this project:
+  - `src/testing/match.go` →
+    `src/main/kotlin/io/github/xefise/golsp/test/model/GoTestRunPattern.kt` (`rewrite`, `isSpace`)
+- Changes: ported to Kotlin; `strconv.IsPrint` approximated with Java Unicode categories, `strconv.QuoteRune`
+  reduced to the escapes non-printable runes need.
+- Also ported (tag go1.27.3, commit 2aae1000ea1d4b28923b96db28acf4e3b99d6aff; Copyright 2017 The Go Authors):
+  `src/cmd/internal/test2json/test2json.go` (`Converter`, `lineBuffer`,
+  `isBenchmarkName`, `trimUTF8`) and the `ok`/`FAIL` summary of `runTestActor` in `src/cmd/go/internal/test/test.go` →
+  `src/main/kotlin/io/github/xefise/golsp/test/model/GoTest2Json.kt`, `GoTest2JsonLineBuffer.kt`; test data
+  `src/cmd/internal/test2json/testdata/*.test`, `*.json` copied unedited to `src/test/testData/test2json/golden/`;
+  tests from `src/cmd/internal/test2json/test2json_test.go` (`TestGolden` chunkings and `diffJSON` →
+  `src/test/kotlin/io/github/xefise/golsp/test/model/GoTest2JsonGoldenTest.kt`, `TestTrimUTF8` → `GoTest2JsonTest.kt`).
+  Changes: ported to Kotlin, events go to a callback as JSON lines (Gson), `SetFailedBuild` and the coverage /
+  "no tests to run" suffixes of the summary line dropped.

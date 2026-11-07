@@ -8,20 +8,14 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.configurations.RuntimeConfigurationError
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.intellij.openapi.components.PathMacroManager
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
-import io.github.xefise.golsp.execution.GoEnvFileLoader
-import io.github.xefise.golsp.execution.GoParentEnvironment
+import io.github.xefise.golsp.execution.GoConsoleFilter
 import io.github.xefise.golsp.execution.GoRunConfigurationBase
-import io.github.xefise.golsp.execution.model.GoEnvironmentLayers
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
-import io.github.xefise.golsp.execution.model.GoRunCommandBuilder
 import io.github.xefise.golsp.execution.model.GoRunTarget
-import java.io.File
-import java.nio.file.Path
 
 class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory, name: String) :
     GoRunConfigurationBase<GoApplicationOptions>(project, factory, name), DumbAware {
@@ -96,11 +90,7 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
             val dir = resolve(workingDirectory)
             if (!dir.toFile().isDirectory) throw RuntimeConfigurationError("Working directory does not exist: $dir")
         }
-        if (envFile.isNotBlank()) {
-            val file = resolve(envFile)
-            if (!file.toFile().isFile) throw RuntimeConfigurationError("Env file does not exist: $file")
-        }
-        GoRunCommandBuilder.buildFlagsError(ParametersListUtil.parse(buildFlags))?.let { throw RuntimeConfigurationError(it) }
+        checkEnvFileAndBuildFlags(envFile, buildFlags)
     }
 
     // Run and DAP debug states are both CommandLineState with a TextConsoleBuilder, so either console gets the links.
@@ -116,11 +106,10 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
     @Throws(ExecutionException::class)
     override fun toExecutionRequest(): GoExecutionRequest {
         val target = target()
-        val fileVars = if (envFile.isBlank()) emptyMap() else GoEnvFileLoader.load(resolve(envFile))
         return GoExecutionRequest(
             target = target,
             programArguments = ParametersListUtil.parse(programArguments),
-            environment = GoEnvironmentLayers.merge(fileVars, GoParentEnvironment.inline(envs)),
+            environment = userEnvironment(envs, envFile),
             workingDirectory = workingDirectory(target),
             buildFlags = ParametersListUtil.parse(buildFlags),
         )
@@ -135,14 +124,5 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
             val file = resolve(filePath)
             GoRunTarget.File(file.parent?.toString() ?: file.toString(), file.fileName?.toString().orEmpty())
         }
-    }
-
-    // Expands $PROJECT_DIR$-style macros; a relative path is taken from the project root.
-    internal fun resolve(path: String): Path {
-        val expanded = PathMacroManager.getInstance(project).expandPath(path.trim())
-        val file = File(expanded)
-        val base = project.basePath
-        val absolute = if (file.isAbsolute || base == null) file else File(base, expanded)
-        return absolute.toPath().normalize()
     }
 }

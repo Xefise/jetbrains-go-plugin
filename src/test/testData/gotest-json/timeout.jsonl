@@ -1,0 +1,42 @@
+{"Time":"2026-11-07T16:57:10.968503+04:00","Action":"start","Package":"example.com/gotests/slow"}
+{"Time":"2026-11-07T16:57:11.264281+04:00","Action":"run","Package":"example.com/gotests/slow","Test":"TestFast"}
+{"Time":"2026-11-07T16:57:11.264388+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestFast","Output":"=== RUN   TestFast\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:11.26446+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestFast","Output":"--- PASS: TestFast (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:11.264472+04:00","Action":"pass","Package":"example.com/gotests/slow","Test":"TestFast","Elapsed":0}
+{"Time":"2026-11-07T16:57:11.264485+04:00","Action":"run","Package":"example.com/gotests/slow","Test":"TestSlow"}
+{"Time":"2026-11-07T16:57:11.264494+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"=== RUN   TestSlow\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:12.269577+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"panic: test timed out after 1s\n"}
+{"Time":"2026-11-07T16:57:12.269629+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\trunning tests:\n"}
+{"Time":"2026-11-07T16:57:12.269636+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t\tTestSlow (1s)\n"}
+{"Time":"2026-11-07T16:57:12.269641+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\n"}
+{"Time":"2026-11-07T16:57:12.269645+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"goroutine 33 [running]:\n"}
+{"Time":"2026-11-07T16:57:12.26965+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"testing.(*M).startAlarm.func1()\n"}
+{"Time":"2026-11-07T16:57:12.269655+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2961 +0x2c4\n"}
+{"Time":"2026-11-07T16:57:12.269674+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"created by time.goFunc\n"}
+{"Time":"2026-11-07T16:57:12.269682+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/time/sleep.go:182 +0x38\n"}
+{"Time":"2026-11-07T16:57:12.269686+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\n"}
+{"Time":"2026-11-07T16:57:12.26969+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"goroutine 1 [chan receive]:\n"}
+{"Time":"2026-11-07T16:57:12.269694+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"testing.(*T).Run(0xd791f292008, {0x100375a5d?, 0xd791f21aa88?}, 0x1004df718)\n"}
+{"Time":"2026-11-07T16:57:12.269698+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2268 +0x3cc\n"}
+{"Time":"2026-11-07T16:57:12.269702+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"testing.runTests.func1(0xd791f292008)\n"}
+{"Time":"2026-11-07T16:57:12.269709+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2744 +0x38\n"}
+{"Time":"2026-11-07T16:57:12.269713+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"testing.tRunner(0xd791f292008, 0xd791f21abb8)\n"}
+{"Time":"2026-11-07T16:57:12.269717+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2195 +0xc4\n"}
+{"Time":"2026-11-07T16:57:12.269721+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"testing.runTests({0x100378bce, 0x13}, {0x10037a4cf, 0x18}, 0xd791f1742d0, {0x1004fe7d0, 0x2, 0x2}, {0xd791f21ac58?, 0xd791f1e01c0?, ...})\n"}
+{"Time":"2026-11-07T16:57:12.269751+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2742 +0x400\n"}
+{"Time":"2026-11-07T16:57:12.269756+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"testing.(*M).Run(0xd791f1dc5a0)\n"}
+{"Time":"2026-11-07T16:57:12.26976+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2602 +0x578\n"}
+{"Time":"2026-11-07T16:57:12.269771+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"main.main()\n"}
+{"Time":"2026-11-07T16:57:12.269776+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t_testmain.go:48 +0x80\n"}
+{"Time":"2026-11-07T16:57:12.26978+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\n"}
+{"Time":"2026-11-07T16:57:12.269795+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"goroutine 5 [sleep]:\n"}
+{"Time":"2026-11-07T16:57:12.2698+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"time.Sleep(0x12a05f200)\n"}
+{"Time":"2026-11-07T16:57:12.269805+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/runtime/time.go:368 +0x150\n"}
+{"Time":"2026-11-07T16:57:12.269809+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"example.com/gotests/slow.TestSlow(0xd791f292488?)\n"}
+{"Time":"2026-11-07T16:57:12.269813+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/work/gotests/slow/slow_test.go:11 +0x28\n"}
+{"Time":"2026-11-07T16:57:12.269828+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"testing.tRunner(0xd791f292488, 0x1004df718)\n"}
+{"Time":"2026-11-07T16:57:12.269832+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2195 +0xc4\n"}
+{"Time":"2026-11-07T16:57:12.269836+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"created by testing.(*T).Run in goroutine 1\n"}
+{"Time":"2026-11-07T16:57:12.26984+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"\t/goroot/src/testing/testing.go:2260 +0x3b8\n"}
+{"Time":"2026-11-07T16:57:12.270407+04:00","Action":"output","Package":"example.com/gotests/slow","Output":"FAIL\texample.com/gotests/slow\t1.301s\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:12.270419+04:00","Action":"fail","Package":"example.com/gotests/slow","Elapsed":1.302}

@@ -10,6 +10,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.redhat.devtools.lsp4ij</depends>
+    <depends>com.intellij.platform.testRunner</depends>
 
     <incompatible-with>org.jetbrains.plugins.go</incompatible-with>
     <incompatible-with>io.github.cag11.go-language-helper</incompatible-with>
@@ -48,6 +49,7 @@
         <lang.syntaxHighlighterFactory language="golsp.gowork"
                                        implementationClass="io.github.xefise.golsp.lang.GoWorkSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="io.github.xefise.golsp.lang.GoColorSettingsPage"/>
+        <langCodeStyleSettingsProvider implementation="io.github.xefise.golsp.lang.GoLanguageCodeStyleSettingsProvider"/>
         <lang.commenter language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoCommenter"/>
         <lang.commenter language="golsp.gomod" implementationClass="io.github.xefise.golsp.lang.GoModCommenter"/>
         <lang.commenter language="golsp.gowork" implementationClass="io.github.xefise.golsp.lang.GoModCommenter"/>
@@ -78,8 +80,12 @@
         <formatOnSaveOptions.defaultsProvider implementation="io.github.xefise.golsp.lsp.GoActionsOnSaveDefaults"/>
         <configurationType implementation="io.github.xefise.golsp.run.GoApplicationConfigurationType"/>
         <runConfigurationProducer implementation="io.github.xefise.golsp.run.GoApplicationRunConfigurationProducer"/>
+        <configurationType implementation="io.github.xefise.golsp.test.GoTestConfigurationType"/>
         <runLineMarkerContributor language="golsp.go"
                                   implementationClass="io.github.xefise.golsp.run.GoApplicationRunLineMarkerContributor"/>
+        <runConfigurationProducer implementation="io.github.xefise.golsp.test.GoTestRunConfigurationProducer"/>
+        <runLineMarkerContributor language="golsp.go"
+                                  implementationClass="io.github.xefise.golsp.test.GoTestRunLineMarkerContributor"/>
         <postStartupActivity implementation="io.github.xefise.golsp.toolchain.GoToolchainStartupActivity"/>
     </extensions>
 

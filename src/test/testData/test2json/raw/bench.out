@@ -1,0 +1,9 @@
+goos: darwin
+goarch: arm64
+pkg: example.com/gotests/calc
+cpu: Apple M1 Pro
+=== RUN   BenchmarkAdd
+BenchmarkAdd
+BenchmarkAdd-8   	     100	         1.250 ns/op
+=== NAME  
+PASS

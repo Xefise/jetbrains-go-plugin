@@ -1,0 +1,52 @@
+{"Time":"2026-11-07T18:10:12.691858+04:00","Action":"start","Package":"example.com/gotests/rerun"}
+{"Time":"2026-11-07T18:10:13.063203+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestTable"}
+{"Time":"2026-11-07T18:10:13.0634+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable","Output":"=== RUN   TestTable\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063467+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestTable/same"}
+{"Time":"2026-11-07T18:10:13.063472+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/same","Output":"=== RUN   TestTable/same\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063503+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/same","Output":"--- PASS: TestTable/same (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063509+04:00","Action":"pass","Package":"example.com/gotests/rerun","Test":"TestTable/same","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063783+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestTable/same#01"}
+{"Time":"2026-11-07T18:10:13.063794+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/same#01","Output":"=== RUN   TestTable/same#01\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063802+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/same#01","Output":"    rerun_test.go:19: case failed\n","OutputType":"error"}
+{"Time":"2026-11-07T18:10:13.06382+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/same#01","Output":"--- FAIL: TestTable/same#01 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063825+04:00","Action":"fail","Package":"example.com/gotests/rerun","Test":"TestTable/same#01","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063829+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestTable/same#02"}
+{"Time":"2026-11-07T18:10:13.063833+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/same#02","Output":"=== RUN   TestTable/same#02\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063838+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/same#02","Output":"--- PASS: TestTable/same#02 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063841+04:00","Action":"pass","Package":"example.com/gotests/rerun","Test":"TestTable/same#02","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063845+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestTable/with_space"}
+{"Time":"2026-11-07T18:10:13.063848+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/with_space","Output":"=== RUN   TestTable/with_space\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063852+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/with_space","Output":"    rerun_test.go:19: case failed\n","OutputType":"error"}
+{"Time":"2026-11-07T18:10:13.063856+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/with_space","Output":"--- FAIL: TestTable/with_space (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063868+04:00","Action":"fail","Package":"example.com/gotests/rerun","Test":"TestTable/with_space","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063877+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestTable/with_space#01"}
+{"Time":"2026-11-07T18:10:13.063881+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/with_space#01","Output":"=== RUN   TestTable/with_space#01\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063885+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/with_space#01","Output":"--- PASS: TestTable/with_space#01 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063894+04:00","Action":"pass","Package":"example.com/gotests/rerun","Test":"TestTable/with_space#01","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063898+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestTable/a/b"}
+{"Time":"2026-11-07T18:10:13.063913+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/a/b","Output":"=== RUN   TestTable/a/b\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063917+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/a/b","Output":"    rerun_test.go:19: case failed\n","OutputType":"error"}
+{"Time":"2026-11-07T18:10:13.063924+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable/a/b","Output":"--- FAIL: TestTable/a/b (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063927+04:00","Action":"fail","Package":"example.com/gotests/rerun","Test":"TestTable/a/b","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063931+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestTable","Output":"--- FAIL: TestTable (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063934+04:00","Action":"fail","Package":"example.com/gotests/rerun","Test":"TestTable","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063936+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestParentFails"}
+{"Time":"2026-11-07T18:10:13.063939+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestParentFails","Output":"=== RUN   TestParentFails\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063942+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestParentFails/child"}
+{"Time":"2026-11-07T18:10:13.063945+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestParentFails/child","Output":"=== RUN   TestParentFails/child\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063948+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestParentFails/child","Output":"--- PASS: TestParentFails/child (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063952+04:00","Action":"pass","Package":"example.com/gotests/rerun","Test":"TestParentFails/child","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063955+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestParentFails","Output":"    rerun_test.go:27: parent failed\n","OutputType":"error"}
+{"Time":"2026-11-07T18:10:13.063958+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestParentFails","Output":"--- FAIL: TestParentFails (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063974+04:00","Action":"fail","Package":"example.com/gotests/rerun","Test":"TestParentFails","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.063977+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestPasses"}
+{"Time":"2026-11-07T18:10:13.06398+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestPasses","Output":"=== RUN   TestPasses\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063984+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestPasses","Output":"--- PASS: TestPasses (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.063987+04:00","Action":"pass","Package":"example.com/gotests/rerun","Test":"TestPasses","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.064003+04:00","Action":"run","Package":"example.com/gotests/rerun","Test":"TestPassesToo"}
+{"Time":"2026-11-07T18:10:13.06402+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestPassesToo","Output":"=== RUN   TestPassesToo\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.064031+04:00","Action":"output","Package":"example.com/gotests/rerun","Test":"TestPassesToo","Output":"--- PASS: TestPassesToo (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.064038+04:00","Action":"pass","Package":"example.com/gotests/rerun","Test":"TestPassesToo","Elapsed":0}
+{"Time":"2026-11-07T18:10:13.064049+04:00","Action":"output","Package":"example.com/gotests/rerun","Output":"FAIL\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.064131+04:00","Action":"output","Package":"example.com/gotests/rerun","Output":"FAIL\texample.com/gotests/rerun\t0.369s\n","OutputType":"frame"}
+{"Time":"2026-11-07T18:10:13.064148+04:00","Action":"fail","Package":"example.com/gotests/rerun","Elapsed":0.372}

@@ -1,0 +1,37 @@
+=== RUN   TestFast
+--- PASS: TestFast (0.00s)
+=== NAME  
+=== RUN   TestSlow
+panic: test timed out after 1s
+	running tests:
+		TestSlow (1s)
+
+goroutine 2 [running]:
+testing.(*M).startAlarm.func1()
+	/goroot/src/testing/testing.go:2961 +0x2c4
+created by time.goFunc
+	/goroot/src/time/sleep.go:182 +0x38
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x390c261da008, {0x104d39a5d?, 0x390c2611aa88?}, 0x104ea3720)
+	/goroot/src/testing/testing.go:2268 +0x3cc
+testing.runTests.func1(0x390c261da008)
+	/goroot/src/testing/testing.go:2744 +0x38
+testing.tRunner(0x390c261da008, 0x390c2611abb8)
+	/goroot/src/testing/testing.go:2195 +0xc4
+testing.runTests({0x104d3cbce, 0x13}, {0x104d3e4cf, 0x18}, 0x390c2618a2b8, {0x104ec27d0, 0x2, 0x2}, {0x390c2611ac58?, 0x390c261901c0?, ...})
+	/goroot/src/testing/testing.go:2742 +0x400
+testing.(*M).Run(0x390c261886e0)
+	/goroot/src/testing/testing.go:2602 +0x578
+main.main()
+	_testmain.go:48 +0x80
+
+goroutine 35 [sleep]:
+time.Sleep(0x12a05f200)
+	/goroot/src/runtime/time.go:368 +0x150
+example.com/gotests/slow.TestSlow(0x390c261da488?)
+	/work/gotests/slow/slow_test.go:11 +0x28
+testing.tRunner(0x390c261da488, 0x104ea3720)
+	/goroot/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/goroot/src/testing/testing.go:2260 +0x3b8

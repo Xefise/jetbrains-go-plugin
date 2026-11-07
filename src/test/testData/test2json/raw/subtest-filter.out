@@ -1,0 +1,9 @@
+=== RUN   TestSubtests
+=== RUN   TestSubtests/with_space
+    calc_test.go:24: output from a subtest
+        second line
+--- PASS: TestSubtests/with_space (0.00s)
+=== NAME  TestSubtests
+--- PASS: TestSubtests (0.00s)
+=== NAME  
+PASS

@@ -1,0 +1,93 @@
+=== RUN   TestAdd
+--- PASS: TestAdd (0.00s)
+=== NAME  
+=== RUN   TestSub
+    calc_test.go:17: Sub(5, 3) = 8, want 2
+--- FAIL: TestSub (0.00s)
+=== NAME  
+=== RUN   TestSubtests
+=== RUN   TestSubtests/plain
+--- PASS: TestSubtests/plain (0.00s)
+=== NAME  TestSubtests
+=== RUN   TestSubtests/with_space
+    calc_test.go:24: output from a subtest
+        second line
+--- PASS: TestSubtests/with_space (0.00s)
+=== NAME  TestSubtests
+=== RUN   TestSubtests/a/b
+--- PASS: TestSubtests/a/b (0.00s)
+=== NAME  TestSubtests
+=== RUN   TestSubtests/nested
+=== RUN   TestSubtests/nested/ok
+--- PASS: TestSubtests/nested/ok (0.00s)
+=== NAME  TestSubtests/nested
+=== RUN   TestSubtests/nested/fails
+    calc_test.go:30: nested failure
+--- FAIL: TestSubtests/nested/fails (0.00s)
+=== NAME  TestSubtests/nested
+--- FAIL: TestSubtests/nested (0.00s)
+=== NAME  TestSubtests
+=== RUN   TestSubtests/регэксп_[x]+$
+--- PASS: TestSubtests/регэксп_[x]+$ (0.00s)
+=== NAME  TestSubtests
+--- FAIL: TestSubtests (0.00s)
+=== NAME  
+=== RUN   TestParallel
+=== RUN   TestParallel/first
+=== PAUSE TestParallel/first
+=== NAME  TestParallel
+=== RUN   TestParallel/second
+=== PAUSE TestParallel/second
+=== NAME  TestParallel
+=== RUN   TestParallel/third
+=== PAUSE TestParallel/third
+=== NAME  TestParallel
+=== CONT  TestParallel/first
+=== CONT  TestParallel/third
+=== CONT  TestParallel/second
+=== NAME  TestParallel/first
+    calc_test.go:41: done first
+--- PASS: TestParallel/first (0.02s)
+=== NAME  TestParallel/second
+    calc_test.go:41: done second
+--- PASS: TestParallel/second (0.02s)
+=== NAME  TestParallel/third
+    calc_test.go:41: done third
+--- PASS: TestParallel/third (0.02s)
+--- PASS: TestParallel (0.00s)
+=== NAME  
+=== RUN   TestParallelTopA
+=== PAUSE TestParallelTopA
+=== NAME  
+=== RUN   TestParallelTopB
+=== PAUSE TestParallelTopB
+=== NAME  
+=== RUN   TestSkipped
+    calc_test.go:59: not today
+--- SKIP: TestSkipped (0.00s)
+=== NAME  
+=== CONT  TestParallelTopA
+=== CONT  TestParallelTopB
+partial line from B without newline--- PASS: TestParallelTopB (0.01s)
+stdout from A
+--- PASS: TestParallelTopA (0.03s)
+=== RUN   FuzzReverse
+=== RUN   FuzzReverse/seed#0
+--- PASS: FuzzReverse/seed#0 (0.00s)
+=== NAME  FuzzReverse
+=== RUN   FuzzReverse/seed#1
+--- PASS: FuzzReverse/seed#1 (0.00s)
+=== NAME  FuzzReverse
+--- PASS: FuzzReverse (0.00s)
+=== NAME  
+=== RUN   ExampleAdd
+--- PASS: ExampleAdd (0.00s)
+=== NAME   
+=== RUN   ExampleSub
+--- FAIL: ExampleSub (0.00s)
+got:
+8
+want:
+2
+=== NAME   
+FAIL

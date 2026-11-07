@@ -1,0 +1,12 @@
+{"Time":"2026-11-07T16:57:09.596514+04:00","Action":"start","Package":"example.com/gotests/calc"}
+{"Time":"2026-11-07T16:57:09.977798+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"goos: darwin\n"}
+{"Time":"2026-11-07T16:57:09.977883+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"goarch: arm64\n"}
+{"Time":"2026-11-07T16:57:09.97789+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"pkg: example.com/gotests/calc\n"}
+{"Time":"2026-11-07T16:57:09.977907+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"cpu: Apple M1 Pro\n"}
+{"Time":"2026-11-07T16:57:09.977919+04:00","Action":"run","Package":"example.com/gotests/calc","Test":"BenchmarkAdd"}
+{"Time":"2026-11-07T16:57:09.977923+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"BenchmarkAdd","Output":"=== RUN   BenchmarkAdd\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:09.97793+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"BenchmarkAdd","Output":"BenchmarkAdd\n"}
+{"Time":"2026-11-07T16:57:09.978297+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"BenchmarkAdd","Output":"BenchmarkAdd-8   \t     100\t         1.670 ns/op\n"}
+{"Time":"2026-11-07T16:57:09.978316+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:09.978975+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"ok  \texample.com/gotests/calc\t0.382s\n"}
+{"Time":"2026-11-07T16:57:09.979019+04:00","Action":"pass","Package":"example.com/gotests/calc","Elapsed":0.383}

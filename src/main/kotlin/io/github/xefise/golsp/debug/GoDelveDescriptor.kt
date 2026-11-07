@@ -2,6 +2,7 @@ package io.github.xefise.golsp.debug
 
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.RunConfigurationOptions
+import com.intellij.execution.configurations.WrappingRunConfiguration
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.diagnostic.thisLogger
@@ -27,10 +28,14 @@ class GoDelveDescriptor(
 ) : DebugAdapterDescriptor(options, environment, serverDefinition) {
 
     private val request: GoExecutionRequest by lazy {
-        val profile = environment.runProfile as? GoRunConfigurationBase<*>
+        val profile = goConfiguration()
             ?: throw ExecutionException("The Go Delve debug adapter works only with Go run configurations")
         profile.launchRequest()
     }
+
+    // Rerun Failed Tests wraps the configuration it launches.
+    private fun goConfiguration(): GoRunConfigurationBase<*>? =
+        environment.runProfile.let { (it as? WrappingRunConfiguration<*>)?.peer ?: it } as? GoRunConfigurationBase<*>
 
     @Throws(ExecutionException::class)
     override fun startServer(): ProcessHandler {

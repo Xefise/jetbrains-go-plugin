@@ -26,6 +26,8 @@ data class GoExecutionRequest(
     val environment: Map<String, String> = emptyMap(),
     val workingDirectory: String = target.directory,
     val buildFlags: List<String> = emptyList(),
+    /** Set for `go test`: then [programArguments] go to the test binary and [buildFlags] are go test flags. */
+    val test: GoTestSpec? = null,
 )
 
 object GoEnvironmentLayers {

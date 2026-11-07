@@ -1,0 +1,12 @@
+package slow
+
+import (
+	"testing"
+	"time"
+)
+
+func TestFast(t *testing.T) {}
+
+func TestSlow(t *testing.T) {
+	time.Sleep(5 * time.Second)
+}

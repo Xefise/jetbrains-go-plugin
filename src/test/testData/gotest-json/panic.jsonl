@@ -1,0 +1,30 @@
+{"Time":"2026-11-07T16:57:10.228531+04:00","Action":"start","Package":"example.com/gotests/panics"}
+{"Time":"2026-11-07T16:57:10.778829+04:00","Action":"run","Package":"example.com/gotests/panics","Test":"TestBeforePanic"}
+{"Time":"2026-11-07T16:57:10.778902+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestBeforePanic","Output":"=== RUN   TestBeforePanic\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.778958+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestBeforePanic","Output":"--- PASS: TestBeforePanic (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.77898+04:00","Action":"pass","Package":"example.com/gotests/panics","Test":"TestBeforePanic","Elapsed":0}
+{"Time":"2026-11-07T16:57:10.778991+04:00","Action":"run","Package":"example.com/gotests/panics","Test":"TestPanic"}
+{"Time":"2026-11-07T16:57:10.778997+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"=== RUN   TestPanic\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.779022+04:00","Action":"run","Package":"example.com/gotests/panics","Test":"TestPanic/inner"}
+{"Time":"2026-11-07T16:57:10.779026+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic/inner","Output":"=== RUN   TestPanic/inner\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.779031+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic/inner","Output":"--- FAIL: TestPanic/inner (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.779035+04:00","Action":"fail","Package":"example.com/gotests/panics","Test":"TestPanic/inner","Elapsed":0}
+{"Time":"2026-11-07T16:57:10.77904+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"--- FAIL: TestPanic (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.781993+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"panic: assignment to entry in nil map [recovered, repanicked]\n"}
+{"Time":"2026-11-07T16:57:10.782018+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"\n"}
+{"Time":"2026-11-07T16:57:10.782025+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"goroutine 5 [running]:\n"}
+{"Time":"2026-11-07T16:57:10.782056+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"testing.tRunner.func1.2({0x10264a7c0, 0x102685100})\n"}
+{"Time":"2026-11-07T16:57:10.782062+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"\t/goroot/src/testing/testing.go:2125 +0x1a0\n"}
+{"Time":"2026-11-07T16:57:10.782077+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"testing.tRunner.func1()\n"}
+{"Time":"2026-11-07T16:57:10.782083+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"\t/goroot/src/testing/testing.go:2128 +0x2c8\n"}
+{"Time":"2026-11-07T16:57:10.782087+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"panic({0x10264a7c0?, 0x102685100?})\n"}
+{"Time":"2026-11-07T16:57:10.782091+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"\t/goroot/src/runtime/panic.go:859 +0x120\n"}
+{"Time":"2026-11-07T16:57:10.782095+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"example.com/gotests/panics.TestPanic.func1(0x288dffe6e6c8?)\n"}
+{"Time":"2026-11-07T16:57:10.782099+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"\t/work/gotests/panics/panics_test.go:10 +0x34\n"}
+{"Time":"2026-11-07T16:57:10.782104+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"testing.tRunner(0x288dffe6e6c8, 0x1026677a8)\n"}
+{"Time":"2026-11-07T16:57:10.782108+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"\t/goroot/src/testing/testing.go:2195 +0xc4\n"}
+{"Time":"2026-11-07T16:57:10.782126+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"created by testing.(*T).Run in goroutine 4\n"}
+{"Time":"2026-11-07T16:57:10.782132+04:00","Action":"output","Package":"example.com/gotests/panics","Test":"TestPanic","Output":"\t/goroot/src/testing/testing.go:2260 +0x3b8\n"}
+{"Time":"2026-11-07T16:57:10.783093+04:00","Action":"fail","Package":"example.com/gotests/panics","Test":"TestPanic","Elapsed":0}
+{"Time":"2026-11-07T16:57:10.78314+04:00","Action":"output","Package":"example.com/gotests/panics","Output":"FAIL\texample.com/gotests/panics\t0.554s\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.783157+04:00","Action":"fail","Package":"example.com/gotests/panics","Elapsed":0.555}

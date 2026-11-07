@@ -1,0 +1,14 @@
+{"Time":"2026-11-07T16:57:14.14133+04:00","Action":"start","Package":"example.com/gotests/calc"}
+{"Time":"2026-11-07T16:57:14.141497+04:00","Action":"run","Package":"example.com/gotests/calc","Test":"TestSubtests"}
+{"Time":"2026-11-07T16:57:14.141502+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"TestSubtests","Output":"=== RUN   TestSubtests\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.141526+04:00","Action":"run","Package":"example.com/gotests/calc","Test":"TestSubtests/with_space"}
+{"Time":"2026-11-07T16:57:14.141529+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"TestSubtests/with_space","Output":"=== RUN   TestSubtests/with_space\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.141541+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"TestSubtests/with_space","Output":"    calc_test.go:24: output from a subtest\n"}
+{"Time":"2026-11-07T16:57:14.141545+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"TestSubtests/with_space","Output":"        second line\n"}
+{"Time":"2026-11-07T16:57:14.14155+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"TestSubtests/with_space","Output":"--- PASS: TestSubtests/with_space (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.141553+04:00","Action":"pass","Package":"example.com/gotests/calc","Test":"TestSubtests/with_space","Elapsed":0}
+{"Time":"2026-11-07T16:57:14.14156+04:00","Action":"output","Package":"example.com/gotests/calc","Test":"TestSubtests","Output":"--- PASS: TestSubtests (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.141563+04:00","Action":"pass","Package":"example.com/gotests/calc","Test":"TestSubtests","Elapsed":0}
+{"Time":"2026-11-07T16:57:14.141565+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.141568+04:00","Action":"output","Package":"example.com/gotests/calc","Output":"ok  \texample.com/gotests/calc\t(cached)\n"}
+{"Time":"2026-11-07T16:57:14.141577+04:00","Action":"pass","Package":"example.com/gotests/calc","Elapsed":0}

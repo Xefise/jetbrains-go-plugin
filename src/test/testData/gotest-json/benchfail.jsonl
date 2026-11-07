@@ -1,0 +1,19 @@
+{"Time":"2026-11-07T16:57:14.296712+04:00","Action":"start","Package":"example.com/gotests/benchfail"}
+{"Time":"2026-11-07T16:57:14.656593+04:00","Action":"output","Package":"example.com/gotests/benchfail","Output":"goos: darwin\n"}
+{"Time":"2026-11-07T16:57:14.656715+04:00","Action":"output","Package":"example.com/gotests/benchfail","Output":"goarch: arm64\n"}
+{"Time":"2026-11-07T16:57:14.656724+04:00","Action":"output","Package":"example.com/gotests/benchfail","Output":"pkg: example.com/gotests/benchfail\n"}
+{"Time":"2026-11-07T16:57:14.65674+04:00","Action":"output","Package":"example.com/gotests/benchfail","Output":"cpu: Apple M1 Pro\n"}
+{"Time":"2026-11-07T16:57:14.656753+04:00","Action":"run","Package":"example.com/gotests/benchfail","Test":"BenchmarkPasses"}
+{"Time":"2026-11-07T16:57:14.656757+04:00","Action":"output","Package":"example.com/gotests/benchfail","Test":"BenchmarkPasses","Output":"=== RUN   BenchmarkPasses\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.656768+04:00","Action":"output","Package":"example.com/gotests/benchfail","Test":"BenchmarkPasses","Output":"BenchmarkPasses\n"}
+{"Time":"2026-11-07T16:57:14.657184+04:00","Action":"output","Package":"example.com/gotests/benchfail","Test":"BenchmarkPasses","Output":"BenchmarkPasses-8   \t      10\t        16.70 ns/op\n"}
+{"Time":"2026-11-07T16:57:14.657216+04:00","Action":"run","Package":"example.com/gotests/benchfail","Test":"BenchmarkFails"}
+{"Time":"2026-11-07T16:57:14.657228+04:00","Action":"output","Package":"example.com/gotests/benchfail","Test":"BenchmarkFails","Output":"=== RUN   BenchmarkFails\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.657234+04:00","Action":"output","Package":"example.com/gotests/benchfail","Test":"BenchmarkFails","Output":"BenchmarkFails\n"}
+{"Time":"2026-11-07T16:57:14.6576+04:00","Action":"output","Package":"example.com/gotests/benchfail","Test":"BenchmarkFails","Output":"    benchfail_test.go:12: benchmark failure\n","OutputType":"error"}
+{"Time":"2026-11-07T16:57:14.657612+04:00","Action":"output","Package":"example.com/gotests/benchfail","Test":"BenchmarkFails","Output":"--- FAIL: BenchmarkFails\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.657651+04:00","Action":"fail","Package":"example.com/gotests/benchfail","Test":"BenchmarkFails"}
+{"Time":"2026-11-07T16:57:14.657685+04:00","Action":"output","Package":"example.com/gotests/benchfail","Output":"FAIL\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.658237+04:00","Action":"output","Package":"example.com/gotests/benchfail","Output":"exit status 1\n"}
+{"Time":"2026-11-07T16:57:14.658251+04:00","Action":"output","Package":"example.com/gotests/benchfail","Output":"FAIL\texample.com/gotests/benchfail\t0.361s\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:14.658257+04:00","Action":"fail","Package":"example.com/gotests/benchfail","Elapsed":0.362}

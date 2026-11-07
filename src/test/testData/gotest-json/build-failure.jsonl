@@ -1,0 +1,6 @@
+{"ImportPath":"example.com/gotests/broken [example.com/gotests/broken.test]","Action":"build-output","Output":"# example.com/gotests/broken [example.com/gotests/broken.test]\n"}
+{"ImportPath":"example.com/gotests/broken [example.com/gotests/broken.test]","Action":"build-output","Output":"broken/broken_test.go:6:2: undefined: undefinedFunction\n"}
+{"ImportPath":"example.com/gotests/broken [example.com/gotests/broken.test]","Action":"build-fail"}
+{"Time":"2026-11-07T16:57:10.073258+04:00","Action":"start","Package":"example.com/gotests/broken"}
+{"Time":"2026-11-07T16:57:10.073355+04:00","Action":"output","Package":"example.com/gotests/broken","Output":"FAIL\texample.com/gotests/broken [build failed]\n","OutputType":"frame"}
+{"Time":"2026-11-07T16:57:10.073374+04:00","Action":"fail","Package":"example.com/gotests/broken","Elapsed":0,"FailedBuild":"example.com/gotests/broken [example.com/gotests/broken.test]"}

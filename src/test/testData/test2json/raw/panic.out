@@ -1,0 +1,22 @@
+=== RUN   TestBeforePanic
+--- PASS: TestBeforePanic (0.00s)
+=== NAME  
+=== RUN   TestPanic
+=== RUN   TestPanic/inner
+--- FAIL: TestPanic/inner (0.00s)
+--- FAIL: TestPanic (0.00s)
+panic: assignment to entry in nil map [recovered, repanicked]
+
+goroutine 36 [running]:
+testing.tRunner.func1.2({0x1048d27c0, 0x10490d100})
+	/goroot/src/testing/testing.go:2125 +0x1a0
+testing.tRunner.func1()
+	/goroot/src/testing/testing.go:2128 +0x2c8
+panic({0x1048d27c0?, 0x10490d100?})
+	/goroot/src/runtime/panic.go:859 +0x120
+example.com/gotests/panics.TestPanic.func1(0x6a0dcc4ce6c8?)
+	/work/gotests/panics/panics_test.go:10 +0x34
+testing.tRunner(0x6a0dcc4ce6c8, 0x1048ef7a8)
+	/goroot/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 35
+	/goroot/src/testing/testing.go:2260 +0x3b8

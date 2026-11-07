@@ -1,7 +1,5 @@
 package io.github.xefise.golsp.run
 
-import com.intellij.execution.configuration.EnvironmentVariablesDialog
-import com.intellij.execution.configuration.EnvironmentVariablesTextFieldWithBrowseButton
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
@@ -11,6 +9,7 @@ import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.FormBuilder
+import io.github.xefise.golsp.execution.GoEnvironmentVariablesField
 import io.github.xefise.golsp.lang.GoFileType
 import javax.swing.JComponent
 import javax.swing.JList
@@ -46,9 +45,7 @@ class GoApplicationSettingsEditor(project: Project) : SettingsEditor<GoApplicati
         )
         textField.toolTipText = "Empty: the package directory, or the file's directory"
     }
-    private val envs = GoEnvironmentVariablesField(project).apply {
-        textField.toolTipText = "Use \$PATH\$ to reference the IDE environment, e.g. PATH=/my/bin:\$PATH\$"
-    }
+    private val envs = GoEnvironmentVariablesField(project)
     private val envFile = TextFieldWithBrowseButton().apply {
         addBrowseFolderListener(project, FileChooserDescriptorFactory.singleFile().withTitle("Select Env File"))
         textField.toolTipText = "KEY=VALUE lines; Environment variables override it"
@@ -100,9 +97,4 @@ class GoApplicationSettingsEditor(project: Project) : SettingsEditor<GoApplicati
     }
 
     override fun createEditor(): JComponent = panel
-
-    // The IDE environment is always inherited, so the dialog must not offer to exclude it.
-    private class GoEnvironmentVariablesField(project: Project) : EnvironmentVariablesTextFieldWithBrowseButton(project) {
-        override fun createDialog(): EnvironmentVariablesDialog = object : EnvironmentVariablesDialog(this, true) {}
-    }
 }

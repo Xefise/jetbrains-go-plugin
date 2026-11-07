@@ -41,6 +41,8 @@ dependencies {
         plugin("com.redhat.devtools.lsp4ij:0.21.0")
         // Product module v2 (DefaultDebugExecutor, XDebugger API); not on the classpath by default.
         bundledModule("intellij.platform.debugger")
+        // SMTestRunner (test tree, OutputToGeneralTestEventsConverter, SMTestLocator).
+        bundledPlugin("com.intellij.platform.testRunner")
         testFramework(TestFrameworkType.Platform)
     }
 }

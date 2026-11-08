@@ -17,14 +17,18 @@ object GoToolLocator {
 
     fun environment(): LookupEnvironment = lookupEnvironment(currentEnvironmentMap())
 
-    fun lookupEnvironment(env: Map<String, String>): LookupEnvironment = LookupEnvironment(
-        path = env["PATH"],
-        home = System.getProperty("user.home"),
-        goPath = env["GOPATH"],
-        goRoot = env["GOROOT"],
-        isWindows = SystemInfo.isWindows,
-        goBinDirs = listOfNotNull(env["GOBIN"]?.takeIf { it.isNotBlank() }),
-    )
+    fun lookupEnvironment(env: Map<String, String>): LookupEnvironment {
+        val home = System.getProperty("user.home")
+        return LookupEnvironment(
+            path = env["PATH"],
+            home = home,
+            goPath = env["GOPATH"],
+            goRoot = env["GOROOT"],
+            isWindows = SystemInfo.isWindows,
+            goBinDirs = listOfNotNull(env["GOBIN"]?.takeIf { it.isNotBlank() }),
+            sdkDirNames = lazy { home?.let { File(it, ToolLookup.SDK_DIR).list()?.toList() }.orEmpty() },
+        )
+    }
 
     // EnvironmentUtil carries the login-shell env (right PATH even when the IDE starts from the Dock), but
     // getEnvironmentMap() blocks until it is loaded and has no public readiness check, so it is only read off-EDT.

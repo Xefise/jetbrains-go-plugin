@@ -1,0 +1,31 @@
+/Users/me/go/bin/dlv: go1.27.3
+	path	github.com/go-delve/delve/cmd/dlv
+	mod	github.com/go-delve/delve	v1.27.2	h1:dhcjFjiVoQI53uwsG7EqYiMhdvFuywsBZx4KDOK+sYE=
+	dep	github.com/cosiner/argv	v0.1.0	h1:BVDiEL32lwHukgJKP87btEPenzrrHUjajs/8yzaqcXg=
+	dep	github.com/cpuguy83/go-md2man/v2	v2.0.6	h1:XJtiaUW6dEEqVuZiMTn1ldk455QWwEIsMIJlo5vtkx0=
+	dep	github.com/derekparker/trie/v3	v3.2.0	h1:fET3Qbp9xSB7yc7tz6Y2GKMNl0SycYFo3cmiRI3Gpf0=
+	dep	github.com/go-delve/liner	v1.2.3-0.20231231155935-4726ab1d7f62	h1:IGtvsNyIuRjl04XAOFGACozgUD7A82UffYxZt4DWbvA=
+	dep	github.com/google/go-dap	v0.12.0	h1:rVcjv3SyMIrpaOoTAdFDyHs99CwVOItIJGKLQFQhNeM=
+	dep	github.com/mattn/go-isatty	v0.0.20	h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
+	dep	github.com/mattn/go-runewidth	v0.0.13	h1:lTGmDsbAYt5DmK6OnoV7EuIF1wEIFAcxld6ypU4OSgU=
+	dep	github.com/rivo/uniseg	v0.2.0	h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
+	dep	github.com/russross/blackfriday/v2	v2.1.0	h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
+	dep	github.com/spf13/cobra	v1.10.2	h1:DMTTonx5m65Ic0GOoRY2c16WCbHxOOw6xxezuLaBpcU=
+	dep	github.com/spf13/pflag	v1.0.10	h1:4EBh2KAYBwaONj6b2Ye1GiHfwjqyROoF4RwYO+vPwFk=
+	dep	go.starlark.net	v0.0.0-20231101134539-556fd59b42f6	h1:+eC0F/k4aBLC4szgOcjd7bDTEnpxADJyWJE0yowgM3E=
+	dep	go.yaml.in/yaml/v3	v3.0.4	h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=
+	dep	golang.org/x/arch	v0.28.0	h1:wVwVdqsTuUbJvhYVCspQYwZXHNYeLSoZnmHD+ggddpQ=
+	dep	golang.org/x/sync	v0.22.0	h1:SZjpbeLmrCk4xhRSZFNZW5gFUeCeFgjekvI/+gfScek=
+	dep	golang.org/x/sys	v0.46.0	h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw=
+	dep	golang.org/x/telemetry	v0.0.0-20241106142447-58a1122356f5	h1:TCDqnvbBsFapViksHcHySl/sW4+rTGNIAoJJesHRuMM=
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	DefaultGODEBUG=cryptocustomrand=1,httpservecontentmaxranges=1,tlssecpmlkem=0,tracebacklabels=0,urlstrictcolons=0,x509sslcertoverrideplatform=0
+	build	CGO_ENABLED=1
+	build	CGO_CFLAGS=
+	build	CGO_CPPFLAGS=
+	build	CGO_CXXFLAGS=
+	build	CGO_LDFLAGS=
+	build	GOARCH=arm64
+	build	GOOS=darwin
+	build	GOARM64=v8.0

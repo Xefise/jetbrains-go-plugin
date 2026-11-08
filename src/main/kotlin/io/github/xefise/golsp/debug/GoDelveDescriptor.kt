@@ -42,7 +42,7 @@ class GoDelveDescriptor(
         thisLogger().info("startServer on thread '${Thread.currentThread().name}'")
         val toolchain = GoToolchainService.getInstance(environment.project)
         val dlv = toolchain.findTool(GoTool.DLV)
-            ?: throw ExecutionException("dlv not found in GOBIN, PATH or ~/go/bin; install it with `go install github.com/go-delve/delve/cmd/dlv@latest`")
+            ?: throw ExecutionException("dlv not found in GOBIN, PATH or ~/go/bin; click Install in the Go editor banner or set its path in the Go settings")
         val path = GoRunProfileState.goFirstPath(environment.project, request)
         // Port 0: dlv picks a free port and LSP4IJ reads it from the ready line, so there is no port race.
         return GoRunProfileState.startKillable(GoRunProfileState.toCommandLine(DelveLaunchBuilder.serverCommand(dlv, request, path)))

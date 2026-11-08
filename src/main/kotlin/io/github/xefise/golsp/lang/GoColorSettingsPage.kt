@@ -1,7 +1,6 @@
 // Modified from go-language-helper (cag11), commit 556c274, Apache-2.0
 package io.github.xefise.golsp.lang
 
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor
@@ -10,7 +9,7 @@ import com.intellij.openapi.options.colors.ColorSettingsPage
 import javax.swing.Icon
 
 class GoColorSettingsPage : ColorSettingsPage {
-    override fun getIcon(): Icon = AllIcons.FileTypes.Text
+    override fun getIcon(): Icon = GoIcons.FILE
 
     override fun getHighlighter(): SyntaxHighlighter = GoSyntaxHighlighter.go()
 

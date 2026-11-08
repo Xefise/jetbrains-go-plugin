@@ -9,6 +9,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import io.github.xefise.golsp.toolchain.model.ConfiguredToolPaths
 import io.github.xefise.golsp.toolchain.model.GoEnvParseResult
 import io.github.xefise.golsp.toolchain.model.GoEnvParser
 import io.github.xefise.golsp.toolchain.model.GoTool
@@ -46,8 +47,8 @@ class GoToolchainService(private val project: Project, private val scope: Corout
 
     val toolchain: GoToolchain? get() = (state as? GoToolchainState.Ready)?.toolchain
 
-    /** Re-detects in the background; [configuredGoBinary] is the explicit path from settings (none yet). */
-    fun refresh(configuredGoBinary: String? = null) {
+    /** Re-detects in the background with [configuredGoBinary], by default the effective one from settings. */
+    fun refresh(configuredGoBinary: String? = configuredPaths().goBinary) {
         val gen = synchronized(lock) {
             job?.cancel()
             if (settled.isDone) settled = CompletableFuture()
@@ -103,10 +104,16 @@ class GoToolchainService(private val project: Project, private val scope: Corout
     /** Lookup env enriched with the detected `go env` (GOBIN, GOPATH); never waits for the shell env. */
     fun lookupEnvironment(): LookupEnvironment = GoToolLocator.environment().withGoEnv(toolchain?.env)
 
+    /** Null in an untrusted project: no path there may come from its workspace file or lead to running a tool. */
     fun findTool(tool: GoTool): String? {
-        if (tool == GoTool.GO) toolchain?.goBinary?.let { return it }
-        return GoToolLocator.find(tool, lookupEnvironment())
+        if (!TrustedProjects.isProjectTrusted(project)) return null
+        val detectedGo = if (tool == GoTool.GO) toolchain?.goBinary else null
+        return configuredPaths().resolve(tool, detectedGo, GoToolLocator::isExecutableFile) {
+            GoToolLocator.find(tool, lookupEnvironment())
+        }
     }
+
+    fun configuredPaths(): ConfiguredToolPaths = GoProjectToolchainSettings.configuredPaths(project)
 
     /** PATH for child processes with the detected go directory first, or null when go is unknown. */
     fun pathWithGoFirst(basePath: String?): String? {

@@ -14,6 +14,8 @@ data class LookupEnvironment(
     val isWindows: Boolean,
     // `go install` targets: $GOBIN from the process env first, then GOBIN reported by `go env`.
     val goBinDirs: List<String> = emptyList(),
+    // Entry names of ~/sdk (`golang.org/dl/goX.Y.Z download`); lazy, so the directory is listed only when go is not found earlier.
+    val sdkDirNames: Lazy<List<String>> = lazyOf(emptyList()),
 ) {
     val pathSeparator: Char get() = if (isWindows) ';' else ':'
     val fileSeparator: Char get() = if (isWindows) '\\' else '/'
@@ -30,13 +32,17 @@ data class LookupEnvironment(
 }
 
 object ToolLookup {
+    const val SDK_DIR = "sdk"
     private val UNIX_FALLBACK_DIRS = listOf("/usr/local/go/bin", "/opt/homebrew/bin", "/usr/local/bin")
 
     fun executableName(tool: GoTool, env: LookupEnvironment): String =
         if (env.isWindows) "${tool.baseName}.exe" else tool.baseName
 
     // Order: GOBIN for installed tools, then PATH (what the user's shell resolves), then Go-specific install locations.
-    fun candidateDirectories(tool: GoTool, env: LookupEnvironment): List<String> {
+    fun candidateDirectories(tool: GoTool, env: LookupEnvironment): List<String> =
+        (primaryDirectories(tool, env) + sdkDirectories(tool, env)).distinct()
+
+    private fun primaryDirectories(tool: GoTool, env: LookupEnvironment): List<String> {
         val dirs = mutableListOf<String>()
         if (tool != GoTool.GO) dirs += env.goBinDirs.map { it.trim() }.filter { it.isNotEmpty() }
         dirs += splitPath(env.path, env.pathSeparator)
@@ -46,16 +52,35 @@ object ToolLookup {
             env.goRoot?.takeIf { it.isNotBlank() }?.let { dirs += join(it, "bin", env) }
         }
         if (!env.isWindows) dirs += UNIX_FALLBACK_DIRS
-        return dirs.map { it.trimEnd(env.fileSeparator).ifEmpty { it } }.distinct()
+        return normalize(dirs, env)
     }
+
+    private fun sdkDirectories(tool: GoTool, env: LookupEnvironment): List<String> {
+        if (tool != GoTool.GO) return emptyList()
+        val home = env.home?.takeIf { it.isNotBlank() } ?: return emptyList()
+        val sdk = join(home, SDK_DIR, env)
+        return normalize(newestFirstSdkDirs(env.sdkDirNames.value).map { join(join(sdk, it, env), "bin", env) }, env)
+    }
+
+    private fun normalize(dirs: List<String>, env: LookupEnvironment): List<String> =
+        dirs.map { it.trimEnd(env.fileSeparator).ifEmpty { it } }.distinct()
+
+    /** `go1.22.3`-style names newest first; release > rc > beta of the same version; anything else (gotip) is dropped. */
+    fun newestFirstSdkDirs(names: List<String>): List<String> =
+        names.mapNotNull { name -> (GoVersion.parse(name) as? GoVersion.Release)?.takeIf { it.text == name }?.let { name to it } }
+            .sortedWith { a, b -> b.second.compareTo(a.second).takeIf { it != 0 } ?: a.first.compareTo(b.first) }
+            .map { it.first }
 
     fun candidates(tool: GoTool, env: LookupEnvironment): List<String> {
         val name = executableName(tool, env)
         return candidateDirectories(tool, env).map { join(it, name, env) }
     }
 
-    fun find(tool: GoTool, env: LookupEnvironment, isExecutable: (String) -> Boolean): String? =
-        candidates(tool, env).firstOrNull(isExecutable)
+    fun find(tool: GoTool, env: LookupEnvironment, isExecutable: (String) -> Boolean): String? {
+        val name = executableName(tool, env)
+        return primaryDirectories(tool, env).map { join(it, name, env) }.firstOrNull(isExecutable)
+            ?: sdkDirectories(tool, env).map { join(it, name, env) }.firstOrNull(isExecutable)
+    }
 
     /** Null when [path] has no entries: replacing an unknown PATH with just the go directory would hide everything else. */
     fun prependToPath(path: String?, directory: String, separator: Char): String? {

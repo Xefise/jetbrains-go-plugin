@@ -1,7 +1,6 @@
 // Modified from go-language-helper (cag11), commit 556c274, Apache-2.0
 package io.github.xefise.golsp.lang
 
-import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.openapi.fileTypes.PlainTextLanguage
@@ -25,7 +24,7 @@ class GoModFileType private constructor() : LanguageFileType(GoModLanguage) {
     override fun getDisplayName(): String = "go.mod"
     override fun getDescription(): String = "Go module file"
     override fun getDefaultExtension(): String = "mod"
-    override fun getIcon(): Icon = AllIcons.FileTypes.Text
+    override fun getIcon(): Icon = GoIcons.MODULE_FILE
 
     companion object {
         const val NAME: String = "golsp.gomod"
@@ -40,7 +39,7 @@ class GoWorkFileType private constructor() : LanguageFileType(GoWorkLanguage) {
     override fun getDisplayName(): String = "go.work"
     override fun getDescription(): String = "Go workspace file"
     override fun getDefaultExtension(): String = "work"
-    override fun getIcon(): Icon = AllIcons.FileTypes.Text
+    override fun getIcon(): Icon = GoIcons.MODULE_FILE
 
     companion object {
         const val NAME: String = "golsp.gowork"
@@ -56,7 +55,7 @@ class GoSumFileType private constructor() : LanguageFileType(PlainTextLanguage.I
     override fun getDisplayName(): String = "go.sum"
     override fun getDescription(): String = "Go checksum file"
     override fun getDefaultExtension(): String = "sum"
-    override fun getIcon(): Icon = AllIcons.FileTypes.Text
+    override fun getIcon(): Icon = GoIcons.MODULE_FILE
 
     companion object {
         const val NAME: String = "golsp.gosum"

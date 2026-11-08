@@ -59,6 +59,7 @@
         <lang.quoteHandler language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoQuoteHandler"/>
         <lang.quoteHandler language="golsp.gomod" implementationClass="io.github.xefise.golsp.lang.GoModQuoteHandler"/>
         <lang.quoteHandler language="golsp.gowork" implementationClass="io.github.xefise.golsp.lang.GoWorkQuoteHandler"/>
+        <fileIconProvider implementation="io.github.xefise.golsp.lang.GoTestFileIconProvider"/>
 
         <!-- LSP4IJ binds these to TEXT/textmate only; a custom language has to register them itself. -->
         <lang.foldingBuilder language="golsp.go"
@@ -87,6 +88,13 @@
         <runLineMarkerContributor language="golsp.go"
                                   implementationClass="io.github.xefise.golsp.test.GoTestRunLineMarkerContributor"/>
         <postStartupActivity implementation="io.github.xefise.golsp.toolchain.GoToolchainStartupActivity"/>
+        <notificationGroup id="Go Tools" displayType="BALLOON"/>
+        <projectConfigurable parentId="language"
+                             id="golsp.settings"
+                             displayName="Go"
+                             nonDefaultProject="true"
+                             instance="io.github.xefise.golsp.toolchain.GoToolchainConfigurable"/>
+        <editorNotificationProvider implementation="io.github.xefise.golsp.toolchain.GoToolBannerProvider"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
@@ -113,5 +121,17 @@
     <projectListeners>
         <listener class="io.github.xefise.golsp.lsp.GoplsToolchainListener"
                   topic="io.github.xefise.golsp.toolchain.GoToolchainListener"/>
+        <listener class="io.github.xefise.golsp.toolchain.GoToolchainSettingsRefresher"
+                  topic="io.github.xefise.golsp.toolchain.GoToolchainSettingsListener"/>
+        <listener class="io.github.xefise.golsp.toolchain.GoToolStatusRefresher"
+                  topic="io.github.xefise.golsp.toolchain.GoToolchainListener"/>
+        <listener class="io.github.xefise.golsp.toolchain.GoToolBannerRefresher"
+                  topic="io.github.xefise.golsp.toolchain.GoToolchainListener"/>
+        <listener class="io.github.xefise.golsp.toolchain.GoToolBannerRefresher"
+                  topic="io.github.xefise.golsp.toolchain.GoToolStatusListener"/>
+        <listener class="io.github.xefise.golsp.lsp.GoplsSettingsListener"
+                  topic="io.github.xefise.golsp.toolchain.GoToolchainSettingsListener"/>
+        <listener class="io.github.xefise.golsp.lsp.GoplsToolInstallListener"
+                  topic="io.github.xefise.golsp.toolchain.GoToolInstallListener"/>
     </projectListeners>
 </idea-plugin>

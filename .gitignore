@@ -8,3 +8,4 @@ build
 CLAUDE.md
 local.properties
 __debug_bin*
+*.hprof

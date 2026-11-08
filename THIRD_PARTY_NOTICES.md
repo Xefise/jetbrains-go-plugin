@@ -58,6 +58,23 @@ This project contains code modified from the following sources. Each ported file
     `src/main/kotlin/io/github/xefise/golsp/execution/model/DotEnvParser.kt`
 - Changes: ported to Kotlin; parses text instead of reading a file (file reading and its errors moved to
   `execution/GoEnvFileLoader.kt`, written from scratch).
+- Also ported (same commit and licence): `extension/src/goTools.ts` (`getImportPathWithVersion`: gopls and dlv
+  pins), `extension/src/goToolsInformation.ts` (gopls and dlv import and module paths), `extension/src/goEnv.ts`
+  (`toolInstallationEnvironment`), `extension/src/goInstallTools.ts` (`installTools`: the `go<version>+auto`
+  GOTOOLCHAIN rule; `tmpDirForToolInstallation`: installing from a neutral directory), `extension/src/util.ts`
+  (`GoVersion`: devel builds assumed newer than releases) → `src/main/kotlin/io/github/xefise/golsp/toolchain/model/`
+  `GoToolRegistry.kt`, `GoToolInstall.kt`, `GoVersion.kt`. Changes: ported to Kotlin as data-only descriptions
+  (no process launch); dlv pins chosen by the project's Go from Delve's supported-version ranges, extended past
+  go1.21; Go prereleases ordered before their release; GOPATH/GOBIN overrides and the minimum-Go refusal dropped.
+- Written from scratch, not derived from vscode-go: `toolchain/model/GoBinaryInfo.kt`, `ModuleVersion.kt`,
+  `GoToolVersionCheck.kt`.
+
+## Delve
+
+- Source: https://github.com/go-delve/delve, `pkg/goversion/compat.go` at each release tag v1.20.0 … v1.27.0
+- Licence: MIT; Copyright (c) 2014 Derek Parker
+- Data only, no code copied: the minimum and maximum Go minor accepted by each Delve release line, as the table
+  in `src/main/kotlin/io/github/xefise/golsp/toolchain/model/GoToolRegistry.kt` (`DelveSupport`).
 
 ## Go
 

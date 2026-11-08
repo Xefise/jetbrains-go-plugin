@@ -18,6 +18,7 @@ import java.nio.file.Path
 class GoplsConnectionProvider(private val project: Project) : OSProcessStreamConnectionProvider() {
     override fun start() {
         project.putUserData(LAUNCHED_WITH, null)
+        project.putUserData(CONFIGURED_GOPLS, GoToolchainService.getInstance(project).configuredPaths().goplsPath.orEmpty())
         val toolchain = GoToolchainService.getInstance(project).awaitDetected(TOOLCHAIN_WAIT_MS)
         commandLine = createCommandLine(toolchain)
         super.start()
@@ -31,7 +32,7 @@ class GoplsConnectionProvider(private val project: Project) : OSProcessStreamCon
         val toolchain = GoToolchainService.getInstance(project)
         blockingReason(state)?.let { throw CannotStartProcessException("gopls is not started: $it") }
         val gopls = toolchain.findTool(GoTool.GOPLS) ?: throw CannotStartProcessException(
-            "gopls not found in GOBIN, PATH or ~/go/bin; install it with `go install golang.org/x/tools/gopls@latest` and restart the server",
+            "gopls not found in GOBIN, PATH or ~/go/bin; click Install in the Go editor banner or set its path in the Go settings",
         )
         val commandLine = GeneralCommandLine(gopls).withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         // gopls shells out to `go`; the detected one must win over whatever comes first in PATH.
@@ -45,7 +46,12 @@ class GoplsConnectionProvider(private val project: Project) : OSProcessStreamCon
 
         private val LAUNCHED_WITH: Key<GoToolchain> = Key.create("golsp.gopls.launchedWith")
 
+        // The configured gopls path the last start saw ("" = autodetect); null when it never started.
+        private val CONFIGURED_GOPLS: Key<String> = Key.create("golsp.gopls.configuredPath")
+
         fun launchedWith(project: Project): GoToolchain? = project.getUserData(LAUNCHED_WITH)
+
+        fun configuredGoplsAtLaunch(project: Project): String? = project.getUserData(CONFIGURED_GOPLS)
 
         fun forgetLaunch(project: Project) = project.putUserData(LAUNCHED_WITH, null)
 

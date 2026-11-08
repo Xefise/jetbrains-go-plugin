@@ -1,0 +1,36 @@
+/Users/me/go/bin/gopls: go1.27.3
+	path	golang.org/x/tools/gopls
+	mod	golang.org/x/tools/gopls	v0.24.0	h1:nPO/LffYa4sP62Ueuema5PPnZPGaZjGl+vZGvbTek4g=
+	dep	github.com/BurntSushi/toml	v1.6.0	h1:dRaEfpa2VI55EwlIW72hMRHdWouJeRF7TPYhI+AUQjk=
+	dep	github.com/fatih/camelcase	v1.0.0	h1:hxNvNX/xYBp0ovncs8WyWZrOrpBNub/JfaMvbURyft8=
+	dep	github.com/fatih/gomodifytags	v1.17.1-0.20250423142747-f3939df9aa3c	h1:dDSgAjoOMp8da3egfz0t2S+t8RGOpEmEXZubcGuc0Bg=
+	dep	github.com/fatih/structtag	v1.2.0	h1:/OdNE99OxoI/PqaW/SuSK9uxxT3f/tcSZgon/ssNSx4=
+	dep	github.com/fsnotify/fsnotify	v1.9.0	h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=
+	dep	github.com/google/jsonschema-go	v0.4.3	h1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=
+	dep	github.com/modelcontextprotocol/go-sdk	v1.8.0	h1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=
+	dep	github.com/segmentio/asm	v1.2.1	h1:DTNbBqs57ioxAD4PrArqftgypG4/qNpXoJx8TVXxPR0=
+	dep	github.com/segmentio/encoding	v0.5.4	h1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=
+	dep	github.com/yosida95/uritemplate/v3	v3.0.2	h1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=
+	dep	golang.org/x/exp/typeparams	v0.0.0-20260908205506-85c1c2202aba	h1:ZoZmFkcuQ289xJilBm9Ck3W+/okrhXc4LUpbtKFQE4k=
+	dep	golang.org/x/mod	v0.41.0	h1:qJmnOUb4YB+FsEuM3HcWucdZASCPGhsX6uljO6pog0c=
+	dep	golang.org/x/oauth2	v0.37.0	h1:JUlcxA8oAtauLfiH8FX2/FkAWHAdi0QtGCGc+hofE98=
+	dep	golang.org/x/sync	v0.23.0	h1:KameEIfc1IkluZyXWLn39Wd4tURc6GbCiISGiZm2bQk=
+	dep	golang.org/x/sys	v0.48.0	h1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=
+	dep	golang.org/x/telemetry	v0.0.0-20260924152758-ed294f943157	h1:DftxASHKl6JolFPqoN+2WrFO53JvkHwRXvFqf8gsivA=
+	dep	golang.org/x/text	v0.42.0	h1:JbOZXgfeCPU9gacVtYliJqOhD+zhrEqK4LfdpmlUZqI=
+	dep	golang.org/x/time	v0.16.0	h1:vMb6ptszcQMkcwiRTAuNNU50gom6++Q/6gY2hDM6VDE=
+	dep	golang.org/x/tools	v0.51.1-0.20261014163302-24a65270771e	h1:OKD783ebWgqIZn7EAQNP944SpADpjJ8k4XI3nJAeB4o=
+	dep	golang.org/x/vuln	v1.8.0	h1:clG4qBU6zH5VKjti8n5j8BBuYzoSha392xXMkXS351U=
+	dep	honnef.co/go/tools	v0.8.1	h1:+JKf3xJ1ni4CwrhVg4/pqsfPGP6vNAXcKbMXJodYx3w=
+	dep	mvdan.cc/gofumpt	v0.12.0	h1:1Lbudkz2kpM9Cjz2pL4M19u7q+GaEhCTNf7N9mfpcho=
+	dep	mvdan.cc/xurls/v2	v2.6.0	h1:3NTZpeTxYVWNSokW3MKeyVkz/j7uYXYiMtXRUfmjbgI=
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	CGO_ENABLED=1
+	build	CGO_CFLAGS=
+	build	CGO_CPPFLAGS=
+	build	CGO_CXXFLAGS=
+	build	CGO_LDFLAGS=
+	build	GOARCH=arm64
+	build	GOOS=darwin
+	build	GOARM64=v8.0

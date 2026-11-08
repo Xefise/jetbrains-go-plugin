@@ -44,6 +44,13 @@ This project contains code modified from the following sources. Each ported file
   resolution and `go get` links removed; resolution against the run's working and package directories added;
   URLs rejected; files missing from VFS linked lazily instead of a synchronous refresh; the index fallback
   limited to project scope and skipped in dumb mode.
+- Also ported (same commit and licence): `src/com/goide/runconfig/testing/coverage/GoCoverageRunner.java`
+  (`parseCoverage`: profile line format, block-to-line expansion, partial lines, `out` data file extension) →
+  `src/main/kotlin/io/github/xefise/golsp/coverage/model/GoCoverProfile.kt`,
+  `src/main/kotlin/io/github/xefise/golsp/coverage/GoCoverageRunner.kt`. Changes: ported to Kotlin; parsing split
+  into a platform-free model; duplicate blocks merged per profile mode; statement-less blocks skipped; a line
+  takes the best count of its blocks instead of their sum; import paths resolved from go.mod/go.work text instead
+  of the Go plugin's package index; absolute and `_/` file names accepted.
 
 ## vscode-go
 
@@ -97,3 +104,16 @@ This project contains code modified from the following sources. Each ported file
   `src/test/kotlin/io/github/xefise/golsp/test/model/GoTest2JsonGoldenTest.kt`, `TestTrimUTF8` → `GoTest2JsonTest.kt`).
   Changes: ported to Kotlin, events go to a callback as JSON lines (Gson), `SetFailedBuild` and the coverage /
   "no tests to run" suffixes of the summary line dropped.
+
+## IntelliJ Community
+
+- Source: https://github.com/JetBrains/intellij-community
+- Commit: 16a8d7c7270906a22cd45ed57ea396bc465c6798
+- Licence: Apache License 2.0 — full text in [`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt)
+- Copyright: Copyright 2000-2024 JetBrains s.r.o. and contributors
+- Original files: `plugins/coverage-common/src/com/intellij/coverage/lcov/LcovSerializationUtils.java`
+  (`convertToProjectData`, `normalizeFilePath`)
+- Mapping to modified files in this project (under `src/main/kotlin/io/github/xefise/golsp/coverage/`):
+  - `convertToProjectData` → `GoCoverageRunner.kt` (`projectData`)
+  - `normalizeFilePath` → `GoCoverageEngine.kt` (`pathKey`)
+- Changes: ported to Kotlin; input is per-line hits of a Go cover profile; partial lines get the PARTIAL status.

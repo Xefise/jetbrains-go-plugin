@@ -110,7 +110,7 @@ class GoTestRerunFailedAction(componentContainer: ComponentContainer, consolePro
             path.normalize()
         }
 
-        private fun packageDirectory(project: Project, importPath: String): String? = ReadAction.compute<String?, RuntimeException> {
+        private fun packageDirectory(project: Project, importPath: String): String? = ReadAction.computeBlocking<String?, RuntimeException> {
             // The go.mod lookup needs indexes; without them the import path still works for Run.
             if (DumbService.isDumb(project)) null
             else GoTestLocator.packageDirectory(project, GlobalSearchScope.allScope(project), importPath)?.path

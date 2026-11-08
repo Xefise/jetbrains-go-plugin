@@ -13,6 +13,8 @@ import com.redhat.devtools.lsp4ij.dap.DebugMode
 import com.redhat.devtools.lsp4ij.dap.definitions.DebugAdapterServerDefinition
 import com.redhat.devtools.lsp4ij.dap.descriptors.DebugAdapterDescriptor
 import com.redhat.devtools.lsp4ij.dap.descriptors.ServerReadyConfig
+import io.github.xefise.golsp.debug.model.DelveAttachBuilder
+import io.github.xefise.golsp.debug.model.DelveAttachTarget
 import io.github.xefise.golsp.debug.model.DelveLaunchBuilder
 import io.github.xefise.golsp.execution.GoRunConfigurationBase
 import io.github.xefise.golsp.execution.GoRunProfileState
@@ -28,17 +30,25 @@ class GoDelveDescriptor(
 ) : DebugAdapterDescriptor(options, environment, serverDefinition) {
 
     private val request: GoExecutionRequest by lazy {
-        val profile = goConfiguration()
-            ?: throw ExecutionException("The Go Delve debug adapter works only with Go run configurations")
+        val profile = runProfile() as? GoRunConfigurationBase<*>
+            ?: throw ExecutionException("The Go Delve debug adapter cannot launch '${environment.runProfile.name}': not a Go Application or Go Test configuration")
         profile.launchRequest()
     }
 
+    private val attachProfile: GoDelveAttachProfile? by lazy { runProfile() as? GoDelveAttachProfile }
+
+    private val isAttach: Boolean get() = attachProfile != null
+
+    // Validated by the profile's getState before LSP4IJ asks the descriptor anything.
+    private val attachTarget: DelveAttachTarget by lazy { checkNotNull(attachProfile) { "not an attach configuration" }.attachTarget() }
+
     // Rerun Failed Tests wraps the configuration it launches.
-    private fun goConfiguration(): GoRunConfigurationBase<*>? =
-        environment.runProfile.let { (it as? WrappingRunConfiguration<*>)?.peer ?: it } as? GoRunConfigurationBase<*>
+    private fun runProfile(): Any? = environment.runProfile.let { (it as? WrappingRunConfiguration<*>)?.peer ?: it }
 
     @Throws(ExecutionException::class)
     override fun startServer(): ProcessHandler {
+        // LSP4IJ never starts a server in ATTACH mode: it connects to the ready config's address directly.
+        if (isAttach) throw ExecutionException("Attach configurations connect to a running dlv and start no server")
         thisLogger().info("startServer on thread '${Thread.currentThread().name}'")
         val toolchain = GoToolchainService.getInstance(environment.project)
         val dlv = toolchain.findTool(GoTool.DLV)
@@ -50,13 +60,16 @@ class GoDelveDescriptor(
 
     override fun getDapParameters(): Map<String, Any> {
         thisLogger().info("getDapParameters on thread '${Thread.currentThread().name}'")
+        if (isAttach) return DelveAttachBuilder.attachParameters(attachTarget)
         return DelveLaunchBuilder.launchParameters(request)
     }
 
-    override fun getDebugMode(): DebugMode = DebugMode.LAUNCH
+    override fun getDebugMode(): DebugMode = if (isAttach) DebugMode.ATTACH else DebugMode.LAUNCH
 
+    // ATTACH: a plain socket connect without retries, so the server must already listen.
     override fun getServerReadyConfig(debugMode: DebugMode): ServerReadyConfig =
-        ServerReadyConfig(DelveLaunchBuilder.READY_PATTERN)
+        if (debugMode == DebugMode.ATTACH) ServerReadyConfig(attachTarget.host, attachTarget.port)
+        else ServerReadyConfig(DelveLaunchBuilder.READY_PATTERN)
 
     override fun getFileType(): FileType = GoFileType.INSTANCE
 

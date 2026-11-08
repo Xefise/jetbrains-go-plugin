@@ -96,4 +96,27 @@ class GoTestCommandBuilderTest {
     fun `ordinary flags sharing a prefix with reserved ones pass`() {
         assertNull(GoTestCommandBuilder.testFlagsError(listOf("-count=1", "-cover", "-coverprofile=c.out", "-cpu=1,2", "-cpu", "-count", "-outputdir=out", "-outputdir", "-v", "json", "")))
     }
+
+    @Test
+    fun `cover profile follows the user flags and precedes the package`() {
+        val request = GoExecutionRequest(pkg, buildFlags = listOf("-race"), test = GoTestSpec(recursive = true, coverProfile = "/tmp/c.out"))
+        assertEquals(listOf("test", "-json", "-race", "-coverprofile=/tmp/c.out", "./..."), args(request))
+    }
+
+    @Test
+    fun `user cover profile in either form is replaced by the IDE one`() {
+        val request = GoExecutionRequest(
+            pkg,
+            buildFlags = listOf("-coverprofile=mine.out", "-covermode=atomic", "--coverprofile", "-v", "-coverpkg=./..."),
+            test = GoTestSpec(coverProfile = "/tmp/c.out"),
+        )
+        // "-v" here is the value of the separated --coverprofile, as go reads it.
+        assertEquals(listOf("test", "-json", "-covermode=atomic", "-coverpkg=./...", "-coverprofile=/tmp/c.out", "."), args(request))
+    }
+
+    @Test
+    fun `user cover profile stays when the IDE does not collect coverage`() {
+        val request = GoExecutionRequest(pkg, buildFlags = listOf("-coverprofile=mine.out"), test = GoTestSpec())
+        assertEquals(listOf("test", "-json", "-coverprofile=mine.out", "."), args(request))
+    }
 }

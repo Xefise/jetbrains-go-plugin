@@ -1,0 +1,6 @@
+mode: set
+example.com/gotests/calc/calc.go:3.26,3.40 1 1
+example.com/gotests/calc/calc.go:6.26,6.40 1 1
+example.com/gotests/calc/calc.go:9.2,10.50 2 1
+example.com/gotests/calc/calc.go:11.3,12.1 1 1
+example.com/gotests/calc/calc.go:13.2,13.18 1 1

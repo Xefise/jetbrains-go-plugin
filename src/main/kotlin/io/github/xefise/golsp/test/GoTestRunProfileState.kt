@@ -20,6 +20,7 @@ import io.github.xefise.golsp.execution.model.GoEnvironmentLayers
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
 import io.github.xefise.golsp.execution.model.GoTestCommandBuilder
 import io.github.xefise.golsp.test.runner.GoTestConsoleProperties
+import java.nio.file.Path
 
 /** A single `go test -json` process shown as an SMTestRunner tree. */
 class GoTestRunProfileState(
@@ -28,6 +29,9 @@ class GoTestRunProfileState(
     private val goExecutable: String,
     private val requestProvider: () -> GoExecutionRequest,
 ) : CommandLineState(environment) {
+
+    /** Where `go test` writes its cover profile; set by the coverage runner before execution. */
+    var coverProfile: Path? = null
 
     @Throws(ExecutionException::class)
     override fun startProcess(): ProcessHandler = start(requestProvider())
@@ -52,7 +56,8 @@ class GoTestRunProfileState(
     @Throws(ExecutionException::class)
     private fun start(launch: GoExecutionRequest): ProcessHandler {
         val path = GoRunProfileState.goFirstPath(environment.project, launch)
-        val request = launch.copy(environment = GoEnvironmentLayers.withPath(launch.environment, path))
+        val test = launch.test?.let { spec -> coverProfile?.let { spec.copy(coverProfile = it.toString()) } ?: spec }
+        val request = launch.copy(environment = GoEnvironmentLayers.withPath(launch.environment, path), test = test)
         return GoRunProfileState.startKillable(GoRunProfileState.toCommandLine(GoTestCommandBuilder.testCommand(goExecutable, request)))
     }
 

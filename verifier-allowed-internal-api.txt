@@ -1,0 +1,2 @@
+# One regex per line, matched against whole lines of the verifier internal-api-usages.txt report.
+^Internal method com\.intellij\.coverage\.CoverageEngine\.getQualifiedName\(java\.nio\.file\.Path outputFile, com\.intellij\.psi\.PsiFile sourceFile\) : java\.lang\.String is overridden in class io\.github\.xefise\.golsp\.coverage\.GoCoverageEngine\..*

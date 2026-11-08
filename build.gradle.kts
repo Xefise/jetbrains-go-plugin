@@ -43,6 +43,9 @@ dependencies {
         bundledModule("intellij.platform.debugger")
         // SMTestRunner (test tree, OutputToGeneralTestEventsConverter, SMTestLocator).
         bundledPlugin("com.intellij.platform.testRunner")
+        // CoverageEngine API and the agent's ProjectData/ClassData/LineData.
+        bundledModule("intellij.platform.coverage")
+        bundledModule("intellij.platform.coverage.agent")
         testFramework(TestFrameworkType.Platform)
     }
 }
@@ -61,11 +64,42 @@ intellijPlatform {
         }
         failureLevel = listOf(
             VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS,
-            VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES,
             VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES,
             VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES,
             VerifyPluginTask.FailureLevel.INVALID_PLUGIN,
         )
+        // INTERNAL_API_USAGES is enforced by verifyPlugin.doLast below: the verifier's ignored-problems file
+        // cannot mute internal API usages, and exactly one of them is unavoidable.
+    }
+}
+
+// Internal API usages must match verifier-allowed-internal-api.txt exactly: nothing unlisted, every listed one present
+// (the CoverageEngine.getQualifiedName override, without which the editor shows no coverage).
+tasks.verifyPlugin {
+    val reports = verificationReportsDirectory
+    val allowedFile = layout.projectDirectory.file("verifier-allowed-internal-api.txt").asFile
+    inputs.file(allowedFile)
+    // Reports of earlier runs (other IDE builds) must not satisfy or fail the check below.
+    doFirst { reports.get().asFile.deleteRecursively() }
+    doLast {
+        val allowed = allowedFile.readLines().filter { it.isNotBlank() && !it.startsWith("#") }.map(::Regex)
+        val verdicts = reports.get().asFile.walkTopDown().filter { it.name == "verification-verdict.txt" }.toList()
+        if (verdicts.isEmpty()) throw GradleException("No plugin verifier report under ${reports.get().asFile}")
+        for (verdict in verdicts) {
+            val report = verdict.resolveSibling("internal-api-usages.txt")
+            val usages = if (report.isFile) report.readLines().filter { it.isNotBlank() } else emptyList()
+            val unlisted = usages.filterNot { usage -> allowed.any { it.matches(usage) } }
+            if (unlisted.isNotEmpty()) {
+                throw GradleException("Internal API usages not listed in ${allowedFile.name}:\n" + unlisted.joinToString("\n"))
+            }
+            val missing = allowed.filterNot { pattern -> usages.any { pattern.matches(it) } }
+            if (missing.isNotEmpty()) {
+                throw GradleException(
+                    "Allowed internal API usage not found in $report (report format changed or the usage is gone; " +
+                        "update ${allowedFile.name}): " + missing.joinToString { it.pattern },
+                )
+            }
+        }
     }
 }
 

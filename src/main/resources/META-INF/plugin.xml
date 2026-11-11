@@ -60,7 +60,10 @@
         <lang.quoteHandler language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoQuoteHandler"/>
         <lang.quoteHandler language="golsp.gomod" implementationClass="io.github.xefise.golsp.lang.GoModQuoteHandler"/>
         <lang.quoteHandler language="golsp.gowork" implementationClass="io.github.xefise.golsp.lang.GoWorkQuoteHandler"/>
+        <lineIndentProvider implementation="io.github.xefise.golsp.lang.GoLineIndentProvider"/>
         <fileIconProvider implementation="io.github.xefise.golsp.lang.GoTestFileIconProvider"/>
+        <internalFileTemplate name="Go File"/>
+        <internalFileTemplate name="Go Application"/>
 
         <!-- LSP4IJ binds these to TEXT/textmate only; a custom language has to register them itself. -->
         <lang.foldingBuilder language="golsp.go"
@@ -122,6 +125,12 @@
     <extensions defaultExtensionNs="com.intellij.xdebugger">
         <attachDebuggerProvider implementation="io.github.xefise.golsp.debug.GoAttachDebuggerProvider"/>
     </extensions>
+
+    <actions>
+        <action id="golsp.NewGoFile" class="io.github.xefise.golsp.lang.GoCreateFileAction">
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
+        </action>
+    </actions>
 
     <applicationListeners>
         <listener class="io.github.xefise.golsp.toolchain.GoToolchainTrustListener"

@@ -25,13 +25,14 @@ import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValue
 import io.github.xefise.golsp.run.GoApplicationConfiguration
 import io.github.xefise.golsp.run.GoApplicationConfigurationType
+import io.github.xefise.golsp.run.GoRunKind
 import io.github.xefise.golsp.run.integration.XDebuggerProbes.Value
 import io.github.xefise.golsp.toolchain.integration.GoIntegrationTestCase
 import io.github.xefise.golsp.toolchain.model.GoTool
 import java.io.File
 import java.util.concurrent.CompletableFuture
 
-/** One debug session per test is expensive (build + dlv), so the scenario walks the whole G40 checklist in order. */
+/** One debug session per test is expensive (build + dlv), so the main scenario walks the whole G40 checklist in order. */
 class GoApplicationDebugIntegrationTest : GoIntegrationTestCase() {
     override val requiredTools: List<GoTool> = listOf(GoTool.GO, GoTool.DLV)
 
@@ -106,12 +107,32 @@ class GoApplicationDebugIntegrationTest : GoIntegrationTestCase() {
         waitUntil("dlv and the debuggee to exit", DEBUG_TIMEOUT_SECONDS) { goDescendants().isEmpty() }
     }
 
-    private fun addLineBreakpoint(line: Int, condition: String): XLineBreakpoint<*> {
+    fun testFileOutsideAnyModuleStopsAtBreakpoint() {
+        main = fixture.addFileToProject("loose/hello.go", "package main\n\nfunc main() {\n\tx := 1\n\tprintln(x)\n}\n").virtualFile
+        addLineBreakpoint(4, condition = null)
+
+        val session = startDebug {
+            runKind = GoRunKind.FILE
+            filePath = main.path
+        }
+        withConsoleOnFailure {
+            waitUntil("breakpoint in the loose file", DEBUG_TIMEOUT_SECONDS) { session.isSuspended && session.currentPosition != null }
+            waitUntil("stop position to resolve to a local file") { session.currentPosition?.file?.isInLocalFileSystem == true }
+        }
+        assertEquals(main, session.currentPosition!!.file)
+        assertEquals(4, session.currentPosition!!.line)
+        session.stop()
+        waitUntil("session to stop", DEBUG_TIMEOUT_SECONDS) { session.isStopped }
+    }
+
+    private fun addLineBreakpoint(line: Int, condition: String?): XLineBreakpoint<*> {
         val util = XDebuggerUtil.getInstance()
         val type = util.lineBreakpointTypes.firstOrNull { it.canPutAt(main, line, project) }
         assertNotNull("no line breakpoint type accepts main.go:$line", type)
         return WriteAction.computeAndWait<XLineBreakpoint<*>, Throwable> {
-            add(type!!, line).apply { conditionExpression = util.createExpression(condition, null, null, EvaluationMode.EXPRESSION) }
+            add(type!!, line).apply {
+                if (condition != null) conditionExpression = util.createExpression(condition, null, null, EvaluationMode.EXPRESSION)
+            }
         }
     }
 
@@ -128,7 +149,7 @@ class GoApplicationDebugIntegrationTest : GoIntegrationTestCase() {
         }
     }
 
-    private fun startDebug(): XDebugSession {
+    private fun startDebug(configure: GoApplicationConfiguration.() -> Unit = { packageDirectory = main.parent.path }): XDebugSession {
         project.messageBus.connect(testRootDisposable).subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
             override fun processStarting(executorId: String, env: ExecutionEnvironment, handler: ProcessHandler) {
                 handler.addProcessListener(object : ProcessListener {
@@ -140,7 +161,7 @@ class GoApplicationDebugIntegrationTest : GoIntegrationTestCase() {
         })
         val typeInstance = ConfigurationTypeUtil.findConfigurationType(GoApplicationConfigurationType::class.java)
         val settings = RunManager.getInstance(project).createConfiguration("debug-integration", typeInstance.configurationFactories.single())
-        (settings.configuration as GoApplicationConfiguration).packageDirectory = main.parent.path
+        (settings.configuration as GoApplicationConfiguration).configure()
         val env = ExecutionEnvironmentBuilder.create(DefaultDebugExecutor.getDebugExecutorInstance(), settings).build()
         env.runner.execute(env)
         waitUntil("debug session to start", DEBUG_TIMEOUT_SECONDS) { XDebuggerManager.getInstance(project).debugSessions.isNotEmpty() }

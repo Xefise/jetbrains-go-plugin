@@ -32,6 +32,11 @@ class GoEditorLspBindingTest : BasePlatformTestCase() {
         assertTrue(LanguageTypeHierarchy.INSTANCE.allForLanguage(GoLanguage).any { it is LSPTypeHierarchyProvider })
     }
 
+    fun testGoplsSelectionRangesAreOffForLsp4ijSelectioners() {
+        val file = myFixture.configureByText("a.go", "package p\n")
+        assertFalse(GoplsLanguageServerFactory().createClientFeatures().selectionRangeFeature.isEnabled(file))
+    }
+
     fun testGoModGetsNoGoOnlyBindings() {
         assertFalse(LanguageParameterInfo.INSTANCE.allForLanguage(GoModLanguage).any { it is LSPParameterInfoHandler })
         assertEmpty(LanguageImportStatements.INSTANCE.allForLanguage(GoModLanguage).filterIsInstance<GoImportOptimizer>())

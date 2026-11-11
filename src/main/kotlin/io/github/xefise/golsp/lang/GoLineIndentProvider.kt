@@ -28,19 +28,10 @@ class GoLineIndentProvider : LineIndentProvider, DumbAware {
         return GoLineIndent.compute(
             document.immutableCharSequence,
             offset,
-            Sequence { backward(highlighter, offset) },
+            Sequence { goTokensBackward(highlighter, offset) },
             Sequence { forward(highlighter, offset, document.textLength) },
             style,
         )
-    }
-
-    private fun backward(highlighter: EditorHighlighter, offset: Int): Iterator<GoIndentToken> = iterator {
-        if (offset == 0) return@iterator
-        val iter = highlighter.createIterator(offset - 1)
-        while (!iter.atEnd()) {
-            if (iter.start < offset) yield(GoIndentToken(goIndentKind(iter.tokenType), iter.start, iter.end))
-            iter.retreat()
-        }
     }
 
     private fun forward(highlighter: EditorHighlighter, offset: Int, length: Int): Iterator<GoIndentToken> = iterator {
@@ -50,6 +41,16 @@ class GoLineIndentProvider : LineIndentProvider, DumbAware {
             if (iter.end > offset) yield(GoIndentToken(goIndentKind(iter.tokenType), iter.start, iter.end))
             iter.advance()
         }
+    }
+}
+
+/** Highlighter tokens starting before [offset], nearest first. */
+internal fun goTokensBackward(highlighter: EditorHighlighter, offset: Int): Iterator<GoIndentToken> = iterator {
+    if (offset == 0) return@iterator
+    val iter = highlighter.createIterator(offset - 1)
+    while (!iter.atEnd()) {
+        if (iter.start < offset) yield(GoIndentToken(goIndentKind(iter.tokenType), iter.start, iter.end))
+        iter.retreat()
     }
 }
 

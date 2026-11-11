@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Modified from vscode-go extension/snippets/go.json (commit 1608cb5, MIT, Copyright (c) 2015-2020 Microsoft
+  Corporation, (c) 2020-present The Go Authors) and go-lang-idea-plugin resources/liveTemplates/go.xml
+  (commit e73dab4, Apache-2.0, Copyright 2013-2016 Sergey Ignatov, Alexander Zolotov, Florin Patan).
+-->
+<templateSet group="Go">
+  <template name="main" value="func main() {&#10;&#9;$END$&#10;}" description="func main()" toReformat="false" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_TOP_LEVEL" value="true"/></context>
+  </template>
+  <template name="init" value="func init() {&#10;&#9;$END$&#10;}" description="func init()" toReformat="false" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_TOP_LEVEL" value="true"/></context>
+  </template>
+  <template name="func" value="func $NAME$($PARAMS$) $RESULT$ {&#10;&#9;$END$&#10;}" description="Function" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RESULT" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_TOP_LEVEL" value="true"/></context>
+  </template>
+  <template name="meth" value="func ($RECEIVER$ $TYPE$) $NAME$($PARAMS$) $RESULT$ {&#10;&#9;$END$&#10;}" description="Method" toReformat="false" toShortenFQNames="false">
+    <variable name="TYPE" expression="" defaultValue="&quot;T&quot;" alwaysStopAt="true"/>
+    <variable name="RECEIVER" expression="decapitalize(regularExpression(TYPE, &quot;^[*]?([A-Za-z_]).*$&quot;, &quot;$1&quot;))" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RESULT" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_TOP_LEVEL" value="true"/></context>
+  </template>
+  <template name="test" value="func Test$NAME$(t *testing.T) {&#10;&#9;$END$&#10;}" description="Test function" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;Name&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_TOP_LEVEL" value="true"/></context>
+  </template>
+  <template name="bench" value="func Benchmark$NAME$(b *testing.B) {&#10;&#9;for b.Loop() {&#10;&#9;&#9;$END$&#10;&#9;}&#10;}" description="Benchmark function" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;Name&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_TOP_LEVEL" value="true"/></context>
+  </template>
+
+  <template name="var" value="var $NAME$ $TYPE$" description="Variable declaration" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <variable name="TYPE" expression="" defaultValue="&quot;type&quot;" alwaysStopAt="true"/>
+    <context>
+      <option name="GOLSP_GO_TOP_LEVEL" value="true"/>
+      <option name="GOLSP_GO_STATEMENT" value="true"/>
+    </context>
+  </template>
+  <template name="const" value="const $NAME$ = $VALUE$" description="Constant declaration" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <variable name="VALUE" expression="" defaultValue="&quot;value&quot;" alwaysStopAt="true"/>
+    <context>
+      <option name="GOLSP_GO_TOP_LEVEL" value="true"/>
+      <option name="GOLSP_GO_STATEMENT" value="true"/>
+    </context>
+  </template>
+  <template name="type" value="type $NAME$ $TYPE$" description="Type declaration" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <variable name="TYPE" expression="" defaultValue="&quot;type&quot;" alwaysStopAt="true"/>
+    <context>
+      <option name="GOLSP_GO_TOP_LEVEL" value="true"/>
+      <option name="GOLSP_GO_STATEMENT" value="true"/>
+    </context>
+  </template>
+  <template name="st" value="type $NAME$ struct {&#10;&#9;$END$&#10;}" description="Struct type" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <context>
+      <option name="GOLSP_GO_TOP_LEVEL" value="true"/>
+      <option name="GOLSP_GO_STATEMENT" value="true"/>
+    </context>
+  </template>
+  <template name="in" value="type $NAME$ interface {&#10;&#9;$END$&#10;}" description="Interface type" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <context>
+      <option name="GOLSP_GO_TOP_LEVEL" value="true"/>
+      <option name="GOLSP_GO_STATEMENT" value="true"/>
+    </context>
+  </template>
+
+  <template name="err" value="if err != nil {&#10;&#9;return $END$&#10;}" description="if err != nil { return }" toReformat="false" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="if" value="if $COND$ {&#10;&#9;$SELECTION$$END$&#10;}" description="if" toReformat="true" toShortenFQNames="false">
+    <variable name="COND" expression="" defaultValue="&quot;condition&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="ife" value="if $COND$ {&#10;&#9;$SELECTION$$END$&#10;} else {&#10;}" description="if / else" toReformat="true" toShortenFQNames="false">
+    <variable name="COND" expression="" defaultValue="&quot;condition&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="ifn" value="if $VAR$ == nil {&#10;&#9;$END$&#10;}" description="if x == nil" toReformat="false" toShortenFQNames="false">
+    <variable name="VAR" expression="" defaultValue="&quot;x&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="for" value="for $COND$ {&#10;&#9;$SELECTION$$END$&#10;}" description="for" toReformat="true" toShortenFQNames="false">
+    <variable name="COND" expression="" defaultValue="&quot;condition&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="fori" value="for $I$ := 0; $I$ &lt; $N$; $I$++ {&#10;&#9;$SELECTION$$END$&#10;}" description="for i := 0; i &lt; n; i++" toReformat="true" toShortenFQNames="false">
+    <variable name="I" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true"/>
+    <variable name="N" expression="" defaultValue="&quot;n&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="forr" value="for $KEY$, $VALUE$ := range $COLLECTION$ {&#10;&#9;$SELECTION$$END$&#10;}" description="for range" toReformat="true" toShortenFQNames="false">
+    <variable name="COLLECTION" expression="" defaultValue="&quot;collection&quot;" alwaysStopAt="true"/>
+    <variable name="KEY" expression="" defaultValue="&quot;_&quot;" alwaysStopAt="true"/>
+    <variable name="VALUE" expression="" defaultValue="&quot;v&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="sw" value="switch $EXPR$ {&#10;case $VALUE$:&#10;&#9;$END$&#10;}" description="switch" toReformat="false" toShortenFQNames="false">
+    <variable name="EXPR" expression="" defaultValue="&quot;x&quot;" alwaysStopAt="true"/>
+    <variable name="VALUE" expression="" defaultValue="&quot;value&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="sel" value="select {&#10;case $CASE$:&#10;&#9;$END$&#10;}" description="select" toReformat="false" toShortenFQNames="false">
+    <variable name="CASE" expression="" defaultValue="&quot;v := &lt;-ch&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="ap" value="$SLICE$ = append($SLICE$, $END$)" description="x = append(x, ...)" toReformat="false" toShortenFQNames="false">
+    <variable name="SLICE" expression="" defaultValue="&quot;s&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="fp" value="fmt.Println($END$)" description="fmt.Println()" toReformat="false" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="ff" value="fmt.Printf(&quot;$FORMAT$\n&quot;, $END$)" description="fmt.Printf()" toReformat="false" toShortenFQNames="false">
+    <variable name="FORMAT" expression="" defaultValue="&quot;%v&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="lf" value="log.Printf(&quot;$FORMAT$&quot;, $END$)" description="log.Printf()" toReformat="false" toShortenFQNames="false">
+    <variable name="FORMAT" expression="" defaultValue="&quot;%v&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="tr" value="t.Run(&quot;$NAME$&quot;, func(t *testing.T) {&#10;&#9;$END$&#10;})" description="t.Run subtest" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="go" value="go func() {&#10;&#9;$SELECTION$$END$&#10;}()" description="go func() { }()" toReformat="true" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="def" value="defer func() {&#10;&#9;$SELECTION$$END$&#10;}()" description="defer func() { }()" toReformat="true" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="closure" value="func() {&#10;&#9;$SELECTION$$END$&#10;}()" description="func() { }()" toReformat="true" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+  <template name="block" value="{&#10;&#9;$SELECTION$$END$&#10;}" description="{ }" toReformat="true" toShortenFQNames="false">
+    <context><option name="GOLSP_GO_STATEMENT" value="true"/></context>
+  </template>
+</templateSet>

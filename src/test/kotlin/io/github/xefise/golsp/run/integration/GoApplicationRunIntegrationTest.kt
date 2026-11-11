@@ -3,6 +3,9 @@ package io.github.xefise.golsp.run.integration
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.ExecutionListener
 import com.intellij.execution.ExecutionManager
+import com.intellij.execution.Location
+import com.intellij.execution.PsiLocation
+import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ConfigurationTypeUtil
@@ -14,9 +17,11 @@ import com.intellij.execution.process.ProcessOutputType
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.ide.trustedProjects.TrustedProjects
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.util.Key
 import io.github.xefise.golsp.run.GoApplicationConfiguration
 import io.github.xefise.golsp.run.GoApplicationConfigurationType
+import io.github.xefise.golsp.run.GoApplicationRunConfigurationProducer
 import io.github.xefise.golsp.run.GoRunKind
 import io.github.xefise.golsp.toolchain.integration.GoIntegrationTestCase
 import java.io.File
@@ -96,6 +101,18 @@ class GoApplicationRunIntegrationTest : GoIntegrationTestCase() {
             filePath = absolutePath("files/b.go")
         })
         assertEquals("b\n", run.stderr)
+        assertEquals(0, run.exitCode)
+    }
+
+    fun testMainOutsideAnyModuleRunsAsTheFileTheProducerPicked() {
+        val file = fixture.addFileToProject("loose/hello.go", "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"no module\")\n}\n")
+        val settings = ReadAction.compute<RunnerAndConfigurationSettings?, Throwable> {
+            val context = ConfigurationContext.createEmptyContextForLocation(PsiLocation(file) as Location<*>)
+            GoApplicationRunConfigurationProducer().createConfigurationFromContext(context)?.configurationSettings
+        }!!
+        assertEquals(GoRunKind.FILE, (settings.configuration as GoApplicationConfiguration).runKind)
+        val run = execute(settings)
+        assertEquals(run.stderr, "no module\n", run.stdout)
         assertEquals(0, run.exitCode)
     }
 

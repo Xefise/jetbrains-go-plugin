@@ -4,6 +4,7 @@ import com.intellij.execution.Location
 import com.intellij.execution.PsiLocation
 import com.intellij.execution.RunManager
 import com.intellij.execution.actions.ConfigurationContext
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -12,6 +13,16 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
 class GoApplicationRunConfigurationProducerTest : BasePlatformTestCase() {
     private val producer = GoApplicationRunConfigurationProducer()
+    private lateinit var rootModule: PsiFile
+
+    override fun setUp() {
+        super.setUp()
+        rootModule = add("go.mod", "module example.com/app\n\ngo 1.27\n")
+    }
+
+    private fun withoutRootModule() {
+        WriteAction.runAndWait<Throwable> { rootModule.virtualFile.delete(this) }
+    }
 
     private fun context(element: PsiElement): ConfigurationContext =
         ConfigurationContext.createEmptyContextForLocation(PsiLocation(element) as Location<*>)
@@ -133,6 +144,56 @@ class GoApplicationRunConfigurationProducerTest : BasePlatformTestCase() {
     fun testBlankPackageDirectoryIsNotReused() {
         val file = add("main.go", "package main\n\nfunc main() {}\n")
         assertFalse(producer.isConfigurationFromContext(configWith { packageDirectory = "" }, context(mainLeaf(file))))
+    }
+
+    fun testMainOutsideAnyModuleProducesFileConfiguration() {
+        withoutRootModule()
+        val file = add("scratch/hello.go", "package main\n\nfunc main() {}\n")
+        val config = produced(mainLeaf(file))!!
+        assertEquals(GoRunKind.FILE, config.runKind)
+        assertEquals(file.virtualFile.path, config.filePath)
+        assertEquals("hello.go", config.name)
+        assertTrue(producer.isConfigurationFromContext(config, context(file)))
+    }
+
+    fun testNestedGoModAboveProducesPackageConfiguration() {
+        withoutRootModule()
+        add("svc/go.mod", "module svc\n")
+        val file = add("svc/cmd/app/main.go", "package main\n\nfunc main() {}\n")
+        assertEquals(GoRunKind.PACKAGE, produced(mainLeaf(file))!!.runKind)
+    }
+
+    fun testGoWorkAloneAboveProducesPackageConfiguration() {
+        withoutRootModule()
+        add("ws/go.work", "go 1.27\n")
+        val file = add("ws/app/main.go", "package main\n\nfunc main() {}\n")
+        assertEquals(GoRunKind.PACKAGE, produced(mainLeaf(file))!!.runKind)
+    }
+
+    fun testSiblingModuleDoesNotCountForAnotherDirectory() {
+        withoutRootModule()
+        add("other/go.mod", "module other\n")
+        val file = add("loose/main.go", "package main\n\nfunc main() {}\n")
+        assertEquals(GoRunKind.FILE, produced(mainLeaf(file))!!.runKind)
+    }
+
+    fun testOutsideModuleSiblingWithoutMainProducesNothing() {
+        withoutRootModule()
+        add("scratch/main.go", "package main\n\nfunc main() {}\n")
+        assertNull(produced(add("scratch/util.go", "package main\n\nfunc util() {}\n")))
+    }
+
+    fun testOutsideModuleDirectoryProducesNothing() {
+        withoutRootModule()
+        val file = add("scratch/main.go", "package main\n\nfunc main() {}\n")
+        assertNull(produced(file.containingDirectory))
+    }
+
+    fun testOutsideModuleExistingPackageConfigurationIsNotReused() {
+        withoutRootModule()
+        val file = add("scratch/main.go", "package main\n\nfunc main() {}\n")
+        val stale = configWith { packageDirectory = dirPath(file) }
+        assertFalse(producer.isConfigurationFromContext(stale, context(mainLeaf(file))))
     }
 
     private fun withExcluded(dir: VirtualFile, block: () -> Unit) {

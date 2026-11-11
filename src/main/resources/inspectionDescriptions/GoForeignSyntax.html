@@ -1,0 +1,11 @@
+<html>
+<body>
+Reports declarations and calls written the C#, Java or JavaScript way, which Go does not accept:
+<ul>
+  <li>a type before the name: <code>[]float64 arr</code>, <code>int a := 0</code>, <code>func f(int n)</code>;</li>
+  <li>a spread before the argument: <code>f(...xs)</code>.</li>
+</ul>
+<p>Quick-fixes rewrite them as <code>arr []float64</code>, <code>a := 0</code> or <code>var a int = 0</code>, <code>f(xs...)</code>.</p>
+<p>Fields and parameters named <code>string</code> or <code>error</code> are valid Go and are not reported.</p>
+</body>
+</html>

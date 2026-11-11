@@ -61,9 +61,22 @@
         <lang.quoteHandler language="golsp.gomod" implementationClass="io.github.xefise.golsp.lang.GoModQuoteHandler"/>
         <lang.quoteHandler language="golsp.gowork" implementationClass="io.github.xefise.golsp.lang.GoWorkQuoteHandler"/>
         <lineIndentProvider implementation="io.github.xefise.golsp.lang.GoLineIndentProvider"/>
+        <extendWordSelectionHandler implementation="io.github.xefise.golsp.lang.GoWordSelectioner"/>
+        <typedHandler implementation="io.github.xefise.golsp.lang.GoTypedHandler"/>
+        <lang.smartEnterProcessor language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoSmartEnterProcessor"/>
+        <localInspection language="golsp.go" shortName="GoForeignSyntax" displayName="Syntax from another language"
+                         groupName="Go" enabledByDefault="true" level="WARNING"
+                         implementationClass="io.github.xefise.golsp.lang.GoForeignSyntaxInspection"/>
         <fileIconProvider implementation="io.github.xefise.golsp.lang.GoTestFileIconProvider"/>
         <internalFileTemplate name="Go File"/>
         <internalFileTemplate name="Go Application"/>
+        <liveTemplateContext contextId="GOLSP_GO" implementation="io.github.xefise.golsp.lang.GoAnyContextType"/>
+        <liveTemplateContext contextId="GOLSP_GO_TOP_LEVEL" baseContextId="GOLSP_GO"
+                             implementation="io.github.xefise.golsp.lang.GoTopLevelContextType"/>
+        <liveTemplateContext contextId="GOLSP_GO_STATEMENT" baseContextId="GOLSP_GO"
+                             implementation="io.github.xefise.golsp.lang.GoStatementContextType"/>
+        <defaultLiveTemplates file="/liveTemplates/Go.xml"/>
+        <liveTemplateOptionalProcessor implementation="io.github.xefise.golsp.lang.GoSelectionIndentProcessor"/>
 
         <!-- LSP4IJ binds these to TEXT/textmate only; a custom language has to register them itself. -->
         <lang.foldingBuilder language="golsp.go"
@@ -82,6 +95,17 @@
                                implementationClass="com.redhat.devtools.lsp4ij.features.typeHierarchy.LSPTypeHierarchyProvider"/>
         <lang.importOptimizer language="golsp.go"
                               implementationClass="io.github.xefise.golsp.lsp.GoImportOptimizer"/>
+        <lang.refactoringSupport language="golsp.go"
+                                 implementationClass="io.github.xefise.golsp.lsp.GoRefactoringSupportProvider"/>
+        <inlineActionHandler implementation="io.github.xefise.golsp.lsp.GoInlineActionHandler"/>
+        <intentionAction>
+            <language>golsp.go</language>
+            <className>io.github.xefise.golsp.lsp.GoRefactoringsIntention</className>
+            <category>Go</category>
+            <skipBeforeAfter>true</skipBeforeAfter>
+        </intentionAction>
+        <codeInsight.template.postfixTemplateProvider language="golsp.go"
+                                                      implementationClass="io.github.xefise.golsp.lang.GoPostfixTemplateProvider"/>
         <formatOnSaveOptions.defaultsProvider implementation="io.github.xefise.golsp.lsp.GoActionsOnSaveDefaults"/>
         <configurationType implementation="io.github.xefise.golsp.run.GoApplicationConfigurationType"/>
         <runConfigurationProducer implementation="io.github.xefise.golsp.run.GoApplicationRunConfigurationProducer"/>
@@ -100,6 +124,11 @@
                              displayName="Go"
                              nonDefaultProject="true"
                              instance="io.github.xefise.golsp.toolchain.GoToolchainConfigurable"/>
+        <projectConfigurable parentId="golsp.settings"
+                             id="golsp.settings.gopls"
+                             displayName="gopls"
+                             nonDefaultProject="true"
+                             instance="io.github.xefise.golsp.lsp.GoplsConfigurable"/>
         <editorNotificationProvider implementation="io.github.xefise.golsp.toolchain.GoToolBannerProvider"/>
         <coverageEngine implementation="io.github.xefise.golsp.coverage.GoCoverageEngine"/>
         <coverageRunner implementation="io.github.xefise.golsp.coverage.GoCoverageRunner"/>
@@ -129,6 +158,10 @@
     <actions>
         <action id="golsp.NewGoFile" class="io.github.xefise.golsp.lang.GoCreateFileAction">
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
+        </action>
+        <action id="golsp.GoRefactorings" class="io.github.xefise.golsp.lsp.GoRefactoringsAction"
+                text="Go Refactorings…" description="Choose one of the gopls refactorings available at the caret">
+            <add-to-group group-id="RefactoringMenu" anchor="last"/>
         </action>
     </actions>
 

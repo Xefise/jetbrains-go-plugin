@@ -51,6 +51,10 @@ This project contains code modified from the following sources. Each ported file
   into a platform-free model; duplicate blocks merged per profile mode; statement-less blocks skipped; a line
   takes the best count of its blocks instead of their sum; import paths resolved from go.mod/go.work text instead
   of the Go plugin's package index; absolute and `_/` file names accepted.
+- Also ported (same commit and licence): `resources/liveTemplates/go.xml` (template names `main`, `init`, `meth`,
+  `test`, `bench`, `for`, `forr`, `type`, `err` and their texts) → `src/main/resources/liveTemplates/Go.xml`. Changes:
+  own context types, variable defaults and receiver expression; `err` returns; `bench` uses `b.Loop()`; `for`/`forr`
+  wrap a selection; tag, `printf`, `map`, `:`, `imp`, `p`, `con`, `iota` templates dropped.
 
 ## vscode-go
 
@@ -73,6 +77,10 @@ This project contains code modified from the following sources. Each ported file
   `GoToolRegistry.kt`, `GoToolInstall.kt`, `GoVersion.kt`. Changes: ported to Kotlin as data-only descriptions
   (no process launch); dlv pins chosen by the project's Go from Delve's supported-version ranges, extended past
   go1.21; Go prereleases ordered before their release; GOPATH/GOBIN overrides and the minimum-Go refusal dropped.
+- Also ported (same commit and licence): `extension/snippets/go.json` (snippet texts of `func`, `var`, `const`,
+  `switch`, `sel`, `for`, `forr`, `if`, `ie`, `fp`, `ff`, `lf`, `go`, `meth`, `tf`, `bf`, `tys`, `tyi`) →
+  `src/main/resources/liveTemplates/Go.xml`. Changes: converted to IntelliJ live templates with own names (`sw`, `ife`,
+  `st`, `in`, `test`, `bench`), contexts and variables; `if`/`ife`/`for`/`fori`/`forr`/`go`/`def` wrap a selection.
 - Written from scratch, not derived from vscode-go: `toolchain/model/GoBinaryInfo.kt`, `ModuleVersion.kt`,
   `GoToolVersionCheck.kt`.
 

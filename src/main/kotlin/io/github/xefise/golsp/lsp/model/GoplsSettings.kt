@@ -9,16 +9,20 @@ object GoplsSettings {
     const val SECTION: String = "gopls"
 
     // gopls keys are flat names; vscode-go's "ui."/"build." prefixes are only its own grouping.
-    fun defaults(): JsonObject = JsonObject().apply {
+    fun defaults(usePlaceholders: Boolean): JsonObject = JsonObject().apply {
         addProperty("semanticTokens", true)
+        // Completed calls get tab stops for their arguments; gopls' own default is off.
+        addProperty("usePlaceholders", usePlaceholders)
         add("directoryFilters", JsonArray().apply { add("-**/node_modules") })
         // Tests run from our own gutter markers; gopls' test code lenses would duplicate them.
         add("codelenses", JsonObject().apply { addProperty("test", false) })
+        // didCreateFiles arrives while a template-created file is still empty on disk, so gopls' clause lands on top of ours.
+        addProperty("newGoFileHeader", false)
     }
 
     /** `{"gopls": defaults}` with [user] (the whole settings object) deep-merged on top; user values win. */
-    fun build(user: JsonObject?): JsonObject {
-        val result = JsonObject().apply { add(SECTION, defaults()) }
+    fun build(user: JsonObject?, usePlaceholders: Boolean): JsonObject {
+        val result = JsonObject().apply { add(SECTION, defaults(usePlaceholders)) }
         return if (user == null) result else deepMerge(result, user)
     }
 

@@ -3,17 +3,27 @@ package io.github.xefise.golsp.lang
 
 import com.intellij.codeInsight.editorActions.SimpleTokenSetQuoteHandler
 import com.intellij.lang.BracePair
+import com.intellij.lang.CodeDocumentationAwareCommenter
 import com.intellij.lang.Commenter
 import com.intellij.lang.PairedBraceMatcher
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
 
-class GoCommenter : Commenter {
+// Token types let Comment with Block Comment refuse a range that starts or ends inside an existing comment.
+class GoCommenter : CodeDocumentationAwareCommenter {
     override fun getLineCommentPrefix(): String = "//"
     override fun getBlockCommentPrefix(): String = "/*"
     override fun getBlockCommentSuffix(): String = "*/"
     override fun getCommentedBlockCommentPrefix(): String? = null
     override fun getCommentedBlockCommentSuffix(): String? = null
+    override fun getLineCommentTokenType(): IElementType = GoTokenTypes.LINE_COMMENT
+    override fun getBlockCommentTokenType(): IElementType = GoTokenTypes.BLOCK_COMMENT
+    override fun getDocumentationCommentTokenType(): IElementType? = null
+    override fun getDocumentationCommentPrefix(): String? = null
+    override fun getDocumentationCommentLinePrefix(): String? = null
+    override fun getDocumentationCommentSuffix(): String? = null
+    override fun isDocumentationComment(element: PsiComment?): Boolean = false
 }
 
 // go.mod and go.work have line comments only.

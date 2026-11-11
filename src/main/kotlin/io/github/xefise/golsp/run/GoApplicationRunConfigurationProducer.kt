@@ -12,7 +12,7 @@ import com.intellij.psi.PsiElement
 import io.github.xefise.golsp.lang.GoFile
 import java.nio.file.Path
 
-// Produces package-kind configurations only; file-kind is picked by the user in the editor.
+// Package kind inside a module; a single-file `go build main.go` outside one, where `go build .` fails.
 class GoApplicationRunConfigurationProducer : LazyRunConfigurationProducer<GoApplicationConfiguration>(), DumbAware {
     override fun getConfigurationFactory(): ConfigurationFactory =
         runConfigurationType<GoApplicationConfigurationType>().configurationFactories.single()
@@ -23,26 +23,34 @@ class GoApplicationRunConfigurationProducer : LazyRunConfigurationProducer<GoApp
         sourceElement: Ref<PsiElement>,
     ): Boolean {
         val target = target(context) ?: return false
-        configuration.runKind = GoRunKind.PACKAGE
-        // Absolute path: workspace serialization collapses it to $PROJECT_DIR$ and resolve() expands it back.
-        configuration.packageDirectory = target.directory.path
-        configuration.name = target.directory.name
+        // Absolute paths: workspace serialization collapses them to $PROJECT_DIR$ and resolve() expands them back.
+        if (target.inModule || target.file == null) {
+            configuration.runKind = GoRunKind.PACKAGE
+            configuration.packageDirectory = target.directory.path
+            configuration.name = target.directory.name
+        } else {
+            configuration.runKind = GoRunKind.FILE
+            configuration.filePath = target.file.path
+            configuration.name = target.file.name
+        }
         return true
     }
 
     override fun isConfigurationFromContext(configuration: GoApplicationConfiguration, context: ConfigurationContext): Boolean {
         val target = target(context) ?: return false
         return when (configuration.runKind) {
-            GoRunKind.PACKAGE -> sameFile(configuration, configuration.packageDirectory, target.directory)
+            GoRunKind.PACKAGE -> target.inModule && sameFile(configuration, configuration.packageDirectory, target.directory)
             GoRunKind.FILE -> target.file != null && sameFile(configuration, configuration.filePath, target.file)
         }
     }
 
-    private class Target(val directory: VirtualFile, val file: VirtualFile?)
+    private class Target(val directory: VirtualFile, val file: VirtualFile?, val inModule: Boolean)
 
     private fun target(context: ConfigurationContext): Target? = when (val location = context.psiLocation) {
         null -> null
-        is PsiDirectory -> location.takeIf(GoMainPackage::isMainPackageDirectory)?.let { Target(it.virtualFile, null) }
+        // `go build .` needs a module, so a directory outside one gets no configuration.
+        is PsiDirectory -> location.takeIf { GoMainPackage.isMainPackageDirectory(it) && GoMainPackage.isInModule(it.virtualFile) }
+            ?.let { Target(it.virtualFile, null, inModule = true) }
         else -> fileTarget(location)
     }
 
@@ -51,8 +59,10 @@ class GoApplicationRunConfigurationProducer : LazyRunConfigurationProducer<GoApp
         if (!GoMainPackage.isMainPackageFile(file) || !GoMainPackage.isInContent(file)) return null
         val virtualFile = file.virtualFile ?: return null
         val directory = file.containingDirectory ?: return null
-        if (!GoMainPackage.hasEntryPoint(file) && !GoMainPackage.isMainPackageDirectory(directory)) return null
-        return Target(directory.virtualFile, virtualFile)
+        val inModule = GoMainPackage.isInModule(directory.virtualFile)
+        // Outside a module only the file itself is built, so it must hold `func main()`; its siblings are not compiled.
+        val runnable = GoMainPackage.hasEntryPoint(file) || inModule && GoMainPackage.isMainPackageDirectory(directory)
+        return if (runnable) Target(directory.virtualFile, virtualFile, inModule) else null
     }
 
     private fun sameFile(configuration: GoApplicationConfiguration, path: String, file: VirtualFile): Boolean =

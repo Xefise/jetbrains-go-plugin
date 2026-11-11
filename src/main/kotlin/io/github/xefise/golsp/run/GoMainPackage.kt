@@ -2,6 +2,7 @@ package io.github.xefise.golsp.run
 
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
@@ -18,6 +19,7 @@ import io.github.xefise.golsp.lang.GoTokenTypes
 // Program entry detection on the flat PSI only: no indexes, no `go` processes.
 object GoMainPackage {
     private const val MAIN = "main"
+    private val MODULE_FILES = listOf("go.mod", "go.work")
 
     // `func main()`: not a method, no type parameters, empty parameter list.
     fun isEntryPoint(header: GoFunctionHeader): Boolean {
@@ -47,6 +49,10 @@ object GoMainPackage {
                 ProjectRootManager.getInstance(directory.project),
             )
         }
+
+    // GOPATH mode (GO111MODULE=off) and GOWORK overrides are ignored: only the files decide, as for most setups.
+    fun isInModule(directory: VirtualFile): Boolean =
+        generateSequence(directory) { it.parent }.any { dir -> MODULE_FILES.any { dir.findChild(it) != null } }
 
     private fun scan(directory: PsiDirectory): Boolean {
         val psiManager = PsiManager.getInstance(directory.project)

@@ -45,6 +45,10 @@ object GoLineIndent {
         }
     }
 
+    /** Indent of the line holding the innermost `{` still open at [offset]; null if there is none or brackets do not pair. */
+    fun enclosingBlockIndent(text: CharSequence, offset: Int, backward: Sequence<GoIndentToken>): String? =
+        findOpener(text, backward, offset, '}')?.let { lineIndent(text, it.start) }
+
     // Brackets must pair by kind: on a mismatch (half-typed code) the answer would be a guess.
     private fun findOpener(text: CharSequence, backward: Sequence<GoIndentToken>, before: Int, closer: Char): GoIndentToken? {
         val expected = ArrayDeque<Char>()

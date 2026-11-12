@@ -10,7 +10,7 @@ class GoplsSettingsTest {
     @Test
     fun `defaults are nested under the gopls section`() {
         assertEquals(
-            json("""{"gopls": {"semanticTokens": true, "usePlaceholders": true, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false}, "newGoFileHeader": false}}"""),
+            json("""{"gopls": {"semanticTokens": true, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false}, "newGoFileHeader": false}}"""),
             GoplsSettings.build(null, usePlaceholders = true),
         )
     }
@@ -19,7 +19,7 @@ class GoplsSettingsTest {
     fun `user values override defaults and nested objects merge`() {
         val user = json("""{"gopls": {"semanticTokens": false, "codelenses": {"tidy": false}, "staticcheck": true}}""")
         assertEquals(
-            json("""{"gopls": {"semanticTokens": false, "usePlaceholders": true, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false, "tidy": false}, "newGoFileHeader": false, "staticcheck": true}}"""),
+            json("""{"gopls": {"semanticTokens": false, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false, "tidy": false}, "newGoFileHeader": false, "staticcheck": true}}"""),
             GoplsSettings.build(user, usePlaceholders = true),
         )
     }

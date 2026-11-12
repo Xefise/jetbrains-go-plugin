@@ -28,7 +28,7 @@ import org.eclipse.lsp4j.DidChangeConfigurationParams
 )
 class GoplsOptions : SimplePersistentStateComponent<GoplsOptions.Options>(Options()) {
     class Options : BaseState() {
-        var usePlaceholders by property(true)
+        var usePlaceholders by property(false)
     }
 
     val usePlaceholders: Boolean get() = state.usePlaceholders
@@ -61,7 +61,7 @@ class GoplsConfigurable : BoundSearchableConfigurable("gopls", ID, ID) {
         row {
             checkBox("Insert argument placeholders when completing functions")
                 .bindSelected({ GoplsOptions.getInstance().usePlaceholders }) { GoplsOptions.getInstance().update(it) }
-                .comment("Tab moves between the arguments. A <code>usePlaceholders</code> value in the gopls JSON configuration wins.")
+                .comment("Argument names are selected for overtyping; Tab or Enter moves to the next one. A <code>usePlaceholders</code> value in the gopls JSON configuration wins.")
         }
     }
 

@@ -13,6 +13,11 @@ object GoplsSettings {
         addProperty("semanticTokens", true)
         // Completed calls get tab stops for their arguments; gopls' own default is off.
         addProperty("usePlaceholders", usePlaceholders)
+        // Rider-style type hints after `x :=` and range variables; gopls ships every hint off.
+        add("hints", JsonObject().apply {
+            addProperty("assignVariableTypes", true)
+            addProperty("rangeVariableTypes", true)
+        })
         add("directoryFilters", JsonArray().apply { add("-**/node_modules") })
         // Tests run from our own gutter markers; gopls' test code lenses would duplicate them.
         add("codelenses", JsonObject().apply { addProperty("test", false) })

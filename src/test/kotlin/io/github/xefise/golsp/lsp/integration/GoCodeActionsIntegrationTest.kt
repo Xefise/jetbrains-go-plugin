@@ -106,13 +106,13 @@ class GoCodeActionsIntegrationTest : GoIntegrationTestCase() {
 
     fun testCompletedPrintfGetsArgumentPlaceholdersWhenOptionOn() {
         GoplsOptions.getInstance().update(true)
-        assertEquals("\tfmt.Printf(format string, a ...any)", completePrintf("on"))
+        assertEquals("\tfmt.Printf(format, a)", completePrintf("on"))
     }
 
     fun testPlaceholdersOptionOffReachesRunningGopls() {
         GoplsOptions.getInstance().update(true)
         // gopls is already running with placeholders on; the change must arrive without a restart.
-        assertEquals("\tfmt.Printf(format string, a ...any)", completePrintf("before"))
+        assertEquals("\tfmt.Printf(format, a)", completePrintf("before"))
         TemplateManager.getInstance(project).getActiveTemplate(fixture.editor)?.let {
             TemplateManagerImpl.getTemplateState(fixture.editor)?.gotoEnd(false)
         }

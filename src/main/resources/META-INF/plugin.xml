@@ -63,6 +63,7 @@
         <lineIndentProvider implementation="io.github.xefise.golsp.lang.GoLineIndentProvider"/>
         <extendWordSelectionHandler implementation="io.github.xefise.golsp.lang.GoWordSelectioner"/>
         <typedHandler implementation="io.github.xefise.golsp.lang.GoTypedHandler"/>
+        <typedHandler implementation="io.github.xefise.golsp.lsp.GoParameterInfoTypedHandler"/>
         <lang.smartEnterProcessor language="golsp.go" implementationClass="io.github.xefise.golsp.lang.GoSmartEnterProcessor"/>
         <localInspection language="golsp.go" shortName="GoForeignSyntax" displayName="Syntax from another language"
                          groupName="Go" enabledByDefault="true" level="WARNING"
@@ -83,7 +84,7 @@
                              implementationClass="com.redhat.devtools.lsp4ij.features.foldingRange.LSPFoldingRangeBuilder"
                              order="first"/>
         <codeInsight.parameterInfo language="golsp.go"
-                                   implementationClass="com.redhat.devtools.lsp4ij.features.signatureHelp.LSPParameterInfoHandler"/>
+                                   implementationClass="io.github.xefise.golsp.lsp.GoParameterInfoHandler"/>
         <lang.psiStructureViewFactory language="golsp.go"
                                       implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
         <codeBlockProvider language="golsp.go"
@@ -185,5 +186,7 @@
                   topic="io.github.xefise.golsp.toolchain.GoToolchainSettingsListener"/>
         <listener class="io.github.xefise.golsp.lsp.GoplsToolInstallListener"
                   topic="io.github.xefise.golsp.toolchain.GoToolInstallListener"/>
+        <listener class="io.github.xefise.golsp.lsp.GoParameterInfoLookupListener"
+                  topic="com.intellij.codeInsight.lookup.LookupManagerListener"/>
     </projectListeners>
 </idea-plugin>

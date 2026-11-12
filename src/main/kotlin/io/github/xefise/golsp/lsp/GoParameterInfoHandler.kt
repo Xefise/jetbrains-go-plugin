@@ -1,6 +1,9 @@
 package io.github.xefise.golsp.lsp
 
+import com.intellij.lang.parameterInfo.CreateParameterInfoContext
 import com.intellij.lang.parameterInfo.ParameterInfoUIContext
+import com.intellij.lang.parameterInfo.UpdateParameterInfoContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -14,8 +17,38 @@ import io.github.xefise.golsp.lang.GoTokenTypes
 import io.github.xefise.golsp.lsp.model.GoParameterLabel
 import org.eclipse.lsp4j.SignatureInformation
 
-/** LSP4IJ's parameter info, but with the parameter types colored like Go code (Rider-style). */
+/** LSP4IJ's parameter info with the parameter types colored like Go code (Rider-style), plus struct fields inside `T{…}`. */
 class GoParameterInfoHandler : LSPParameterInfoHandler() {
+    override fun findElementForParameterInfo(context: CreateParameterInfoContext): LSPSignatureHelperPsiElement? =
+        GoStructLiteralInfo.create(context.editor, context.file, context.offset) ?: super.findElementForParameterInfo(context)
+
+    override fun showParameterInfo(element: LSPSignatureHelperPsiElement, context: CreateParameterInfoContext) {
+        if (element !is GoStructLiteralElement) return super.showParameterInfo(element, context)
+        context.itemsToShow = element.activeSignatureHelp.signatures.toTypedArray()
+        context.showHint(element, context.offset, this)
+    }
+
+    override fun updateParameterInfo(element: LSPSignatureHelperPsiElement, context: UpdateParameterInfoContext) {
+        val site = GoStructLiteralInfo.siteAt(context.editor, context.offset)
+        if (element is GoStructLiteralElement) {
+            if (site == null || site.lbrace != element.lbrace) return replaceHint(context)
+            element.activeSignatureHelp = GoStructLiteralInfo.signatureHelp(element.fields, site)
+            context.setCurrentParameter(element.activeSignatureHelp.activeParameter)
+            return
+        }
+        // gopls has no signature inside `f(T{…})` and would just close the hint; the struct hint takes over instead.
+        if (site != null) return replaceHint(context)
+        super.updateParameterInfo(element, context)
+    }
+
+    // The auto popup skips editors that already show a hint, so it is retried once this one is gone.
+    private fun replaceHint(context: UpdateParameterInfoContext) {
+        context.removeHint()
+        val editor = context.editor
+        val file = context.file
+        ApplicationManager.getApplication().invokeLater({ GoParameterInfoAutoPopup.maybeShow(context.project, editor, file) }, context.project.disposed)
+    }
+
     override fun updateUI(shownSignature: SignatureInformation, context: ParameterInfoUIContext) {
         val owner = context.parameterOwner as? LSPSignatureHelperPsiElement
         val help = owner?.activeSignatureHelp
@@ -24,8 +57,10 @@ class GoParameterInfoHandler : LSPParameterInfoHandler() {
         val parameters = signature.parameters
         if (context.isSingleParameterInfo || parameters.isNullOrEmpty()) return super.updateUI(shownSignature, context)
 
+        // LSP falls back to the first parameter; a struct literal may be at no field at all.
+        val fallback = if (owner is GoStructLiteralElement) -1 else 0
         val active = (signature.activeParameter ?: help?.activeParameter ?: context.currentParameterIndex)
-            .takeIf { it in parameters.indices } ?: 0
+            .takeIf { it in parameters.indices } ?: fallback
         val html = StringBuilder()
         parameters.forEachIndexed { index, parameter ->
             if (index > 0) html.append(", ")

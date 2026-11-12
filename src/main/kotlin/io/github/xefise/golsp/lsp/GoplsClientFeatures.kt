@@ -29,7 +29,7 @@ class GoplsClientFeatures : LSPClientFeatures() {
     }
 }
 
-/** gopls argument placeholders read `sku string`; only the name is left to overtype. */
+/** gopls argument placeholders read `sku string`, only the name is left to overtype; types in signatures get a name and `*`. */
 private class GoplsCompletionFeature : LSPCompletionFeature() {
     override fun createLookupElement(item: CompletionItem, context: LSPCompletionContext): LookupElement? {
         if (item.insertTextFormat == InsertTextFormat.Snippet) {
@@ -37,6 +37,7 @@ private class GoplsCompletionFeature : LSPCompletionFeature() {
             item.textEdit?.right?.let { it.newText = GoplsSnippets.argumentNamesOnly(it.newText) }
             item.insertText?.let { item.insertText = GoplsSnippets.argumentNamesOnly(it) }
         }
+        GoTypeSlotCompletion.rewrite(item, context)
         return super.createLookupElement(item, context)
     }
 }

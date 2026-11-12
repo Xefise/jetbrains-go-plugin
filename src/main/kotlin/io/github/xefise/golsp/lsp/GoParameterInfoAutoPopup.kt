@@ -19,7 +19,7 @@ import io.github.xefise.golsp.lang.goTokensBackward
 import io.github.xefise.golsp.lsp.model.GoCallArguments
 
 /**
- * Rider-style parameter info: opens while typing inside a call's parentheses and after a completed call.
+ * Rider-style parameter info: opens while typing inside a call's parentheses or a `T{…}` literal and after a completed call.
  * The platform only pops it on `(`/`,` and drops the request if the caret moves before the delay ends.
  */
 internal object GoParameterInfoAutoPopup {
@@ -29,7 +29,9 @@ internal object GoParameterInfoAutoPopup {
         if (ParameterInfoControllerBase.existsWithVisibleHintForEditor(editor, false)) return
         val highlighter = (editor as? EditorEx)?.highlighter ?: return
         val offset = editor.caretModel.offset
-        if (!GoCallArguments.isInside(goTokensBackward(highlighter, offset).asSequence(), editor.document.immutableCharSequence)) return
+        val text = editor.document.immutableCharSequence
+        val inCall = GoCallArguments.isInside(goTokensBackward(highlighter, offset).asSequence(), text)
+        if (!inCall && GoStructLiteralInfo.siteAt(editor, offset) == null) return
         AutoPopupController.getInstance(project).autoPopupParameterInfo(editor, null)
     }
 }

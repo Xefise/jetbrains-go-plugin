@@ -119,6 +119,72 @@ class GoParameterInfoIntegrationTest : GoIntegrationTestCase() {
         }
     }
 
+    private fun structSource(statement: String) = """
+        |package main
+        |
+        |import "net/http"
+        |
+        |type OrderLine struct {
+        |	SKU      string
+        |	Quantity int
+        |}
+        |
+        |type Warehouse struct{}
+        |
+        |func (warehouse *Warehouse) Reserve(sku string, quantity int) error { return nil }
+        |
+        |func main() {
+        |	w := &Warehouse{}
+        |	_ = w
+        |	_ = http.Server{}
+        |	$statement
+        |}
+        |""".trimMargin()
+
+    fun testShowParameterInfoInStructLiteralListsFields() {
+        open("struct", structSource("_ = OrderLine{}"), "OrderLine{")
+        waitUntil("struct fields hint") {
+            if (hints.currentHintText == null) fixture.performEditorAction(IdeActions.ACTION_EDITOR_SHOW_PARAMETER_INFO)
+            hints.currentHintText?.contains("Quantity") == true
+        }
+        assertTrue(hints.currentHintText!!, hints.currentHintText!!.contains("<b>SKU "))
+    }
+
+    fun testTypingKeyHighlightsItsField() {
+        open("key", structSource("_ = OrderLine{}"), "OrderLine{")
+        fixture.type("SKU: \"a\", Quantity: ")
+        waitUntil("hint on Quantity") {
+            AutoPopupController.getInstance(project).waitForDelayedActions(5, TimeUnit.SECONDS)
+            hints.currentHintText?.contains("<b>Quantity ") == true
+        }
+    }
+
+    fun testOtherPackageStructHidesUnexportedFields() {
+        open("foreign", structSource(""), "http.Server{")
+        // Re-invoking would cancel the pending hover, and a cold hover on the standard library is slow.
+        fixture.performEditorAction(IdeActions.ACTION_EDITOR_SHOW_PARAMETER_INFO)
+        waitUntil("http.Server fields hint") { hints.currentHintText?.contains("ReadTimeout") == true }
+        assertFalse(hints.currentHintText!!, hints.currentHintText!!.contains("inShutdown"))
+    }
+
+    fun testMovingIntoLiteralInsideCallSwitchesToFields() {
+        open("nested", structSource("_ = w.Reserve(\"a\", OrderLine{})"), "w.Reserve(")
+        waitUntil("call hint") {
+            if (hints.currentHintText == null) fixture.performEditorAction(IdeActions.ACTION_EDITOR_SHOW_PARAMETER_INFO)
+            hints.currentHintText?.contains("quantity") == true
+        }
+        val text = fixture.editor.document.text
+        fixture.editor.caretModel.moveToOffset(text.indexOf("OrderLine{})") + "OrderLine{".length)
+        waitUntil("struct fields hint") { hints.currentHintText?.contains("Quantity int") == true }
+    }
+
+    fun testTypingInIfBlockShowsNothing() {
+        open("block", structSource("if w != nil {\n\t}"), "if w != nil {")
+        fixture.type("x")
+        AutoPopupController.getInstance(project).waitForDelayedActions(5, TimeUnit.SECONDS)
+        assertNull(hints.currentHintText)
+    }
+
     private fun open(dir: String, text: String, caretAfter: String, path: String = "$dir/main.go") {
         fixture.addFileToProject("$dir/go.mod", "module $dir\n\ngo 1.27\n")
         fixture.configureFromExistingVirtualFile(fixture.addFileToProject(path, text).virtualFile)

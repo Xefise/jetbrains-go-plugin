@@ -105,6 +105,12 @@
             <category>Go</category>
             <skipBeforeAfter>true</skipBeforeAfter>
         </intentionAction>
+        <intentionAction>
+            <language>golsp.go</language>
+            <className>io.github.xefise.golsp.lsp.GoFillStructIntention</className>
+            <category>Go</category>
+            <skipBeforeAfter>true</skipBeforeAfter>
+        </intentionAction>
         <codeInsight.template.postfixTemplateProvider language="golsp.go"
                                                       implementationClass="io.github.xefise.golsp.lang.GoPostfixTemplateProvider"/>
         <formatOnSaveOptions.defaultsProvider implementation="io.github.xefise.golsp.lsp.GoActionsOnSaveDefaults"/>

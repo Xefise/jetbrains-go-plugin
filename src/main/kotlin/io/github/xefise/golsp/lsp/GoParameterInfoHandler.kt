@@ -12,10 +12,12 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.ColorUtil
 import com.redhat.devtools.lsp4ij.features.signatureHelp.LSPParameterInfoHandler
 import com.redhat.devtools.lsp4ij.features.signatureHelp.LSPSignatureHelperPsiElement
+import io.github.xefise.golsp.lang.GoColors
 import io.github.xefise.golsp.lang.GoLanguage
 import io.github.xefise.golsp.lang.GoTokenTypes
 import io.github.xefise.golsp.lsp.model.GoParameterLabel
 import org.eclipse.lsp4j.SignatureInformation
+import java.awt.Color
 
 /** LSP4IJ's parameter info with the parameter types colored like Go code (Rider-style), plus struct fields inside `T{…}`. */
 class GoParameterInfoHandler : LSPParameterInfoHandler() {
@@ -68,7 +70,10 @@ class GoParameterInfoHandler : LSPParameterInfoHandler() {
             val label = GoParameterLabel.parse(text)
             val current = index == active && context.isUIComponentEnabled
             if (current) html.append("<b>")
-            label.name?.let { html.append(StringUtil.escapeXmlEntities(it)).append(' ') }
+            label.name?.let {
+                if (owner is GoStructLiteralElement) colored(html, it, color(DefaultLanguageHighlighterColors.INSTANCE_FIELD)) else plain(html, it)
+                html.append(' ')
+            }
             appendType(html, label.type)
             if (current) html.append("</b>")
         }
@@ -77,28 +82,31 @@ class GoParameterInfoHandler : LSPParameterInfoHandler() {
 
     private fun appendType(html: StringBuilder, type: String) {
         val highlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(GoLanguage, null, null) ?: return plain(html, type)
-        val scheme = EditorColorsManager.getInstance().globalScheme
         val lexer = highlighter.highlightingLexer
         lexer.start(type)
         while (true) {
             val tokenType = lexer.tokenType ?: break
             val text = type.substring(lexer.tokenStart, lexer.tokenEnd)
             lexer.advance()
-            val key: TextAttributesKey? = when {
+            val color = when {
                 // `testing.T`: the qualifier is a package, the rest of the names are types.
                 tokenType == GoTokenTypes.IDENTIFIER && lexer.tokenType == GoTokenTypes.DOT -> null
-                tokenType == GoTokenTypes.IDENTIFIER -> DefaultLanguageHighlighterColors.CLASS_REFERENCE
-                else -> highlighter.getTokenHighlights(tokenType).lastOrNull()
+                tokenType == GoTokenTypes.IDENTIFIER -> color(DefaultLanguageHighlighterColors.CLASS_REFERENCE)
+                // Most schemes leave predefined symbols uncolored; Rider shows `int`, `string` as keywords.
+                tokenType == GoTokenTypes.BUILTIN -> color(GoColors.BUILTIN) ?: color(GoColors.KEYWORD)
+                else -> highlighter.getTokenHighlights(tokenType).lastOrNull()?.let(::color)
             }
-            val color = key?.let { scheme.getAttributes(it)?.foregroundColor }
-            if (color == null) {
-                plain(html, text)
-            } else {
-                html.append("<span style=\"color:#").append(ColorUtil.toHex(color)).append("\">")
-                plain(html, text)
-                html.append("</span>")
-            }
+            colored(html, text, color)
         }
+    }
+
+    private fun color(key: TextAttributesKey): Color? = EditorColorsManager.getInstance().globalScheme.getAttributes(key)?.foregroundColor
+
+    private fun colored(html: StringBuilder, text: String, color: Color?) {
+        if (color == null) return plain(html, text)
+        html.append("<span style=\"color:#").append(ColorUtil.toHex(color)).append("\">")
+        plain(html, text)
+        html.append("</span>")
     }
 
     private fun plain(html: StringBuilder, text: String) {

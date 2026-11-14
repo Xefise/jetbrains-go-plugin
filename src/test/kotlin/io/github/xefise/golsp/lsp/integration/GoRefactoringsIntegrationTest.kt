@@ -9,6 +9,7 @@ import com.redhat.devtools.lsp4ij.LanguageServerManager
 import com.redhat.devtools.lsp4ij.ServerStatus
 import io.github.xefise.golsp.lsp.GoCodeAction
 import io.github.xefise.golsp.lsp.GoCodeActions
+import io.github.xefise.golsp.lsp.GoFillStructIntention
 import io.github.xefise.golsp.lsp.GoRefactoringsIntention
 import io.github.xefise.golsp.lsp.GoplsLanguageServerFactory
 import io.github.xefise.golsp.lsp.model.GoCodeActionCatalog
@@ -30,6 +31,28 @@ class GoRefactoringsIntegrationTest : GoIntegrationTestCase() {
             "package main\n\ntype Point struct {\n\tX, Y int\n}\n\nfunc main() {\n\tp := Point{\n\t\tX: 0,\n\t\tY: 0,\n\t}\n\t_ = p\n}\n",
             fixture.editor.document.text,
         )
+    }
+
+    fun testFillAllFieldsIntentionFillsOtherPackageStruct() {
+        fixture.addFileToProject("fillall/stock/order.go", "package stock\n\ntype Order struct {\n\tID    int\n\tLines []string\n\tnote  string\n}\n")
+        open("fillall/main.go", "package main\n\nimport \"fillall/stock\"\n\nfunc main() {\n\torder := stock.Order{}\n\t_ = order\n}\n")
+        fixture.editor.caretModel.moveToOffset(fixture.editor.document.text.indexOf("Order{}") + "Order{".length)
+        val intention = GoFillStructIntention()
+        assertTrue(intention.isAvailable(project, fixture.editor, fixture.file))
+        awaitKind("refactor.rewrite.fillStruct")
+
+        intention.invoke(project, fixture.editor, fixture.file)
+
+        waitUntil("fill struct applied") { "ID:" in fixture.editor.document.text }
+        val text = fixture.editor.document.text
+        assertTrue(text, text.contains("ID:    0,") && text.contains("Lines: []string{},"))
+        assertFalse(text, text.contains("note"))
+    }
+
+    fun testFillAllFieldsIntentionIsHiddenInBlocks() {
+        open("fillblock/main.go", "package main\n\nfunc main() {\n\tif true {\n\t}\n}\n")
+        fixture.editor.caretModel.moveToOffset(fixture.editor.document.text.indexOf("if true {") + "if true {".length)
+        assertFalse(GoFillStructIntention().isAvailable(project, fixture.editor, fixture.file))
     }
 
     fun testInvertIfFromThePopup() {

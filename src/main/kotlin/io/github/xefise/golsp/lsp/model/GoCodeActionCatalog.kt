@@ -19,6 +19,7 @@ object GoCodeActionCatalog {
     const val EXTRACT_TO_NEW_FILE: String = "refactor.extract.toNewFile"
     const val INLINE_CALL: String = "refactor.inline.call"
     const val INLINE_VARIABLE: String = "refactor.inline.variable"
+    const val FILL_STRUCT: String = "refactor.rewrite.fillStruct"
 
     val KINDS: List<GoCodeActionKind> = listOf(
         GoCodeActionKind(EXTRACT_FUNCTION, GoCodeActionGroup.EXTRACT, "Extract Function", needsSelection = true),
@@ -30,7 +31,7 @@ object GoCodeActionCatalog {
         GoCodeActionKind(EXTRACT_TO_NEW_FILE, GoCodeActionGroup.EXTRACT, "Move Declarations to New File", needsSelection = false),
         GoCodeActionKind(INLINE_CALL, GoCodeActionGroup.INLINE, "Inline Call", needsSelection = false),
         GoCodeActionKind(INLINE_VARIABLE, GoCodeActionGroup.INLINE, "Inline Variable", needsSelection = false),
-        rewrite("fillStruct", "Fill Struct"),
+        GoCodeActionKind(FILL_STRUCT, GoCodeActionGroup.REWRITE, "Fill Struct", needsSelection = false),
         rewrite("fillSwitch", "Fill Switch Cases"),
         rewrite("invertIf", "Invert If"),
         rewrite("changeQuote", "Change Quotes"),

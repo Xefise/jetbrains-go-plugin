@@ -147,7 +147,9 @@ class GoParameterInfoIntegrationTest : GoIntegrationTestCase() {
             if (hints.currentHintText == null) fixture.performEditorAction(IdeActions.ACTION_EDITOR_SHOW_PARAMETER_INFO)
             hints.currentHintText?.contains("Quantity") == true
         }
-        assertTrue(hints.currentHintText!!, hints.currentHintText!!.contains("<b>SKU "))
+        val hint = hints.currentHintText!!
+        assertTrue(hint, Regex("""<b><span style="color:#[0-9a-fA-F]{6}">SKU</span> """).containsMatchIn(hint))
+        assertTrue(hint, Regex("""<span style="color:#[0-9a-fA-F]{6}">int</span>""").containsMatchIn(hint))
     }
 
     fun testTypingKeyHighlightsItsField() {
@@ -155,7 +157,7 @@ class GoParameterInfoIntegrationTest : GoIntegrationTestCase() {
         fixture.type("SKU: \"a\", Quantity: ")
         waitUntil("hint on Quantity") {
             AutoPopupController.getInstance(project).waitForDelayedActions(5, TimeUnit.SECONDS)
-            hints.currentHintText?.contains("<b>Quantity ") == true
+            hints.currentHintText?.let { Regex("""<b><span[^>]*>Quantity</span> """).containsMatchIn(it) } == true
         }
     }
 
@@ -175,7 +177,29 @@ class GoParameterInfoIntegrationTest : GoIntegrationTestCase() {
         }
         val text = fixture.editor.document.text
         fixture.editor.caretModel.moveToOffset(text.indexOf("OrderLine{})") + "OrderLine{".length)
-        waitUntil("struct fields hint") { hints.currentHintText?.contains("Quantity int") == true }
+        waitUntil("struct fields hint") { hints.currentHintText?.contains("Quantity</span>") == true }
+    }
+
+    fun testTypingBraceAfterOtherPackageTypePopsUpFields() {
+        fixture.addFileToProject("brace/stock/order.go", "package stock\n\ntype Order struct {\n\tID    int\n\tLines []string\n}\n")
+        val text = "package main\n\nimport \"brace/stock\"\n\nfunc main() {\n\torder := stock.Order\n\t_ = order\n}\n"
+        open("brace", text, "stock.Order")
+        fixture.type("{")
+        waitUntil("struct fields hint after typing {") {
+            AutoPopupController.getInstance(project).waitForDelayedActions(5, TimeUnit.SECONDS)
+            hints.currentHintText?.contains("Lines") == true
+        }
+    }
+
+    fun testEmptyLiteralAfterMultilineCallListsFields() {
+        fixture.addFileToProject("after/stock/order.go", "package stock\n\ntype Order struct {\n\tID    int\n\tLines []string\n}\n\nfunc New(m map[string]int) int { return 0 }\n")
+        val text = "package main\n\nimport (\n\t\"log\"\n\t\"after/stock\"\n)\n\nfunc main() {\n\tw := stock.New(map[string]int{\n\t\t\"apple\": 5,\n\t})\n\n" +
+            "\torder := stock.Order{}\n\n\tlog.Println(w, order)\n}\n"
+        open("after", text, "stock.Order{")
+        waitUntil("struct fields hint") {
+            if (hints.currentHintText == null) fixture.performEditorAction(IdeActions.ACTION_EDITOR_SHOW_PARAMETER_INFO)
+            hints.currentHintText?.contains("Lines") == true
+        }
     }
 
     fun testTypingInIfBlockShowsNothing() {

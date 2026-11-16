@@ -214,4 +214,16 @@ class GoApplicationConfigurationTest : BasePlatformTestCase() {
             configuration(tempDir.path).apply { envFile = File(tempDir, "nope.env").path }.checkConfiguration()
         }
     }
+
+    // NUL is rejected by every OS path parser, like `C:\a<b` on Windows.
+    fun testPathTheOsRejectsIsAConfigurationError() {
+        val error = expectFailure(RuntimeConfigurationError::class.java) { configuration("bad\u0000dir").checkConfiguration() }
+        assertEquals("Invalid path: bad\u0000dir", error.localizedMessage)
+        expectFailure(RuntimeConfigurationError::class.java) {
+            configuration(tempDir.path).apply { workingDirectory = "bad\u0000dir" }.checkConfiguration()
+        }
+        expectFailure(RuntimeConfigurationError::class.java) {
+            configuration(tempDir.path).apply { envFile = "bad\u0000.env" }.checkConfiguration()
+        }
+    }
 }

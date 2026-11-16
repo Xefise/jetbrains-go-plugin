@@ -50,6 +50,41 @@ class GoCoverFileResolverTest {
         assertEquals("/abs/dir/a.go", resolver.resolve("_/abs/dir/a.go"))
     }
 
+    private fun existing(vararg files: String) = GoCoverFileResolver(emptyMap(), listOf("/work/m/", "/work/n")) { it in files }
+
+    @Test
+    fun `windows package named by its directory restores the drive colon`() {
+        assertEquals("C:/Users/me/x/a.go", existing("C:/Users/me/x/a.go").resolve("_/C_/Users/me/x/a.go"))
+    }
+
+    @Test
+    fun `unix directory that looks like a mangled drive is kept when it exists`() {
+        assertEquals("/C_/x/a.go", existing("/C_/x/a.go").resolve("_/C_/x/a.go"))
+    }
+
+    @Test
+    fun `package named by a mangled directory that does not exist is unresolved`() {
+        // `my project` was written as `my_project`; the name cannot be reversed.
+        assertNull(existing().resolve("_/Users/me/my_project/a.go"))
+    }
+
+    @Test
+    fun `package outside every module resolves under the first vendor that has the file`() {
+        assertEquals("/work/n/vendor/github.com/dep/pkg/a.go", existing("/work/n/vendor/github.com/dep/pkg/a.go").resolve("github.com/dep/pkg/a.go"))
+        assertEquals("/work/m/vendor/github.com/dep/pkg/a.go", existing("/work/m/vendor/github.com/dep/pkg/a.go").resolve("github.com/dep/pkg/a.go"))
+    }
+
+    @Test
+    fun `package missing from vendor is unresolved`() {
+        assertNull(existing().resolve("github.com/dep/pkg/a.go"))
+    }
+
+    @Test
+    fun `module package wins over a vendored copy`() {
+        val both = GoCoverFileResolver(mapOf("example.com/lib" to "/lib"), listOf("/work/m")) { true }
+        assertEquals("/lib/a.go", both.resolve("example.com/lib/a.go"))
+    }
+
     @Test
     fun `go work use directives in a block and on single lines`() {
         val text = """

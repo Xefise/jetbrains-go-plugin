@@ -16,6 +16,7 @@ import io.github.xefise.golsp.execution.GoConsoleFilter
 import io.github.xefise.golsp.execution.GoRunConfigurationBase
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
 import io.github.xefise.golsp.execution.model.GoRunTarget
+import kotlin.reflect.KMutableProperty0
 
 class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory, name: String) :
     GoRunConfigurationBase<GoApplicationOptions>(project, factory, name), DumbAware {
@@ -72,6 +73,13 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = GoApplicationSettingsEditor(project)
 
+    override fun pathOptions(): List<KMutableProperty0<String>> =
+        listOf(this::packageDirectory, this::filePath, this::workingDirectory, this::envFile)
+
+    /** The package directory's or the file's name. */
+    override fun suggestedName(): String? =
+        storedPath(if (runKind == GoRunKind.PACKAGE) packageDirectory else filePath)?.fileName?.toString()
+
     override fun checkConfiguration() {
         when (runKind) {
             GoRunKind.PACKAGE -> {
@@ -99,7 +107,7 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
         super.getState(executor, environment).also { state ->
             if (state is CommandLineState) {
                 val target = target()
-                state.addConsoleFilters(GoConsoleFilter(project, workingDirectory(target), target.directory))
+                state.addConsoleFilters(GoConsoleFilter(project, resolvedWorkingDirectory(target), target.directory))
             }
         }
 
@@ -110,12 +118,12 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
             target = target,
             programArguments = ParametersListUtil.parse(programArguments),
             environment = userEnvironment(envs, envFile),
-            workingDirectory = workingDirectory(target),
+            workingDirectory = resolvedWorkingDirectory(target),
             buildFlags = ParametersListUtil.parse(buildFlags),
         )
     }
 
-    private fun workingDirectory(target: GoRunTarget): String =
+    private fun resolvedWorkingDirectory(target: GoRunTarget): String =
         if (workingDirectory.isBlank()) target.directory else resolve(workingDirectory).toString()
 
     private fun target(): GoRunTarget = when (runKind) {

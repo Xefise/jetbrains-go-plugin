@@ -78,4 +78,34 @@ class GoTestNodeEventMapperTest {
         )
         assertEquals(listOf(Output(null, "# build output\n", error = true)), events)
     }
+
+    @Test
+    fun `test failure keeps details and comparison and skip keeps its reason`() {
+        val mapper = GoTestNodeEventMapper()
+        mapper.map(listOf(GoTestTreeOp.PackageStarted(1, pkg), GoTestTreeOp.TestStarted(2, 1, "TestA", pkg, "TestA")))
+        assertEquals(
+            listOf(Failed("2", "Not equal", 3, "  a_test.go:5: ...", "1", "2")),
+            mapper.map(listOf(GoTestTreeOp.Failed(2, "Not equal", 3, "  a_test.go:5: ...", "1", "2"))),
+        )
+        mapper.map(listOf(GoTestTreeOp.TestStarted(3, 1, "TestB", pkg, "TestB")))
+        assertEquals(listOf(GoTestNodeEvent.Ignored("3", "no db")), mapper.map(listOf(GoTestTreeOp.Skipped(3, "no db"))))
+    }
+
+    @Test
+    fun `package failure node gets the package details`() {
+        val events = GoTestNodeEventMapper().map(listOf(GoTestTreeOp.PackageStarted(1, pkg), GoTestTreeOp.Failed(1, "", 0, "leak")))
+        assertEquals(Failed("1:package", PACKAGE_FAILURE_MESSAGE, null, "leak"), events[2])
+    }
+
+    @Test
+    fun `run failure is one failed top-level node with the first stderr line as message`() {
+        assertEquals(
+            listOf(
+                TestStarted("go-test-failed", null, GoTestNodeEventMapper.RUN_FAILURE, null),
+                Failed("go-test-failed", "go: bad flag", null, "go: bad flag\nusage: go test"),
+            ),
+            GoTestNodeEventMapper.runFailure("\n  go: bad flag\nusage: go test\n", 2),
+        )
+        assertEquals("go test exited with code 2", (GoTestNodeEventMapper.runFailure(" \n", 2)[1] as Failed).message)
+    }
 }

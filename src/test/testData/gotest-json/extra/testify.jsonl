@@ -1,0 +1,127 @@
+{"Time":"2026-11-14T16:54:49.62996+04:00","Action":"start","Package":"example.com/cap/fail"}
+{"Time":"2026-11-14T16:54:50.080241+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestErrorf"}
+{"Time":"2026-11-14T16:54:50.080351+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestErrorf","Output":"=== RUN   TestErrorf\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080421+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestErrorf","Output":"    fail_test.go:17: a log line before the failure\n"}
+{"Time":"2026-11-14T16:54:50.080435+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestErrorf","Output":"    fail_test.go:18: got 1, want 2\n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.080482+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestErrorf","Output":"--- FAIL: TestErrorf (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080522+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestErrorf","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.080539+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestMultiLineError"}
+{"Time":"2026-11-14T16:54:50.080546+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestMultiLineError","Output":"=== RUN   TestMultiLineError\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080553+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestMultiLineError","Output":"    fail_test.go:22: first line\n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.080559+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestMultiLineError","Output":"        second line\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080575+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestMultiLineError","Output":"--- FAIL: TestMultiLineError (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080588+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestMultiLineError","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.080595+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestFatalAfterLog"}
+{"Time":"2026-11-14T16:54:50.080601+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFatalAfterLog","Output":"=== RUN   TestFatalAfterLog\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080607+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFatalAfterLog","Output":"plain stdout from the test\n"}
+{"Time":"2026-11-14T16:54:50.080614+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFatalAfterLog","Output":"    fail_test.go:27: fatal reason\n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.080628+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFatalAfterLog","Output":"--- FAIL: TestFatalAfterLog (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080635+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestFatalAfterLog","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.080641+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestFakeFrame"}
+{"Time":"2026-11-14T16:54:50.080646+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFakeFrame","Output":"=== RUN   TestFakeFrame\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080652+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFakeFrame","Output":"    fail_test.go:31: --- FAIL: NotATest (0.00s)\n"}
+{"Time":"2026-11-14T16:54:50.080657+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFakeFrame","Output":"=== RUN   Bogus\n"}
+{"Time":"2026-11-14T16:54:50.080671+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestFakeFrame","Output":"--- PASS: TestFakeFrame (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080677+04:00","Action":"pass","Package":"example.com/cap/fail","Test":"TestFakeFrame","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.080683+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestEqualInts"}
+{"Time":"2026-11-14T16:54:50.080688+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"=== RUN   TestEqualInts\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080723+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"    fail_test.go:36: \n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.08073+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"        \tError Trace:\t/work/cap/fail/fail_test.go:36\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080741+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"        \tError:      \tNot equal: \n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080747+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"        \t            \texpected: 1\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080752+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"        \t            \tactual  : 2\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080757+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"        \tTest:       \tTestEqualInts\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080762+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualInts","Output":"--- FAIL: TestEqualInts (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080771+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestEqualInts","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.08078+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestEqualStrings"}
+{"Time":"2026-11-14T16:54:50.080785+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"=== RUN   TestEqualStrings\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.08079+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"    fail_test.go:40: \n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.080794+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \tError Trace:\t/work/cap/fail/fail_test.go:40\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080799+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \tError:      \tNot equal: \n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080803+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \texpected: \"say \\\"hi\\\"\\nthere\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080816+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \tactual  : \"say \\\"bye\\\"\\nthere\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080827+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \t\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080832+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \tDiff:\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080837+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \t--- Expected\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080842+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \t+++ Actual\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080846+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \t@@ -1,2 +1,2 @@\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.08085+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \t-say \"hi\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.08086+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \t+say \"bye\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080864+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \t            \t there\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080869+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \tTest:       \tTestEqualStrings\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080873+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"        \tMessages:   \tgreeting for bob\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080882+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStrings","Output":"--- FAIL: TestEqualStrings (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080887+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestEqualStrings","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.080891+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestEqualStructs"}
+{"Time":"2026-11-14T16:54:50.080896+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"=== RUN   TestEqualStructs\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.080902+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"    fail_test.go:44: \n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.080911+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \tError Trace:\t/work/cap/fail/fail_test.go:44\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080916+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \tError:      \tNot equal: \n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080924+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \texpected: fail.point{X:1, Y:2, Name:\"a\"}\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080931+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \tactual  : fail.point{X:1, Y:3, Name:\"b\"}\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080938+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080944+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \tDiff:\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080951+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t--- Expected\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080956+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t+++ Actual\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080963+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t@@ -2,4 +2,4 @@\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080969+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t  X: (int) 1,\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080975+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t- Y: (int) 2,\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080981+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t- Name: (string) (len=1) \"a\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080992+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t+ Y: (int) 3,\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.080998+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t+ Name: (string) (len=1) \"b\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081002+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \t            \t }\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081007+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"        \tTest:       \tTestEqualStructs\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081016+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualStructs","Output":"--- FAIL: TestEqualStructs (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081024+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestEqualStructs","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.081029+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestEqualSlices"}
+{"Time":"2026-11-14T16:54:50.081034+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"=== RUN   TestEqualSlices\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081038+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"    fail_test.go:48: \n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.081042+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \tError Trace:\t/work/cap/fail/fail_test.go:48\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081048+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \tError:      \tNot equal: \n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081054+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \texpected: []string{\"a\", \"b\", \"c\"}\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081058+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \tactual  : []string{\"a\", \"x\", \"c\"}\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081063+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081068+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \tDiff:\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.08108+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t--- Expected\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081085+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t+++ Actual\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.08109+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t@@ -2,3 +2,3 @@\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081095+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t  (string) (len=1) \"a\",\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081099+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t- (string) (len=1) \"b\",\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081104+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t+ (string) (len=1) \"x\",\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081114+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \t            \t  (string) (len=1) \"c\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081119+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"        \tTest:       \tTestEqualSlices\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081131+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestEqualSlices","Output":"--- FAIL: TestEqualSlices (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081137+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestEqualSlices","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.081141+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestTrue"}
+{"Time":"2026-11-14T16:54:50.081145+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestTrue","Output":"=== RUN   TestTrue\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.08115+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestTrue","Output":"    fail_test.go:52: \n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.081155+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestTrue","Output":"        \tError Trace:\t/work/cap/fail/fail_test.go:52\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081159+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestTrue","Output":"        \tError:      \tShould be true\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081163+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestTrue","Output":"        \tTest:       \tTestTrue\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081168+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestTrue","Output":"        \tMessages:   \tshould be true\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081173+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestTrue","Output":"--- FAIL: TestTrue (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081179+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestTrue","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.081187+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestSubFails"}
+{"Time":"2026-11-14T16:54:50.081196+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails","Output":"=== RUN   TestSubFails\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081208+04:00","Action":"run","Package":"example.com/cap/fail","Test":"TestSubFails/child"}
+{"Time":"2026-11-14T16:54:50.081219+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"=== RUN   TestSubFails/child\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081229+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"    fail_test.go:57: \n","OutputType":"error"}
+{"Time":"2026-11-14T16:54:50.08124+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \tError Trace:\t/work/cap/fail/fail_test.go:57\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081251+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \tError:      \tNot equal: \n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081262+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \texpected: \"x\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081273+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \tactual  : \"y\"\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081285+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \t\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081303+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \tDiff:\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081315+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \t--- Expected\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081326+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \t+++ Actual\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081337+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \t@@ -1 +1 @@\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081361+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \t-x\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081374+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \t            \t+y\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081385+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"        \tTest:       \tTestSubFails/child\n","OutputType":"error-continue"}
+{"Time":"2026-11-14T16:54:50.081421+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails/child","Output":"--- FAIL: TestSubFails/child (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081434+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestSubFails/child","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.081445+04:00","Action":"output","Package":"example.com/cap/fail","Test":"TestSubFails","Output":"--- FAIL: TestSubFails (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.081457+04:00","Action":"fail","Package":"example.com/cap/fail","Test":"TestSubFails","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.081467+04:00","Action":"output","Package":"example.com/cap/fail","Output":"FAIL\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.082015+04:00","Action":"output","Package":"example.com/cap/fail","Output":"FAIL\texample.com/cap/fail\t0.452s\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.082061+04:00","Action":"fail","Package":"example.com/cap/fail","Elapsed":0.452}

@@ -15,7 +15,7 @@ data class GoTestEvent(
     val importPath: String? = null,
     /** On a package `fail`: the [importPath] whose build failed. */
     val failedBuild: String? = null,
-    /** Go 1.24+: "frame" for `=== RUN` / `--- PASS` style lines, "error" for `t.Error` lines. */
+    /** Go 1.27+: "frame" for `=== RUN` / `--- PASS` style lines, "error" / "error-continue" for `t.Error` lines. */
     val outputType: String? = null,
 ) {
     companion object {

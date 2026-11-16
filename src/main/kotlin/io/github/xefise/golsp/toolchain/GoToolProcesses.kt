@@ -6,8 +6,11 @@ import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessOutput
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.util.SystemInfo
 import io.github.xefise.golsp.toolchain.model.GoBinaryInfo
 import io.github.xefise.golsp.toolchain.model.GoBinaryInfoParser
+import io.github.xefise.golsp.toolchain.model.GoRootPolicy
+import io.github.xefise.golsp.toolchain.model.GoToolchain
 import io.github.xefise.golsp.toolchain.model.GoVersion
 import io.github.xefise.golsp.toolchain.model.ToolLookup
 import java.io.File
@@ -44,6 +47,14 @@ object GoToolProcesses {
             if (it.exitCode == 0) GoBinaryInfoParser.parse(it.stdout) else null
         }
 
+    /**
+     * `GOROOT/bin/go` of the detected toolchain rather than the binary that was found: a shim (asdf, mise, goenv) picks
+     * its version by the working directory, and outside the project it would pick another one or fail.
+     */
+    fun realGo(toolchain: GoToolchain): String =
+        toolchain.localGoRoot?.let { GoRootPolicy.goExecutable(it, SystemInfo.isWindows) }
+            ?.takeIf(GoToolLocator::isExecutableFile) ?: toolchain.goBinary
+
     /** The version [go] itself is, without toolchain switching: the Go that would run `go install`. */
     fun localGoVersion(go: String): GoVersion =
         cached(localVersions, go, go, listOf("env", "GOVERSION"), GoVersion.Unknown) {
@@ -79,7 +90,7 @@ object GoToolProcesses {
 
     private fun runQuietly(go: String, arguments: List<String>): ProcessOutput? {
         // GOTOOLCHAIN=local: inspecting a file must never download a toolchain.
-        val commandLine = commandLine(go, arguments, mapOf("GOTOOLCHAIN" to "local"), setOf("GOFLAGS"), System.getProperty("java.io.tmpdir"))
+        val commandLine = commandLine(go, arguments, mapOf("GOTOOLCHAIN" to "local"), setOf("GOFLAGS", GoRootPolicy.GOROOT), System.getProperty("java.io.tmpdir"))
         return try {
             runner.run(commandLine, INSPECT_TIMEOUT_MS, null).takeUnless { it.isTimeout }
         } catch (e: ExecutionException) {

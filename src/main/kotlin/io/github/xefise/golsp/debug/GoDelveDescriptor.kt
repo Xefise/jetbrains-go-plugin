@@ -3,11 +3,14 @@ package io.github.xefise.golsp.debug
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.RunConfigurationOptions
 import com.intellij.execution.configurations.WrappingRunConfiguration
+import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessHandler
+import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.redhat.devtools.lsp4ij.dap.DebugMode
 import com.redhat.devtools.lsp4ij.dap.definitions.DebugAdapterServerDefinition
@@ -20,8 +23,9 @@ import io.github.xefise.golsp.execution.GoRunConfigurationBase
 import io.github.xefise.golsp.execution.GoRunProfileState
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
 import io.github.xefise.golsp.lang.GoFileType
-import io.github.xefise.golsp.toolchain.GoToolchainService
-import io.github.xefise.golsp.toolchain.model.GoTool
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
 
 class GoDelveDescriptor(
     options: RunConfigurationOptions,
@@ -50,18 +54,47 @@ class GoDelveDescriptor(
         // LSP4IJ never starts a server in ATTACH mode: it connects to the ready config's address directly.
         if (isAttach) throw ExecutionException("Attach configurations connect to a running dlv and start no server")
         thisLogger().info("startServer on thread '${Thread.currentThread().name}'")
-        val toolchain = GoToolchainService.getInstance(environment.project)
-        val dlv = toolchain.findTool(GoTool.DLV)
-            ?: throw ExecutionException("dlv not found in GOBIN, PATH or ~/go/bin; click Install in the Go editor banner or set its path in the Go settings")
+        val dlv = GoDelveLookup.find(environment.project)
         val path = GoRunProfileState.goFirstPath(environment.project, request)
-        // Port 0: dlv picks a free port and LSP4IJ reads it from the ready line, so there is no port race.
-        return GoRunProfileState.startKillable(GoRunProfileState.toCommandLine(DelveLaunchBuilder.serverCommand(dlv, request, path)))
+        debugBinaryDirectory = null
+        val outputDir = createOutputDirectory()
+        val handler = try {
+            // Port 0: dlv picks a free port and LSP4IJ reads it from the ready line, so there is no port race.
+            GoRunProfileState.startKillable(GoRunProfileState.toCommandLine(DelveLaunchBuilder.serverCommand(dlv, request, path)))
+        } catch (e: Throwable) {
+            outputDir?.let(::deleteOutputDirectory)
+            throw e
+        }
+        outputDir?.let { dir ->
+            // dlv removes its binary on a clean exit only; a killed dlv would leave it behind.
+            handler.addProcessListener(object : ProcessListener {
+                override fun processTerminated(event: ProcessEvent) = deleteOutputDirectory(dir)
+            })
+        }
+        debugBinaryDirectory = outputDir
+        return handler
     }
 
     override fun getDapParameters(): Map<String, Any> {
         thisLogger().info("getDapParameters on thread '${Thread.currentThread().name}'")
         if (isAttach) return DelveAttachBuilder.attachParameters(attachTarget)
-        return DelveLaunchBuilder.launchParameters(request)
+        val output = debugBinaryDirectory?.resolve(DEBUG_BINARY)?.toString()
+        return DelveLaunchBuilder.launchParameters(request, output = output)
+    }
+
+    // Without an explicit output dlv builds `__debug_bin*` into the source directory, where VFS and VCS pick it up.
+    @Volatile
+    private var debugBinaryDirectory: Path? = null
+
+    private fun createOutputDirectory(): Path? = try {
+        Files.createTempDirectory(OUTPUT_DIRECTORY_PREFIX)
+    } catch (e: IOException) {
+        thisLogger().warn("Cannot create a directory for the debug binary; dlv will build into the package directory", e)
+        null
+    }
+
+    private fun deleteOutputDirectory(dir: Path) {
+        if (!FileUtil.delete(dir.toFile())) thisLogger().info("Cannot delete the debug binary directory $dir")
     }
 
     override fun getDebugMode(): DebugMode = if (isAttach) DebugMode.ATTACH else DebugMode.LAUNCH
@@ -75,4 +108,10 @@ class GoDelveDescriptor(
 
     // The base asks the server definition's language mappings, and go-delve has none: breakpoints would never be sent.
     override fun isDebuggableFile(file: VirtualFile, project: Project): Boolean = file.fileType == GoFileType.INSTANCE
+
+    private companion object {
+        const val OUTPUT_DIRECTORY_PREFIX = "golsp-dlv-"
+        // dlv appends .exe on Windows itself.
+        const val DEBUG_BINARY = "__debug_bin"
+    }
 }

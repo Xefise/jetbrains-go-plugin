@@ -1,7 +1,6 @@
 // Modified from intellij-community (commit 16a8d7c, Apache-2.0): LcovSerializationUtils.normalizeFilePath
 package io.github.xefise.golsp.coverage
 
-import com.intellij.coverage.BaseCoverageSuite
 import com.intellij.coverage.CoverageAnnotator
 import com.intellij.coverage.CoverageEngine
 import com.intellij.coverage.CoverageFileProvider
@@ -11,12 +10,14 @@ import com.intellij.coverage.CoverageSuitesBundle
 import com.intellij.coverage.view.CoverageViewExtension
 import com.intellij.coverage.view.DirectoryCoverageViewExtension
 import com.intellij.execution.configurations.RunConfigurationBase
+import com.intellij.execution.configurations.RuntimeConfigurationError
 import com.intellij.execution.configurations.coverage.CoverageEnabledConfiguration
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiFile
 import io.github.xefise.golsp.test.GoTestConfiguration
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
 /** Coverage of Go Test runs; profile data is keyed by the normalized path of each source file. */
@@ -34,8 +35,9 @@ class GoCoverageEngine : CoverageEngine() {
         runner: CoverageRunner,
         fileProvider: CoverageFileProvider,
         timestamp: Long,
-    ): CoverageSuite = GoCoverageSuite(name, project, runner, fileProvider, timestamp)
+    ): CoverageSuite = GoCoverageSuite(name, project, runner, fileProvider, timestamp, targetDirectory = null)
 
+    // The directory is captured now: the configuration may be edited before the suite is reloaded.
     override fun createCoverageSuite(
         name: String,
         project: Project,
@@ -43,7 +45,10 @@ class GoCoverageEngine : CoverageEngine() {
         fileProvider: CoverageFileProvider,
         timestamp: Long,
         config: CoverageEnabledConfiguration,
-    ): CoverageSuite = GoCoverageSuite(name, project, runner, fileProvider, timestamp).apply { configuration = config.configuration }
+    ): CoverageSuite {
+        val directory = (config.configuration as? GoTestConfiguration)?.let(::targetDirectoryOf)
+        return GoCoverageSuite(name, project, runner, fileProvider, timestamp, directory).apply { configuration = config.configuration }
+    }
 
     override fun createEmptyCoverageSuite(coverageRunner: CoverageRunner): CoverageSuite = GoCoverageSuite()
 
@@ -70,7 +75,13 @@ class GoCoverageEngine : CoverageEngine() {
             return if (SystemInfo.isWindows) independent.lowercase() else independent
         }
 
-        internal fun configurationOf(suite: CoverageSuite?): RunConfigurationBase<*>? = (suite as? BaseCoverageSuite)?.configuration
+        private fun targetDirectoryOf(configuration: GoTestConfiguration): String? = try {
+            configuration.targetDirectory().toAbsolutePath().normalize().toString()
+        } catch (_: InvalidPathException) {
+            null
+        } catch (_: RuntimeConfigurationError) {
+            null
+        }
 
         private fun key(file: PsiFile): String? = file.virtualFile?.path?.let(::pathKey)
 

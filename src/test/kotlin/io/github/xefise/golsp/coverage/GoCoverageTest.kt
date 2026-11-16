@@ -8,6 +8,7 @@ import com.intellij.coverage.DefaultCoverageFileProvider
 import com.intellij.coverage.CoverageRunner
 import com.intellij.coverage.FailedCoverageLoadingResult
 import com.intellij.coverage.SuccessCoverageLoadingResult
+import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.coverage.CoverageEnabledConfiguration
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.util.io.FileUtil
@@ -19,6 +20,7 @@ import io.github.xefise.golsp.coverage.model.GoLineHits
 import io.github.xefise.golsp.test.GoTestConfiguration
 import io.github.xefise.golsp.test.GoTestConfigurationFactory
 import io.github.xefise.golsp.test.GoTestConfigurationType
+import org.jdom.Element
 import java.io.File
 import java.nio.file.Path
 
@@ -96,8 +98,66 @@ class GoCoverageTest : BasePlatformTestCase() {
     fun testSuiteWithoutProfileHasEmptyDataInsteadOfNone() {
         val runner = CoverageRunner.getInstance(GoCoverageRunner::class.java)
         val provider = DefaultCoverageFileProvider(tempDir.toPath().resolve("absent.out"))
-        val suite = GoCoverageSuite("t", project, runner, provider, 0)
+        val suite = GoCoverageSuite("t", project, runner, provider, 0, null)
         assertEquals(emptyMap<String, Any>(), suite.getCoverageData(CoverageDataManager.getInstance(project))!!.classes)
+    }
+
+    private fun suite(targetDirectory: String?): GoCoverageSuite = GoCoverageSuite(
+        "t", project, CoverageRunner.getInstance(GoCoverageRunner::class.java),
+        DefaultCoverageFileProvider(tempDir.toPath().resolve("cover.out")), 0, targetDirectory,
+    )
+
+    private fun restored(suite: GoCoverageSuite): GoCoverageSuite {
+        val element = Element("SUITE")
+        suite.writeExternal(element)
+        return GoCoverageSuite().apply { readExternal(element) }
+    }
+
+    fun testRestoredSuiteResolvesAgainstItsStoredDirectory() {
+        val calcDir = File(moduleDir(), "calc").path
+        val copy = restored(suite(calcDir))
+        assertEquals(calcDir, copy.targetDirectory)
+        val data = GoCoverageRunner.load(fixture("calc-set.out"), copy.resolutionDirectory()).projectData!!
+        assertEquals(setOf(key(File(tempDir, "calc/calc.go"))), data.classes.keys)
+    }
+
+    fun testSuiteSavedWithoutDirectoryRestoresWithout() {
+        assertNull(restored(suite(null)).targetDirectory)
+    }
+
+    fun testSuiteWithoutDirectoryFallsBackToTheProjectRoot() {
+        assertEquals(Path.of(project.basePath!!), suite(null).resolutionDirectory())
+    }
+
+    fun testSuiteKeepsTheDirectoryOfTheRunAfterTheConfigurationIsEdited() {
+        val configuration = GoTestConfiguration(project, GoTestConfigurationFactory(GoTestConfigurationType()), "calc")
+        configuration.directory = File(moduleDir(), "calc").path
+        CoverageHelper.resetCoverageSuit(configuration)
+        val suite = CoverageEnabledConfiguration.getOrCreate(configuration).currentCoverageSuite as GoCoverageSuite
+        try {
+            configuration.directory = File(tempDir, "other").path
+            assertEquals(File(tempDir, "calc").toPath().toAbsolutePath().normalize().toString(), suite.targetDirectory)
+        } finally {
+            CoverageDataManager.getInstance(project).unregisterCoverageSuite(suite)
+        }
+    }
+
+    private fun profile(vararg names: String): Path = tempDir.toPath().resolve("p.out").also { file ->
+        file.toFile().writeText("mode: set\n" + names.joinToString("") { "$it:3.1,3.10 1 1\n" })
+    }
+
+    fun testLocallyReplacedModuleResolvesToItsDirectory() {
+        File(tempDir, "app").mkdirs()
+        File(tempDir, "app/go.mod").writeText("module example.com/app\n\nrequire example.com/lib v0.0.0\n\nreplace example.com/lib => ../lib\n")
+        val greet = File(tempDir, "lib/greet/greet.go").apply { parentFile.mkdirs(); writeText("package greet\n") }
+        val data = GoCoverageRunner.load(profile("example.com/lib/greet/greet.go"), File(tempDir, "app").toPath()).projectData!!
+        assertEquals(setOf(key(greet)), data.classes.keys)
+    }
+
+    fun testVendoredPackageResolvesUnderVendor() {
+        val vendored = File(moduleDir(), "vendor/github.com/dep/pkg/a.go").apply { parentFile.mkdirs(); writeText("package pkg\n") }
+        val data = GoCoverageRunner.load(profile("github.com/dep/pkg/a.go", "github.com/dep/pkg/missing.go"), tempDir.toPath()).projectData!!
+        assertEquals(setOf(key(vendored)), data.classes.keys)
     }
 
     fun testUnreadableProfileFailsTheLoad() {
@@ -163,6 +223,38 @@ class GoCoverageTest : BasePlatformTestCase() {
         assertFalse(suite in manager.suites)
         assertNull(CoverageEnabledConfiguration.getOrCreate(configuration).currentCoverageSuite)
         assertEmpty(manager.activeSuites())
+    }
+
+    fun testSuiteIsRegisteredBeforeTheProcessStarts() {
+        val configuration = GoTestConfiguration(project, GoTestConfigurationFactory(GoTestConfigurationType()), "race")
+        val manager = CoverageDataManager.getInstance(project)
+        var registeredAtStart = false
+        val started = GoCoverageProgramRunner.withFreshSuite(configuration) {
+            registeredAtStart = CoverageEnabledConfiguration.getOrCreate(configuration).currentCoverageSuite in manager.suites
+            "started"
+        }
+        assertEquals("started", started)
+        assertTrue(registeredAtStart)
+        val suite = CoverageEnabledConfiguration.getOrCreate(configuration).currentCoverageSuite!!
+        manager.unregisterCoverageSuite(suite)
+    }
+
+    fun testSuiteIsDroppedWhenNothingStarted() {
+        val configuration = GoTestConfiguration(project, GoTestConfigurationFactory(GoTestConfigurationType()), "none")
+        val manager = CoverageDataManager.getInstance(project)
+        assertNull(GoCoverageProgramRunner.withFreshSuite<String>(configuration) { null })
+        assertNull(CoverageEnabledConfiguration.getOrCreate(configuration).currentCoverageSuite)
+        assertEmpty(manager.suites.filter { it.presentableName == "none" })
+    }
+
+    fun testSuiteIsDroppedWhenTheStartFails() {
+        val configuration = GoTestConfiguration(project, GoTestConfigurationFactory(GoTestConfigurationType()), "failing")
+        val manager = CoverageDataManager.getInstance(project)
+        assertThrows(ExecutionException::class.java) {
+            GoCoverageProgramRunner.withFreshSuite<String>(configuration) { throw ExecutionException("go not found") }
+        }
+        assertNull(CoverageEnabledConfiguration.getOrCreate(configuration).currentCoverageSuite)
+        assertEmpty(manager.suites.filter { it.presentableName == "failing" })
     }
 
     fun testRunWithProfileOpensItsSuite() {

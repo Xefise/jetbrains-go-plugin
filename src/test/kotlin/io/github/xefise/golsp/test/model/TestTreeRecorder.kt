@@ -12,6 +12,9 @@ class TestTreeRecorder {
         val children = mutableListOf<Node>()
         var status: String? = null
         var message: String? = null
+        var details: String? = null
+        var expected: String? = null
+        var actual: String? = null
         val output = StringBuilder()
         val errorOutput = StringBuilder()
     }
@@ -34,8 +37,10 @@ class TestTreeRecorder {
                 (if (op.error) node.errorOutput else node.output).append(op.text)
             }
             is GoTestTreeOp.Passed -> finish(op.id, "passed", null)
-            is GoTestTreeOp.Failed -> finish(op.id, "failed", op.message)
-            is GoTestTreeOp.Skipped -> finish(op.id, "skipped", null)
+            is GoTestTreeOp.Failed -> finish(op.id, "failed", op.message).also {
+                nodes.getValue(op.id).apply { details = op.details; expected = op.expected; actual = op.actual }
+            }
+            is GoTestTreeOp.Skipped -> finish(op.id, "skipped", op.reason)
         }
     }
 

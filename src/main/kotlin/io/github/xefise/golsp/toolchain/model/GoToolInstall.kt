@@ -27,17 +27,28 @@ object GoToolInstall {
         projectGo: GoVersion,
         workingDirectory: String,
         goEnv: GoEnv = GoEnv(emptyMap()),
+        inheritedEnvironment: Map<String, String> = emptyMap(),
     ): GoToolInstallCommand = GoToolInstallCommand(
         executable = goExecutable,
         arguments = listOf("install", "-v", GoToolRegistry.installTarget(spec, projectGo)),
-        environment = mapOf("GOTOOLCHAIN" to toolchain(installGo, projectGo)) + installTarget(goEnv),
+        environment = mapOf("GOTOOLCHAIN" to toolchain(installGo, projectGo)) + installTarget(goEnv) +
+            downloadSettings(goEnv, inheritedEnvironment),
         removedEnvironment = REMOVED_ENVIRONMENT,
         workingDirectory = workingDirectory,
     )
 
+    /** `go env -w` settings that make downloads work behind a corporate proxy or for private modules. */
+    val DOWNLOAD_SETTINGS: List<String> = listOf("GOPROXY", "GOSUMDB", "GONOSUMDB", "GOPRIVATE", "GONOPROXY", "GOINSECURE", "GOMODCACHE")
+
     // GOENV is unset, so GOBIN/GOPATH from the user's GOENV file are passed explicitly: install where lookup looks.
-    private fun installTarget(goEnv: GoEnv): Map<String, String> =
-        listOf("GOBIN", "GOPATH").mapNotNull { key -> goEnv.value(key)?.takeIf { it.isNotBlank() }?.let { key to it } }.toMap()
+    private fun installTarget(goEnv: GoEnv): Map<String, String> = fromGoEnv(listOf("GOBIN", "GOPATH"), goEnv)
+
+    // Variables the environment already sets are inherited unchanged; only what the GOENV file adds is passed on.
+    private fun downloadSettings(goEnv: GoEnv, inherited: Map<String, String>): Map<String, String> =
+        fromGoEnv(DOWNLOAD_SETTINGS.filter { it !in inherited }, goEnv)
+
+    private fun fromGoEnv(keys: List<String>, goEnv: GoEnv): Map<String, String> =
+        keys.mapNotNull { key -> goEnv.value(key)?.let { key to it } }.toMap()
 
     /**
      * `auto` lets tools that need a newer Go download it; set unconditionally because GOENV or go.env may say `local`.

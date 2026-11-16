@@ -59,6 +59,22 @@ class GoConsoleFilterTest : BasePlatformTestCase() {
         assertEquals(Target(path(file), 2, 0, 101, expectedEnd), canonical(apply(filter(), line)))
     }
 
+    fun testAbsolutePanicFrameWithSpacesLinksTheWholePathOnce() {
+        val file = diskFile("My Projects/app/main.go")
+        val line = "\t${path(file)}:3 +0x1d\n"
+        val expectedEnd = 100 + 1 + path(file).length + 2
+        // The tail "Projects/app/main.go" also resolves from cwd, yet must not become a second, overlapping link.
+        diskFile("cwd/Projects/app/main.go")
+        assertEquals(Target(path(file), 2, 0, 101, expectedEnd), canonical(apply(filter(dir("cwd")), line)))
+    }
+
+    fun testUnresolvedSpacedPathFallsBackToItsTail() {
+        val file = diskFile("pkg/sub/x.go")
+        // "/nowhere/a " precedes "sub/x.go:3", which starts at 11 and is 10 chars long
+        val target = canonical(apply(filter(dir("pkg"), dir("pkg")), "/nowhere/a sub/x.go:3\n"))
+        assertEquals(Target(path(file), 2, 0, 111, 121), target)
+    }
+
     fun testRelativePathResolvesAgainstWorkingDirectory() {
         val file = diskFile("wd/data/x.go")
         assertEquals(path(file), canonical(apply(filter(dir("wd"), dir("pkg")), "data/x.go:2: msg\n"))!!.path)

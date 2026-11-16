@@ -62,7 +62,10 @@ class GoTestRunProfileState(
     }
 
     internal fun createTestConsole(executor: Executor, handler: ProcessHandler, directory: String): ConsoleView =
-        createConsole(configuration, executor, directory, test2JsonPackage = null).apply { attachToProcess(handler) }
+        createConsole(configuration, executor, directory, test2JsonPackage = null).apply {
+            (properties as? GoTestConsoleProperties)?.watchStop(handler)
+            attachToProcess(handler)
+        }
 
     companion object {
         const val FRAMEWORK_NAME: String = "GoTest"

@@ -14,7 +14,6 @@ import com.intellij.rt.coverage.data.ProjectData
 import io.github.xefise.golsp.coverage.model.GoCoverLines
 import io.github.xefise.golsp.coverage.model.GoCoverProfileParser
 import io.github.xefise.golsp.coverage.model.GoLineHits
-import io.github.xefise.golsp.test.GoTestConfiguration
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -34,11 +33,7 @@ class GoCoverageRunner : CoverageRunner() {
         sessionDataFile: Path,
         baseCoverageSuite: CoverageSuite?,
         reporter: CoverageLoadErrorReporter,
-    ): CoverageLoadingResult {
-        // A suite restored after a restart has no configuration: only absolute paths of the profile resolve then.
-        val configuration = GoCoverageEngine.configurationOf(baseCoverageSuite) as? GoTestConfiguration
-        return load(sessionDataFile, configuration?.targetDirectory())
-    }
+    ): CoverageLoadingResult = load(sessionDataFile, (baseCoverageSuite as? GoCoverageSuite)?.resolutionDirectory())
 
     companion object {
         const val ID: String = "GoLspCoverage"

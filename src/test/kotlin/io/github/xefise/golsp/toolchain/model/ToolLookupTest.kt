@@ -74,8 +74,34 @@ class ToolLookupTest {
     }
 
     @Test
-    fun `prependToPath keeps PATH unchanged when the directory is already there`() {
-        assertEquals("/usr/bin:/sdk/go/bin", ToolLookup.prependToPath("/usr/bin:/sdk/go/bin", "/sdk/go/bin", ':'))
+    fun `prependToPath moves a directory already in PATH to the front`() {
+        assertEquals("/sdk/go/bin:/usr/bin", ToolLookup.prependToPath("/usr/bin:/sdk/go/bin", "/sdk/go/bin", ':'))
+    }
+
+    @Test
+    fun `prependToPath drops every later copy including ones with a trailing slash`() {
+        assertEquals(
+            "/sdk/go/bin:/usr/bin:/bin",
+            ToolLookup.prependToPath("/sdk/go/bin/:/usr/bin:/sdk/go/bin:/bin", "/sdk/go/bin", ':'),
+        )
+    }
+
+    @Test
+    fun `prependToPath keeps a root entry and drops empty entries`() {
+        assertEquals("/sdk/go/bin:/:/usr/bin", ToolLookup.prependToPath("/::/usr/bin:", "/sdk/go/bin", ':'))
+    }
+
+    @Test
+    fun `prependToPath on Unix is case-sensitive`() {
+        assertEquals("/sdk/go/bin:/SDK/Go/bin", ToolLookup.prependToPath("/SDK/Go/bin", "/sdk/go/bin", ':'))
+    }
+
+    @Test
+    fun `prependToPath on Windows matches case-insensitively with either slash`() {
+        assertEquals(
+            "C:\\Go\\bin;C:\\Windows",
+            ToolLookup.prependToPath("C:\\Windows;c:/go/BIN/;C:\\GO\\bin\\", "C:\\Go\\bin", ';'),
+        )
     }
 
     @Test

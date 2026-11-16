@@ -1,0 +1,17 @@
+{"Time":"2026-11-14T17:40:02.384847+04:00","Action":"start","Package":"example.com/cap/stop"}
+{"Time":"2026-11-14T17:40:02.641905+04:00","Action":"run","Package":"example.com/cap/stop","Test":"TestPasses"}
+{"Time":"2026-11-14T17:40:02.642073+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestPasses","Output":"=== RUN   TestPasses\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:02.642185+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestPasses","Output":"--- PASS: TestPasses (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:02.642206+04:00","Action":"pass","Package":"example.com/cap/stop","Test":"TestPasses","Elapsed":0}
+{"Time":"2026-11-14T17:40:02.642225+04:00","Action":"run","Package":"example.com/cap/stop","Test":"TestFails"}
+{"Time":"2026-11-14T17:40:02.642228+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestFails","Output":"=== RUN   TestFails\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:02.642231+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestFails","Output":"    stop_test.go:11: failed before the stop\n","OutputType":"error"}
+{"Time":"2026-11-14T17:40:02.642236+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestFails","Output":"--- FAIL: TestFails (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:02.642239+04:00","Action":"fail","Package":"example.com/cap/stop","Test":"TestFails","Elapsed":0}
+{"Time":"2026-11-14T17:40:02.642241+04:00","Action":"run","Package":"example.com/cap/stop","Test":"TestSlowParent"}
+{"Time":"2026-11-14T17:40:02.642243+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestSlowParent","Output":"=== RUN   TestSlowParent\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:02.642246+04:00","Action":"run","Package":"example.com/cap/stop","Test":"TestSlowParent/child"}
+{"Time":"2026-11-14T17:40:02.64226+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestSlowParent/child","Output":"=== RUN   TestSlowParent/child\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:03.15011+04:00","Action":"output","Package":"example.com/cap/stop","Test":"TestSlowParent/child","Output":"signal: interrupt\n"}
+{"Time":"2026-11-14T17:40:03.150218+04:00","Action":"output","Package":"example.com/cap/stop","Output":"FAIL\texample.com/cap/stop\t0.765s\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:03.150236+04:00","Action":"fail","Package":"example.com/cap/stop","Elapsed":0.765}

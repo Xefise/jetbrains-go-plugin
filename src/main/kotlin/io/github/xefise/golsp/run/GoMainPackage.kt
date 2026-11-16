@@ -2,7 +2,6 @@ package io.github.xefise.golsp.run
 
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
@@ -14,12 +13,12 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import io.github.xefise.golsp.lang.GoFile
 import io.github.xefise.golsp.lang.GoFunctionHeader
+import io.github.xefise.golsp.lang.GoPackageFiles
 import io.github.xefise.golsp.lang.GoTokenTypes
 
 // Program entry detection on the flat PSI only: no indexes, no `go` processes.
 object GoMainPackage {
     private const val MAIN = "main"
-    private val MODULE_FILES = listOf("go.mod", "go.work")
 
     // `func main()`: not a method, no type parameters, empty parameter list.
     fun isEntryPoint(header: GoFunctionHeader): Boolean {
@@ -34,13 +33,19 @@ object GoMainPackage {
 
     fun hasEntryPoint(file: GoFile): Boolean = isMainPackageFile(file) && file.functionHeaders.any(::isEntryPoint)
 
+    // A `//go:build ignore` generator: never part of its directory's package, run only as `go run gen.go`.
+    fun isBuiltAlone(file: GoFile): Boolean = GoPackageFiles.isIgnoredByBuildConstraint(file.viewProvider.contents)
+
+    // `_x.go` / `.x.go` cannot be run at all, not even when named on the command line.
+    fun isIgnoredByGo(file: GoFile): Boolean = GoPackageFiles.isIgnoredByName(file.name)
+
     // Excluded and library directories get neither the gutter nor a producer.
     fun isInContent(item: PsiFileSystemItem): Boolean {
         val file = item.virtualFile ?: return false
         return ProjectFileIndex.getInstance(item.project).isInContent(file)
     }
 
-    // A project directory holding a non-test `package main` file with `func main()`.
+    // A project directory whose package build holds a non-test `package main` file with `func main()`.
     fun isMainPackageDirectory(directory: PsiDirectory): Boolean =
         CachedValuesManager.getCachedValue(directory) {
             CachedValueProvider.Result.create(
@@ -50,16 +55,12 @@ object GoMainPackage {
             )
         }
 
-    // GOPATH mode (GO111MODULE=off) and GOWORK overrides are ignored: only the files decide, as for most setups.
-    fun isInModule(directory: VirtualFile): Boolean =
-        generateSequence(directory) { it.parent }.any { dir -> MODULE_FILES.any { dir.findChild(it) != null } }
-
     private fun scan(directory: PsiDirectory): Boolean {
         val psiManager = PsiManager.getInstance(directory.project)
         return directory.virtualFile.children.asSequence()
-            .filter { !it.isDirectory && it.name.endsWith(".go") }
+            .filter { !it.isDirectory && it.name.endsWith(".go") && !GoPackageFiles.isIgnoredByName(it.name) }
             .mapNotNull { psiManager.findFile(it) as? GoFile }
-            .any(::hasEntryPoint)
+            .any { hasEntryPoint(it) && !isBuiltAlone(it) }
     }
 
     private fun nextSignificant(element: PsiElement): PsiElement? =

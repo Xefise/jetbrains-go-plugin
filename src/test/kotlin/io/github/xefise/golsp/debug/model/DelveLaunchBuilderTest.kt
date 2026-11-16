@@ -39,9 +39,60 @@ class DelveLaunchBuilderTest {
     }
 
     @Test
-    fun `build flags are passed as an array`() {
+    fun `build flags are sent as one string with spaced flags quoted`() {
         val flagged = request.copy(buildFlags = listOf("-tags=integration", "-ldflags=-X main.v=a b"))
-        assertEquals(listOf("-tags=integration", "-ldflags=-X main.v=a b"), DelveLaunchBuilder.launchParameters(flagged)["buildFlags"])
+        assertEquals("-tags=integration '-ldflags=-X main.v=a b'", DelveLaunchBuilder.launchParameters(flagged)["buildFlags"])
+    }
+
+    // Expected strings follow delve's SplitQuotedFields(s, '\''): ' toggles quoting, \ escapes only inside quotes.
+    @Test
+    fun `plain flags are joined unquoted`() {
+        assertEquals("-race -tags=a,b -gcflags=all=-N", DelveLaunchBuilder.quoteBuildFlags(listOf("-race", "-tags=a,b", "-gcflags=all=-N")))
+    }
+
+    @Test
+    fun `flag with a tab or newline is quoted`() {
+        assertEquals("'-ldflags=a\tb' '-x\ny'", DelveLaunchBuilder.quoteBuildFlags(listOf("-ldflags=a\tb", "-x\ny")))
+    }
+
+    @Test
+    fun `single quote is escaped inside quotes`() {
+        assertEquals("""'-ldflags=-X main.s=it\'s'""", DelveLaunchBuilder.quoteBuildFlags(listOf("-ldflags=-X main.s=it's")))
+    }
+
+    @Test
+    fun `backslash outside quotes stays literal`() {
+        assertEquals("""-overlay=C:\o.json""", DelveLaunchBuilder.quoteBuildFlags(listOf("""-overlay=C:\o.json""")))
+    }
+
+    @Test
+    fun `backslash in a quoted flag is doubled`() {
+        assertEquals("""'-overlay=C:\\my dir\\o.json'""", DelveLaunchBuilder.quoteBuildFlags(listOf("""-overlay=C:\my dir\o.json""")))
+    }
+
+    @Test
+    fun `double quotes are literal for delve and stay unquoted`() {
+        assertEquals("""-ldflags="-s"""", DelveLaunchBuilder.quoteBuildFlags(listOf("""-ldflags="-s"""")))
+    }
+
+    @Test
+    fun `empty flag survives as an empty quoted field`() {
+        assertEquals("-tags ''", DelveLaunchBuilder.quoteBuildFlags(listOf("-tags", "")))
+    }
+
+    @Test
+    fun `go unicode space U+0085 is quoted`() {
+        assertEquals("'a\u0085b'", DelveLaunchBuilder.quoteBuildFlags(listOf("a\u0085b")))
+    }
+
+    @Test
+    fun `output is passed when given`() {
+        assertEquals("/tmp/d/__debug_bin", DelveLaunchBuilder.launchParameters(request, output = "/tmp/d/__debug_bin")["output"])
+    }
+
+    @Test
+    fun `no output omits output`() {
+        assertFalse("output" in DelveLaunchBuilder.launchParameters(request))
     }
 
     @Test
@@ -152,14 +203,14 @@ class DelveLaunchBuilderTest {
     @Test
     fun `go test flags of a test request become dlv build flags`() {
         val flagged = testRequest.copy(buildFlags = listOf("-race", "-tags=integration"))
-        assertEquals(listOf("-race", "-tags=integration"), DelveLaunchBuilder.launchParameters(flagged)["buildFlags"])
+        assertEquals("-race -tags=integration", DelveLaunchBuilder.launchParameters(flagged)["buildFlags"])
     }
 
     @Test
     fun `test-binary flags among go test flags reach the binary before the IDE selection, build flags stay with dlv`() {
         val flagged = testRequest.copy(programArguments = emptyList(), buildFlags = listOf("-race", "-count", "1", "-run=TestOther", "-v"))
         val params = DelveLaunchBuilder.launchParameters(flagged)
-        assertEquals(listOf("-race"), params["buildFlags"])
+        assertEquals("-race", params["buildFlags"])
         // The flag package keeps the last -test.run, so the IDE selection wins over the user's.
         assertEquals(listOf("-test.count=1", "-test.run=TestOther", "-test.run", "^TestSubtests$/^with_space$", "-test.v=test2json"), params["args"])
     }
@@ -172,7 +223,7 @@ class DelveLaunchBuilderTest {
     @Test
     fun `application debug keeps test-looking build flags as build flags`() {
         val app = request.copy(buildFlags = listOf("-v", "-race"))
-        assertEquals(listOf("-v", "-race"), DelveLaunchBuilder.launchParameters(app)["buildFlags"])
+        assertEquals("-v -race", DelveLaunchBuilder.launchParameters(app)["buildFlags"])
     }
 
     @Test

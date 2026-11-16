@@ -28,6 +28,34 @@ class GoToolInstallTest {
     }
 
     @Test
+    fun `proxy and private-module settings from the GOENV file are passed on`() {
+        val env = GoEnv(
+            mapOf(
+                "GOPROXY" to "https://proxy.corp", "GOSUMDB" to "off", "GONOSUMDB" to "corp.io", "GOPRIVATE" to "corp.io/*",
+                "GONOPROXY" to "corp.io", "GOINSECURE" to "insecure.corp", "GOMODCACHE" to "/cache", "GOFLAGS" to "-mod=vendor",
+            ),
+        )
+        val command = GoToolInstall.command(GoToolRegistry.GOPLS, "go", GoVersion.parse("go1.27.3"), GoVersion.parse("go1.27.3"), "/tmp/t", env)
+        assertEquals(
+            mapOf(
+                "GOTOOLCHAIN" to "auto", "GOPROXY" to "https://proxy.corp", "GOSUMDB" to "off", "GONOSUMDB" to "corp.io",
+                "GOPRIVATE" to "corp.io/*", "GONOPROXY" to "corp.io", "GOINSECURE" to "insecure.corp", "GOMODCACHE" to "/cache",
+            ),
+            command.environment,
+        )
+    }
+
+    @Test
+    fun `settings the environment already has are not overridden`() {
+        val env = GoEnv(mapOf("GOPROXY" to "https://from-goenv", "GOPRIVATE" to "corp.io", "GOSUMDB" to ""))
+        val command = GoToolInstall.command(
+            GoToolRegistry.GOPLS, "go", GoVersion.parse("go1.27.3"), GoVersion.parse("go1.27.3"), "/tmp/t", env,
+            inheritedEnvironment = mapOf("GOPROXY" to "https://from-shell"),
+        )
+        assertEquals(mapOf("GOTOOLCHAIN" to "auto", "GOPRIVATE" to "corp.io"), command.environment)
+    }
+
+    @Test
     fun `project on the same or an older Go uses plain auto`() {
         assertEquals("auto", toolchain("go1.27.3", "go1.27.3"))
         assertEquals("auto", toolchain("go1.27.3", "go1.25.0"))

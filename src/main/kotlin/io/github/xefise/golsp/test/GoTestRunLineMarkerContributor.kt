@@ -12,6 +12,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import io.github.xefise.golsp.lang.GoFile
 import io.github.xefise.golsp.lang.GoFunctionHeader
+import io.github.xefise.golsp.lang.GoPackageFiles
 import io.github.xefise.golsp.lang.GoSubtestCall
 import io.github.xefise.golsp.test.model.GoModules
 import io.github.xefise.golsp.test.model.GoTestLocation
@@ -25,6 +26,8 @@ class GoTestRunLineMarkerContributor : RunLineMarkerContributor(), DumbAware {
         val file = element.containingFile as? GoFile ?: return null
         if (!GoTestDeclarations.isTestFileInContent(file)) return null
         val test = GoTestDeclarations.at(element) ?: return null
+        // Outside a module `go test` fails, so a ▶ would offer nothing runnable.
+        if (file.virtualFile?.parent?.let(GoPackageFiles::isInModule) != true) return null
         return Info(icon(file, test), ExecutorAction.getActions(0), null)
     }
 

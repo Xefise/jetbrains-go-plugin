@@ -20,6 +20,7 @@ object GoEnvFileLoader {
         } catch (e: IOException) {
             throw ExecutionException("Cannot read env file $path: ${e.message ?: e.javaClass.simpleName}", e)
         }
-        return DotEnvParser.parse(text, EnvironmentUtil.getEnvironmentMap())
+        // Called from startProcess on EDT: getEnvironmentMap() may wait for the shell env, so only when `$` needs it.
+        return DotEnvParser.parse(text, if ('$' in text) EnvironmentUtil.getEnvironmentMap() else emptyMap())
     }
 }

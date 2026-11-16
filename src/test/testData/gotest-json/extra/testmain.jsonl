@@ -1,0 +1,9 @@
+{"Time":"2026-11-14T16:54:50.319808+04:00","Action":"start","Package":"example.com/cap/testmain"}
+{"Time":"2026-11-14T16:54:50.608859+04:00","Action":"run","Package":"example.com/cap/testmain","Test":"TestOk"}
+{"Time":"2026-11-14T16:54:50.609018+04:00","Action":"output","Package":"example.com/cap/testmain","Test":"TestOk","Output":"=== RUN   TestOk\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.609123+04:00","Action":"output","Package":"example.com/cap/testmain","Test":"TestOk","Output":"--- PASS: TestOk (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.609155+04:00","Action":"pass","Package":"example.com/cap/testmain","Test":"TestOk","Elapsed":0}
+{"Time":"2026-11-14T16:54:50.6092+04:00","Action":"output","Package":"example.com/cap/testmain","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.609232+04:00","Action":"output","Package":"example.com/cap/testmain","Output":"leak detected: goroutine 7 still running\n"}
+{"Time":"2026-11-14T16:54:50.610801+04:00","Action":"output","Package":"example.com/cap/testmain","Output":"FAIL\texample.com/cap/testmain\t0.291s\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:50.610849+04:00","Action":"fail","Package":"example.com/cap/testmain","Elapsed":0.291}

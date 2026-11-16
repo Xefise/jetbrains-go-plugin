@@ -15,7 +15,7 @@ class GoApplicationRunLineMarkerContributor : RunLineMarkerContributor(), DumbAw
         val header = element.parent as? GoFunctionHeader ?: return null
         if (header.nameIdentifier != element || !GoMainPackage.isEntryPoint(header)) return null
         val file = header.containingFile as? GoFile ?: return null
-        if (!GoMainPackage.isMainPackageFile(file) || !GoMainPackage.isInContent(file)) return null
+        if (!GoMainPackage.isMainPackageFile(file) || GoMainPackage.isIgnoredByGo(file) || !GoMainPackage.isInContent(file)) return null
         return Info(AllIcons.RunConfigurations.TestState.Run, ExecutorAction.getActions(0), null)
     }
 }

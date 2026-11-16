@@ -31,8 +31,6 @@ import io.github.xefise.golsp.execution.GoRunProfileState
 import io.github.xefise.golsp.execution.model.GoEnvironmentLayers
 import io.github.xefise.golsp.toolchain.GoToolInstaller
 import io.github.xefise.golsp.toolchain.GoToolchainService
-import io.github.xefise.golsp.toolchain.model.GoTool
-import io.github.xefise.golsp.toolchain.model.GoToolchainState
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -55,7 +53,7 @@ internal class GoAttachLauncher(private val project: Project, private val proces
             @Volatile private var port = 0
 
             override fun run(indicator: ProgressIndicator) {
-                val handler = GoRunProfileState.startKillable(GoRunProfileState.toCommandLine(serverCommand(findDlv())))
+                val handler = GoRunProfileState.startKillable(GoRunProfileState.toCommandLine(serverCommand(GoDelveLookup.find(project))))
                 val started = DlvServer(project, handler, pid)
                 server = started
                 handler.startNotify()
@@ -80,15 +78,6 @@ internal class GoAttachLauncher(private val project: Project, private val proces
                 STARTING.remove(pid)
             }
         })
-    }
-
-    private fun findDlv(): String {
-        val toolchain = GoToolchainService.getInstance(project)
-        toolchain.awaitDetected(DETECTION_WAIT_MS)
-        return toolchain.findTool(GoTool.DLV) ?: throw ExecutionException(
-            if (toolchain.state is GoToolchainState.Detecting) "The Go toolchain is still being detected; try again in a moment"
-            else "dlv not found in GOBIN, PATH or ~/go/bin; click Install in the Go editor banner or set its path in the Go settings",
-        )
     }
 
     private fun serverCommand(dlv: String) = run {
@@ -241,7 +230,6 @@ internal class GoAttachLauncher(private val project: Project, private val proces
 
     private companion object {
         const val POLL_MS = 100L
-        const val DETECTION_WAIT_MS = 10_000L
         const val DETACH_GRACE_MS = 5_000L
         const val SESSION_START_TIMEOUT_MS = 60_000L
         const val OUTPUT_LIMIT = 16_384

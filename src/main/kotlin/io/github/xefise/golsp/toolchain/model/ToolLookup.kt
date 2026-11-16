@@ -82,12 +82,23 @@ object ToolLookup {
             ?: sdkDirectories(tool, env).map { join(it, name, env) }.firstOrNull(isExecutable)
     }
 
-    /** Null when [path] has no entries: replacing an unknown PATH with just the go directory would hide everything else. */
+    /**
+     * [directory] first, later copies of it removed: an entry further down would still lose to an earlier `go`.
+     * Null when [path] has no entries: replacing an unknown PATH with just the go directory would hide everything else.
+     */
     fun prependToPath(path: String?, directory: String, separator: Char): String? {
         val entries = splitPath(path, separator)
         if (entries.isEmpty()) return null
-        if (directory in entries) return path
-        return (listOf(directory) + entries).joinToString(separator.toString())
+        val isWindows = separator == ';'
+        return (listOf(directory) + entries.filterNot { sameDirectory(it, directory, isWindows) }).joinToString(separator.toString())
+    }
+
+    /** Ignores trailing separators; case-insensitive on Windows, where both slashes separate. */
+    fun sameDirectory(a: String, b: String, isWindows: Boolean): Boolean {
+        val trim = if (isWindows) charArrayOf('/', '\\') else charArrayOf('/')
+        fun canonical(dir: String) = dir.trim().let { d -> d.trimEnd(*trim).ifEmpty { d.take(1) } }
+            .let { if (isWindows) it.replace('/', '\\') else it }
+        return canonical(a).equals(canonical(b), ignoreCase = isWindows)
     }
 
     private fun splitPath(path: String?, separator: Char): List<String> =

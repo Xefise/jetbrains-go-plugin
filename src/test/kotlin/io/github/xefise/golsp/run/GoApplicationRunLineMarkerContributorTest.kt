@@ -37,6 +37,16 @@ class GoApplicationRunLineMarkerContributorTest : BasePlatformTestCase() {
         assertTrue(RunLineMarkerContributor.EXTENSION.allForLanguage(GoLanguage).any { it is GoApplicationRunLineMarkerContributor })
     }
 
+    fun testFilesGoIgnoresByNameAreNotMarked() {
+        assertEquals(emptyList<Int>(), markedOffsets("package main\n\nfunc main() {}\n", "_gen.go"))
+        assertEquals(emptyList<Int>(), markedOffsets("package main\n\nfunc main() {}\n", ".gen.go"))
+    }
+
+    fun testIgnoreConstrainedGeneratorIsMarked() {
+        val text = "//go:build ignore\n\npackage main\n\nfunc main() {}\n"
+        assertEquals(listOf(text.indexOf("main()")), markedOffsets(text, "gen.go"))
+    }
+
     fun testWhitespaceAndCommentsInsideEmptyParametersStillMark() {
         assertMarkedOnlyAt("package main\n\nfunc main /* c */ ( /* none */ ) {}\n", "main /*")
     }

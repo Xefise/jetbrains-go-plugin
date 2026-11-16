@@ -16,6 +16,7 @@ import io.github.xefise.golsp.execution.model.GoEnvironmentLayers
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
 import io.github.xefise.golsp.execution.model.GoRunCommandBuilder
 import io.github.xefise.golsp.execution.model.ProcessSpec
+import io.github.xefise.golsp.toolchain.GoChildCommandLine
 import io.github.xefise.golsp.toolchain.GoToolchainService
 import java.io.IOException
 import java.nio.file.Files
@@ -32,6 +33,7 @@ class GoRunProfileState(
     override fun startProcess(): ProcessHandler {
         val launch = requestProvider()
         val request = launch.copy(environment = GoEnvironmentLayers.withPath(launch.environment, goFirstPath(environment.project, launch)))
+        val goRoots = GoToolchainService.getInstance(environment.project).goRoots()
         val buildDirectory = try {
             Files.createTempDirectory(BUILD_DIRECTORY_PREFIX)
         } catch (e: IOException) {
@@ -42,8 +44,8 @@ class GoRunProfileState(
         try {
             val binary = buildDirectory.resolve(GoRunCommandBuilder.binaryName(request.target, SystemInfo.isWindows)).toString()
             val handler = GoBuildAndRunProcessHandler(
-                toCommandLine(GoRunCommandBuilder.buildCommand(goExecutable, request, binary)),
-                toCommandLine(GoRunCommandBuilder.programCommand(request, binary)),
+                toCommandLine(GoRunCommandBuilder.buildCommand(goExecutable, request, binary), goRoots),
+                toCommandLine(GoRunCommandBuilder.programCommand(request, binary), goRoots),
                 buildDirectory,
             )
             ProcessTerminatedListener.attach(handler)
@@ -85,11 +87,15 @@ class GoRunProfileState(
             return toolchain.pathWithGoFirst(request.environment["PATH"] ?: toolchain.lookupEnvironment().path)
         }
 
-        fun toCommandLine(spec: ProcessSpec): GeneralCommandLine =
-            GeneralCommandLine(listOf(spec.executable) + spec.arguments)
+        /**
+         * The login-shell environment (so `go` finds its own tools on macOS) without an inherited GOROOT other than
+         * [goRoots]; with none known, any inherited GOROOT is dropped. A GOROOT in [ProcessSpec.environment] wins.
+         */
+        fun toCommandLine(spec: ProcessSpec, goRoots: List<String> = emptyList()): GeneralCommandLine =
+            GoChildCommandLine(listOf(spec.executable) + spec.arguments, goRoots)
                 .withWorkingDirectory(Path.of(spec.workingDirectory))
                 .withEnvironment(spec.environment)
-                // CONSOLE takes the login-shell environment on macOS, so `go` finds its own tools.
-                .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+                // go and test2json print UTF-8 whatever the platform charset is.
+                .withCharset(Charsets.UTF_8)
     }
 }

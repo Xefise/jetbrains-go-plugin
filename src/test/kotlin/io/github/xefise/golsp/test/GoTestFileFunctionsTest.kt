@@ -1,8 +1,6 @@
 package io.github.xefise.golsp.test
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class GoTestFileFunctionsTest {
@@ -45,19 +43,5 @@ class GoTestFileFunctionsTest {
         val bom = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte())
         assertEquals("package p\n", GoTestFileFunctions.decode(bom + "package p\n".toByteArray()))
         assertEquals("a\uFFFDb", GoTestFileFunctions.decode(byteArrayOf('a'.code.toByte(), 0xFF.toByte(), 'b'.code.toByte())))
-    }
-
-    @Test
-    fun `ignore build constraint in the header excludes the file`() {
-        assertTrue(GoTestFileFunctions.isIgnoredByBuildConstraint("//go:build ignore\n\npackage main\n"))
-        assertTrue(GoTestFileFunctions.isIgnoredByBuildConstraint("// Copyright\n\n// +build ignore\r\n\npackage main\n"))
-    }
-
-    @Test
-    fun `other constraints and ignore after the header do not exclude the file`() {
-        assertFalse(GoTestFileFunctions.isIgnoredByBuildConstraint("//go:build integration\n\npackage p\n"))
-        assertFalse(GoTestFileFunctions.isIgnoredByBuildConstraint("//go:build !ignore\n\npackage p\n"))
-        assertFalse(GoTestFileFunctions.isIgnoredByBuildConstraint("package p\n\n//go:build ignore\n"))
-        assertFalse(GoTestFileFunctions.isIgnoredByBuildConstraint(""))
     }
 }

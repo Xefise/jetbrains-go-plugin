@@ -32,8 +32,14 @@ class GoConsoleFilter(
 
     override fun applyFilter(line: String, entireLength: Int): Filter.Result? {
         val lineStart = entireLength - line.length
-        val items = GoConsoleLinks.find(line).mapNotNull { link ->
-            hyperlink(link)?.let { Filter.ResultItem(lineStart + link.start, lineStart + link.end, it) }
+        val items = mutableListOf<Filter.ResultItem>()
+        var linkedUntil = 0
+        for (link in GoConsoleLinks.find(line)) {
+            // Overlapping candidates are alternatives: the first one that resolves wins.
+            if (link.start < linkedUntil) continue
+            val info = hyperlink(link) ?: continue
+            items += Filter.ResultItem(lineStart + link.start, lineStart + link.end, info)
+            linkedUntil = link.end
         }
         return if (items.isEmpty()) null else Filter.Result(items)
     }

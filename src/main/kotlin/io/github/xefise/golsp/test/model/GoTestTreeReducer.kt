@@ -1,5 +1,6 @@
 package io.github.xefise.golsp.test.model
 
+import io.github.xefise.golsp.test.model.GoTestOutputLog.Companion.appendCapped
 import kotlin.math.roundToLong
 
 /** Test-tree changes in the order the test runner UI must apply them; a `null` parent or output target is the root. */
@@ -17,8 +18,17 @@ sealed interface GoTestTreeOp {
 
     data class Output(val id: Int?, val text: String, val error: Boolean = false) : GoTestTreeOp
     data class Passed(val id: Int, val durationMs: Long?) : GoTestTreeOp
-    data class Failed(val id: Int, val message: String, val durationMs: Long?) : GoTestTreeOp
-    data class Skipped(val id: Int) : GoTestTreeOp
+    /** [expected] and [actual] come together, from a testify comparison. */
+    data class Failed(
+        val id: Int,
+        val message: String,
+        val durationMs: Long?,
+        val details: String = "",
+        val expected: String? = null,
+        val actual: String? = null,
+    ) : GoTestTreeOp
+
+    data class Skipped(val id: Int, val reason: String = "") : GoTestTreeOp
 }
 
 /**
@@ -36,9 +46,25 @@ class GoTestTreeReducer {
     /** Build output shown under a failed package; a shared dependency can fail many packages. */
     private val claimedBuildOutput = HashSet<String>()
 
+    private var stopped = false
+
+    /**
+     * The user stopped the run: go then reports each package it interrupted as failed, with no result for its running
+     * tests. Such a package stays open, as if the process had been killed (see [finish]); results already given stay.
+     */
+    fun stop() {
+        stopped = true
+    }
+
     private class PackageState(val importPath: String) {
         var id: Int? = null
         val pendingOutput = StringBuilder()
+
+        /** Output outside of tests (TestMain, leak checkers): the failure details of a package with no failed test. */
+        val ownOutput = StringBuilder()
+
+        /** Own output of open tests. */
+        val logs = HashMap<String, GoTestOutputLog>()
 
         /** Tests that have started and not finished, in start order. */
         val openTests = LinkedHashMap<String, Int>()
@@ -76,7 +102,7 @@ class GoTestTreeReducer {
             if (state.id == null && state.openTests.isEmpty() && state.pendingOutput.isEmpty()) continue
             closeOpenTests(state, passed = false, ops)
             val id = packageNode(state, ops)
-            ops += GoTestTreeOp.Failed(id, "go test exited before reporting a result for this package", null)
+            ops += GoTestTreeOp.Failed(id, "go test exited before reporting a result for this package", null, state.ownDetails())
         }
         packages.clear()
         buildOutput.filter { it.key !in claimedBuildOutput && it.value.isNotEmpty() }
@@ -95,18 +121,22 @@ class GoTestTreeReducer {
         when (event.action) {
             "run" -> startTest(state, test, ops)
             "output", "bench" -> testOutput(state, test, event, ops)
-            "pass" -> finishTest(state, test, ops) { GoTestTreeOp.Passed(it, event.durationMs()) }
-            "fail" -> finishTest(state, test, ops) { GoTestTreeOp.Failed(it, "", event.durationMs()) }
-            "skip" -> finishTest(state, test, ops) { GoTestTreeOp.Skipped(it) }
+            "pass" -> finishTest(state, test, ops) { id, _ -> GoTestTreeOp.Passed(id, event.durationMs()) }
+            "fail" -> finishTest(state, test, ops) { id, log ->
+                val failure = log.failure()
+                GoTestTreeOp.Failed(id, failure.message, event.durationMs(), failure.details, failure.expected, failure.actual)
+            }
+            "skip" -> finishTest(state, test, ops) { id, log -> GoTestTreeOp.Skipped(id, log.skipReason()) }
         }
     }
 
     private fun onPackageLevel(state: PackageState, event: GoTestEvent, ops: MutableList<GoTestTreeOp>) {
         when (event.action) {
-            "output" -> if (!event.isFrame()) {
+            "output" -> if (!event.isFrame(state)) {
                 val text = event.output.orEmpty()
+                state.ownOutput.appendCapped(text)
                 val id = state.id
-                if (id == null) state.pendingOutput.append(text) else ops += GoTestTreeOp.Output(id, text)
+                if (id == null) state.pendingOutput.appendCapped(text) else ops += GoTestTreeOp.Output(id, text)
             }
             "pass" -> {
                 closeOpenTests(state, passed = true, ops)
@@ -120,6 +150,7 @@ class GoTestTreeReducer {
                 packages.remove(state.importPath)
             }
             "fail" -> {
+                if (stopped && state.openTests.isNotEmpty()) return
                 closeOpenTests(state, passed = false, ops)
                 val id = packageNode(state, ops)
                 event.failedBuild?.let { failedBuild ->
@@ -128,10 +159,11 @@ class GoTestTreeReducer {
                         ops += GoTestTreeOp.Output(id, it.toString(), error = true)
                     }
                 }
-                ops += GoTestTreeOp.Failed(id, "", event.durationMs())
+                ops += GoTestTreeOp.Failed(id, "", event.durationMs(), state.ownDetails())
                 packages.remove(state.importPath)
             }
             "skip" -> {
+                closeOpenTests(state, passed = false, ops)
                 val id = state.id
                 if (id == null) {
                     // "[no test files]"
@@ -178,16 +210,18 @@ class GoTestTreeReducer {
         state.cutOff.removeIf { it == fullName || it.startsWith("$fullName/") }
         val id = nextId++
         state.openTests[fullName] = id
+        state.logs[fullName] = GoTestOutputLog()
         ops += GoTestTreeOp.TestStarted(id, parentId, name, state.importPath, fullName)
         return id
     }
 
     private fun testOutput(state: PackageState, test: String, event: GoTestEvent, ops: MutableList<GoTestTreeOp>) {
         val text = event.output ?: return
-        if (event.isFrame()) return
+        if (event.isFrame(state)) return
         if (GoTestNames.kindOf(test.substringBefore('/')) == GoTestKind.BENCHMARK) state.trackBenchmarkResult(test, text)
-        val target = state.openTests[test] ?: packageNode(state, ops)
-        ops += GoTestTreeOp.Output(target, text, error = event.outputType == "error")
+        val open = state.openTests[test]
+        if (open != null) state.logs[test]?.append(text, event.outputType) else state.ownOutput.appendCapped(text)
+        ops += GoTestTreeOp.Output(open ?: packageNode(state, ops), text, error = GoTestOutputLog.isError(event.outputType))
     }
 
     private fun PackageState.trackBenchmarkResult(test: String, text: String) {
@@ -213,12 +247,17 @@ class GoTestTreeReducer {
     private fun isBenchmarkResult(test: String, line: CharSequence): Boolean =
         line.startsWith(test) && BENCHMARK_RESULT.matches(line.subSequence(test.length, line.length))
 
-    private fun finishTest(state: PackageState, test: String, ops: MutableList<GoTestTreeOp>, result: (Int) -> GoTestTreeOp) {
+    private fun finishTest(
+        state: PackageState,
+        test: String,
+        ops: MutableList<GoTestTreeOp>,
+        result: (Int, GoTestOutputLog) -> GoTestTreeOp,
+    ) {
         val id = state.openTests[test] ?: startTest(state, test, ops)
         closeOpenChildren(state, test, ops)
         state.openTests.remove(test)
         state.partialLines.remove(test)
-        ops += result(id)
+        ops += result(id, state.logs.remove(test) ?: GoTestOutputLog())
     }
 
     // Children can still be open when the binary reports the parent (e.g. a panicking subtest): close them first.
@@ -246,16 +285,26 @@ class GoTestTreeReducer {
      */
     private fun PackageState.closeOpen(name: String, id: Int, passed: Boolean): GoTestTreeOp {
         settlePartialLine(name)
+        val log = logs.remove(name)
         val prefix = "$name/"
         val finished = name in benchmarksWithResult ||
             (benchmarksWithResult.any { it.startsWith(prefix) } && cutOff.none { it.startsWith(prefix) })
         if (passed || finished) return GoTestTreeOp.Passed(id, null)
         cutOff += name
-        return GoTestTreeOp.Failed(id, DID_NOT_FINISH, null)
+        return GoTestTreeOp.Failed(id, DID_NOT_FINISH, null, log?.text.orEmpty())
     }
 
-    private fun GoTestEvent.isFrame(): Boolean =
-        outputType == "frame" || (outputType == null && FRAME_LINE.containsMatchIn(output.orEmpty()))
+    private fun PackageState.ownDetails(): String =
+        ownOutput.lineSequence().filterNot { SUMMARY_LINE.matches(it) }.joinToString("\n").trim()
+
+    // Without OutputType a line counts as framing only if it names a test of this package that is running, so a test
+    // printing "=== RUN   X" itself keeps its output.
+    private fun GoTestEvent.isFrame(state: PackageState): Boolean {
+        if (outputType != null) return outputType == "frame"
+        val match = FRAME_LINE.find(output.orEmpty()) ?: return false
+        val name = match.groupValues[1]
+        return name.isEmpty() || name == test || name in state.openTests
+    }
 
     private fun GoTestEvent.durationMs(): Long? = elapsedSeconds?.let { (it * 1000).roundToLong() }
 
@@ -268,7 +317,10 @@ class GoTestTreeReducer {
         // After the name: optional -GOMAXPROCS, iterations, then value-unit metric pairs; ns/op can be suppressed.
         val BENCHMARK_RESULT = Regex("""(-\d+)?\s+\d+(\s+[\d.]+\s+\S+)+\s*""")
 
-        // Before Go 1.24 frame lines carry no OutputType; PASS/FAIL/ok lines of the package are kept.
-        val FRAME_LINE = Regex("""^\s*(=== (RUN|PAUSE|CONT|NAME)\s|--- (PASS|FAIL|SKIP|BENCH): )""")
+        // Before Go 1.27 frame lines carry no OutputType; PASS/FAIL/ok lines of the package are kept.
+        val FRAME_LINE = Regex("""^\s*(?:=== (?:RUN|PAUSE|CONT|NAME)(?:\s+|$)|--- (?:PASS|FAIL|SKIP|BENCH): )(\S*)""")
+
+        // The package result lines go test prints; Go 1.27+ marks them as frames.
+        val SUMMARY_LINE = Regex("""^(?:PASS|FAIL|ok )(?:\s.*)?$""")
     }
 }

@@ -1,0 +1,10 @@
+{"Time":"2026-11-14T17:40:01.233608+04:00","Action":"start","Package":"example.com/gotests/slow"}
+{"Time":"2026-11-14T17:40:01.59606+04:00","Action":"run","Package":"example.com/gotests/slow","Test":"TestFast"}
+{"Time":"2026-11-14T17:40:01.596357+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestFast","Output":"=== RUN   TestFast\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:01.596407+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestFast","Output":"--- PASS: TestFast (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:01.59642+04:00","Action":"pass","Package":"example.com/gotests/slow","Test":"TestFast","Elapsed":0}
+{"Time":"2026-11-14T17:40:01.596428+04:00","Action":"run","Package":"example.com/gotests/slow","Test":"TestSlow"}
+{"Time":"2026-11-14T17:40:01.59643+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"=== RUN   TestSlow\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:02.10607+04:00","Action":"output","Package":"example.com/gotests/slow","Test":"TestSlow","Output":"signal: interrupt\n"}
+{"Time":"2026-11-14T17:40:02.106203+04:00","Action":"output","Package":"example.com/gotests/slow","Output":"FAIL\texample.com/gotests/slow\t0.871s\n","OutputType":"frame"}
+{"Time":"2026-11-14T17:40:02.10625+04:00","Action":"fail","Package":"example.com/gotests/slow","Elapsed":0.873}

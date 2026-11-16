@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.redhat.devtools.lsp4ij.server.CannotStartProcessException
 import com.redhat.devtools.lsp4ij.server.OSProcessStreamConnectionProvider
+import io.github.xefise.golsp.toolchain.GoChildCommandLine
 import io.github.xefise.golsp.toolchain.GoToolchainService
 import io.github.xefise.golsp.toolchain.model.GoTool
 import io.github.xefise.golsp.toolchain.model.GoToolchain
@@ -34,7 +35,7 @@ class GoplsConnectionProvider(private val project: Project) : OSProcessStreamCon
         val gopls = toolchain.findTool(GoTool.GOPLS) ?: throw CannotStartProcessException(
             "gopls not found in GOBIN, PATH or ~/go/bin; click Install in the Go editor banner or set its path in the Go settings",
         )
-        val commandLine = GeneralCommandLine(gopls).withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+        val commandLine = GoChildCommandLine(listOf(gopls), toolchain.goRoots())
         // gopls shells out to `go`; the detected one must win over whatever comes first in PATH.
         toolchain.pathWithGoFirst(toolchain.lookupEnvironment().path)?.let { commandLine.withEnvironment("PATH", it) }
         project.basePath?.let { Path.of(it) }?.takeIf { Files.isDirectory(it) }?.let { commandLine.withWorkingDirectory(it) }

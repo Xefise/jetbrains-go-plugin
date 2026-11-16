@@ -90,8 +90,35 @@ class GoTestEventsConverterTest : BasePlatformTestCase() {
 
     fun testErrorLinesGoToStderrOfTheirTest() {
         val sub = node(replay(project, "calc"), "example.com/gotests/calc", "TestSub")
-        assertEquals("    calc_test.go:17: Sub(5, 3) = 8, want 2\n", output(sub, ProcessOutputType.STDERR))
+        // The failure (message, then details) is printed to stderr after the test's own output.
+        assertEquals(
+            "    calc_test.go:17: Sub(5, 3) = 8, want 2\nSub(5, 3) = 8, want 2\n    calc_test.go:17: Sub(5, 3) = 8, want 2\n",
+            output(sub, ProcessOutputType.STDERR),
+        )
         assertEquals("", output(sub, ProcessOutputType.STDOUT))
+    }
+
+    fun testFailedTestCarriesItsErrorAsMessageAndDetails() {
+        val sub = node(replay(project, "calc"), "example.com/gotests/calc", "TestSub")
+        assertEquals("Sub(5, 3) = 8, want 2", sub.errorMessage)
+        assertEquals("    calc_test.go:17: Sub(5, 3) = 8, want 2", sub.stacktrace)
+    }
+
+    fun testTestifyEqualFailureOffersTheDiff() {
+        val root = replay(project, "extra/testify")
+        val strings = node(root, "example.com/cap/fail", "TestEqualStrings")
+        assertEquals("Not equal: greeting for bob", strings.errorMessage)
+        val diff = strings.diffViewerProvider
+        assertNotNull(diff)
+        assertEquals("say \"hi\"\nthere", diff!!.left)
+        assertEquals("say \"bye\"\nthere", diff.right)
+        assertNull(node(root, "example.com/cap/fail", "TestTrue").diffViewerProvider)
+    }
+
+    fun testPackageFailureNodeShowsTheOutputOfTestMain() {
+        val root = replay(project, "extra/testmain")
+        val failure = node(root, "example.com/cap/testmain", "[package failed]")
+        assertEquals("leak detected: goroutine 7 still running", failure.stacktrace)
     }
 
     fun testInterleavedParallelSubtestKeepsItsOwnLog() {
@@ -254,15 +281,44 @@ class GoTestEventsConverterTest : BasePlatformTestCase() {
         assertTrue(root.wasTerminated())
     }
 
-    fun testRunWithOnlyStderrShowsItAndEndsWithoutTests() {
+    fun testGoFailingBeforeAnyEventIsAFailedNodeWithItsStderr() {
         val replay = SmTreeReplay(project)
-        replay.stderr("go: go.mod file not found in current directory or any parent directory\n")
-        val root = replay.terminate()
-        assertEquals("go: go.mod file not found in current directory or any parent directory\n", output(root, ProcessOutputType.STDERR))
-        assertTrue(root.children.isEmpty())
+        // Captured from Go 1.23 outside a module: no JSON at all, exit code 1.
+        replay.stderr("pattern ./...: directory prefix . does not contain main module or its selected dependencies\n")
+        val root = replay.terminate(exitCode = 1)
+        assertEquals(
+            "pattern ./...: directory prefix . does not contain main module or its selected dependencies\n",
+            output(root, ProcessOutputType.STDERR),
+        )
+        assertTree("[go test failed]: failed", root)
+        val failure = node(root, "[go test failed]")
+        assertEquals("pattern ./...: directory prefix . does not contain main module or its selected dependencies", failure.errorMessage)
+        assertEquals(failure.errorMessage, failure.stacktrace)
         assertFalse(root.isInProgress)
+    }
+
+    fun testStderrWithExitCodeZeroAddsNoNode() {
+        val replay = SmTreeReplay(project)
+        replay.stderr("go: warning\n")
+        val root = replay.terminate(exitCode = 0)
+        assertTrue(root.children.isEmpty())
         // Not attached: the runner reports that the test framework quit instead of "no tests".
         assertFalse(root.isTestsReporterAttached)
+    }
+
+    fun testStderrBeforeTheFirstEventOfAFailedRunAddsNoExtraNode() {
+        val replay = SmTreeReplay(project)
+        replay.stderr("go: downloading example.com/dep v1.0.0\n")
+        SmTreeReplay.fixture("build-failure").forEach { replay.stdout("$it\n") }
+        val root = replay.terminate(exitCode = 1)
+        assertEquals(listOf("example.com/gotests/broken"), root.children.map { it.name })
+    }
+
+    fun testStoppedRunWithoutOutputAddsNoNode() {
+        val replay = SmTreeReplay(project)
+        replay.stdout("go: downloading example.com/dep v1.0.0\n")
+        val root = replay.terminate(exitCode = 130)
+        assertTrue(root.children.isEmpty())
     }
 
     fun testReporterIsAttachedOnceJsonArrives() {
@@ -271,6 +327,26 @@ class GoTestEventsConverterTest : BasePlatformTestCase() {
         assertFalse(replay.root.isTestsReporterAttached)
         SmTreeReplay.fixture("build-failure").forEach { replay.stdout("$it\n") }
         assertTrue(replay.terminate().isTestsReporterAttached)
+    }
+
+    fun testTestsRunningAtStopAreTerminatedAndEarlierFailuresStay() {
+        System.setProperty(DEBUG_PROPERTY, "false")
+        var stopped = false
+        val replay = SmTreeReplay(project, GoTestEventsConverter(SmTreeReplay.FRAMEWORK, { stopped }))
+        for (line in SmTreeReplay.fixture("extra/stopped-after-failure")) {
+            if ("signal: interrupt" in line) stopped = true
+            replay.stdout("$line\n")
+        }
+        assertTree(
+            """
+            example.com/cap/stop: terminated
+              TestPasses: passed
+              TestFails: failed
+              TestSlowParent: terminated
+                child: terminated
+            """,
+            replay.terminate(),
+        )
     }
 
     private companion object {

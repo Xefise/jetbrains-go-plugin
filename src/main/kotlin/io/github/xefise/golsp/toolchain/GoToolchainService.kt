@@ -1,19 +1,27 @@
 package io.github.xefise.golsp.toolchain
 
 import com.intellij.execution.ExecutionException
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.execution.process.ProcessOutput
 import com.intellij.ide.trustedProjects.TrustedProjects
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import io.github.xefise.golsp.toolchain.model.ConfiguredToolPaths
+import io.github.xefise.golsp.toolchain.model.GoEnv
 import io.github.xefise.golsp.toolchain.model.GoEnvParseResult
 import io.github.xefise.golsp.toolchain.model.GoEnvParser
+import io.github.xefise.golsp.toolchain.model.GoRootPolicy
 import io.github.xefise.golsp.toolchain.model.GoTool
 import io.github.xefise.golsp.toolchain.model.GoToolchain
+import io.github.xefise.golsp.toolchain.model.GoToolchainSetting
 import io.github.xefise.golsp.toolchain.model.GoToolchainState
 import io.github.xefise.golsp.toolchain.model.LookupEnvironment
 import io.github.xefise.golsp.toolchain.model.NotFoundReason
@@ -22,10 +30,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.nio.charset.StandardCharsets
+import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
@@ -41,6 +51,7 @@ class GoToolchainService(private val project: Project, private val scope: Corout
     private var generation = 0L
     private var job: Job? = null
     private var settled = CompletableFuture<GoToolchainState>()
+    private var resolving: ProgressIndicator? = null
 
     /** Reading the snapshot starts detection lazily in projects the startup check did not recognise as Go. */
     val state: GoToolchainState get() = current.also { ensureStarted() }
@@ -51,9 +62,12 @@ class GoToolchainService(private val project: Project, private val scope: Corout
     fun refresh(configuredGoBinary: String? = configuredPaths().goBinary) {
         val gen = synchronized(lock) {
             job?.cancel()
+            resolving?.cancel()
             if (settled.isDone) settled = CompletableFuture()
             ++generation
         }
+        // A shim may now resolve to another Go (`asdf install`, `mise use`) although its own file is unchanged.
+        GoToolProcesses.clearCaches()
         // Detecting is published before the job starts, so it can never overwrite the job's result.
         update(gen, GoToolchainState.Detecting)
         synchronized(lock) {
@@ -71,13 +85,15 @@ class GoToolchainService(private val project: Project, private val scope: Corout
     }
 
     private suspend fun detectWithRetry(gen: Long, configuredGoBinary: String?) {
-        val first = safeDetect(configuredGoBinary)
-        settle(gen, first)
-        // A first `go env` may be slow while GOTOOLCHAIN downloads a toolchain; retry once, never in a loop.
-        if (first is GoToolchainState.NotFound && first.reason == NotFoundReason.GO_ENV_TIMEOUT) {
+        var detected = safeDetect(configuredGoBinary)
+        settle(gen, detected)
+        // A cold first `go env` (empty build cache, antivirus) may be slow; retry once, never in a loop.
+        if (detected is GoToolchainState.NotFound && detected.reason == NotFoundReason.GO_ENV_TIMEOUT) {
             delay(TIMEOUT_RETRY_DELAY_MS)
-            settle(gen, safeDetect(configuredGoBinary))
+            detected = safeDetect(configuredGoBinary)
+            settle(gen, detected)
         }
+        if (detected is GoToolchainState.Ready) resolveEffective(gen, detected.toolchain)
     }
 
     private fun safeDetect(configuredGoBinary: String?): GoToolchainState = try {
@@ -115,11 +131,19 @@ class GoToolchainService(private val project: Project, private val scope: Corout
 
     fun configuredPaths(): ConfiguredToolPaths = GoProjectToolchainSettings.configuredPaths(project)
 
-    /** PATH for child processes with the detected go directory first, or null when go is unknown. */
+    /**
+     * PATH for child processes with the detected go's `GOROOT/bin` first, or null when go is unknown. Not the found
+     * binary's directory: that may be `/opt/homebrew/bin` or a shims directory, and would reorder python, node...
+     */
     fun pathWithGoFirst(basePath: String?): String? {
-        val goDir = findTool(GoTool.GO)?.let { Path.of(it).parent?.toString() } ?: return null
+        val go = findTool(GoTool.GO) ?: return null
+        val real = toolchain?.takeIf { it.goBinary == go }?.let(GoToolProcesses::realGo) ?: go
+        val goDir = Path.of(real).parent?.toString() ?: return null
         return ToolLookup.prependToPath(basePath, goDir, lookupEnvironment().pathSeparator)
     }
+
+    /** GOROOTs a child process may inherit; any other inherited GOROOT is dropped (see [GoChildCommandLine]). */
+    fun goRoots(): List<String> = toolchain?.goRoots.orEmpty()
 
     private fun settle(gen: Long, state: GoToolchainState) {
         if (!update(gen, state)) return
@@ -155,20 +179,98 @@ class GoToolchainService(private val project: Project, private val scope: Corout
             GoToolLocator.find(GoTool.GO, GoToolLocator.lookupEnvironment(shellEnv))
                 ?: return GoToolchainState.NotFound(NotFoundReason.GO_NOT_FOUND, "Go executable not found in PATH, ~/go/bin, GOROOT or standard locations")
         }
-        return runGoEnv(go, shellEnv)
+        return runGoEnv(go)
     }
 
-    private fun runGoEnv(go: String, shellEnv: Map<String, String>): GoToolchainState {
-        val lookup = GoToolLocator.lookupEnvironment(shellEnv)
-        val commandLine = GeneralCommandLine(listOf(go) + GoEnvParser.ARGUMENTS)
-            .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
-            .withCharset(StandardCharsets.UTF_8)
-        Path.of(go).parent?.let { ToolLookup.prependToPath(lookup.path, it.toString(), lookup.pathSeparator) }
-            ?.let { commandLine.withEnvironment("PATH", it) }
-        // Run inside the project so go.mod/go.work `toolchain` lines (GOTOOLCHAIN=auto) pick the effective version.
-        project.basePath?.let { Path.of(it) }?.takeIf { Files.isDirectory(it) }?.let { commandLine.withWorkingDirectory(it) }
+    /**
+     * Ready is published from a `GOTOOLCHAIN=local` run; here the user's GOTOOLCHAIN and the project's go.mod may make
+     * go download another toolchain (~70 MB), so this has a long timeout, cancellation on refresh, and shows progress
+     * only once it outlives [PROGRESS_DELAY_MS] (a plain `go env` takes ~100 ms).
+     */
+    private suspend fun resolveEffective(gen: Long, local: GoToolchain) {
+        if (GoToolchainSetting.neverSwitches(userGoToolchain(local.env))) return
+        val indicator = EmptyProgressIndicator()
+        synchronized(lock) {
+            if (gen != generation || project.isDisposed) return
+            resolving = indicator
+        }
+        val done = CompletableFuture<Unit>()
+        try {
+            coroutineScope<Unit> {
+                val progress = launch {
+                    delay(PROGRESS_DELAY_MS)
+                    if (!done.isDone) showResolvingProgress(indicator, done)
+                }
+                try {
+                    val effective = runGoEnv(local.goBinary, emptyMap()) { it.runProcessWithProgressIndicator(indicator, EFFECTIVE_TIMEOUT_MS) }
+                    if (indicator.isCanceled) return@coroutineScope
+                    if (effective !is GoToolchainState.Ready) {
+                        thisLogger().info("Effective Go toolchain not resolved, keeping the local one: $effective")
+                        return@coroutineScope
+                    }
+                    update(gen, GoToolchainState.Ready(GoToolchain(local.goBinary, effective.toolchain.env, local.env.goRoot)))
+                } finally {
+                    done.complete(Unit)
+                    progress.cancel()
+                }
+            }
+        } catch (_: ProcessCanceledException) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            thisLogger().warn("Effective Go toolchain resolution failed", e)
+        } finally {
+            synchronized(lock) { if (resolving === indicator) resolving = null }
+        }
+    }
+
+    // Only mirrors the quiet run: waits for it, and cancelling the visible task kills the process through [quiet].
+    private fun showResolvingProgress(quiet: ProgressIndicator, done: CompletableFuture<Unit>) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Resolving the project's Go toolchain", true) {
+            override fun run(indicator: ProgressIndicator) {
+                while (!done.isDone) {
+                    if (indicator.isCanceled) {
+                        quiet.cancel()
+                        return
+                    }
+                    try {
+                        done.get(PROGRESS_POLL_MS, TimeUnit.MILLISECONDS)
+                    } catch (_: TimeoutException) {
+                    }
+                }
+            }
+        })
+    }
+
+    // Phase 1 forces `local`, so the user's value comes from the environment and go env files, as go itself reads them.
+    private fun userGoToolchain(env: GoEnv): String? {
+        val userFile = env.value("GOENV")?.takeIf { it != "off" }?.let { file -> readTextOrNull { Path.of(file) } }
+        val goRootFile = env.goRoot?.let { root -> readTextOrNull { Path.of(root, "go.env") } }
+        return GoToolchainSetting.effective(GoToolLocator.loadShellEnvironment()[GOTOOLCHAIN], userFile, goRootFile)
+    }
+
+    private fun readTextOrNull(path: () -> Path): String? = try {
+        path().takeIf { Files.isRegularFile(it) }?.let { Files.readString(it) }
+    } catch (_: IOException) {
+        null
+    } catch (_: InvalidPathException) {
+        null
+    }
+
+    // GOTOOLCHAIN=local never waits for a toolchain download (resolveEffective does); the forced value is not the user's.
+    private fun runGoEnv(go: String): GoToolchainState =
+        when (val state = runGoEnv(go, mapOf(GOTOOLCHAIN to "local")) { it.runProcess(GO_ENV_TIMEOUT_MS, true) }) {
+            is GoToolchainState.Ready -> GoToolchainState.Ready(GoToolchain(go, GoEnv(state.toolchain.env.values - GOTOOLCHAIN)))
+            else -> state
+        }
+
+    private fun runGoEnv(go: String, extra: Map<String, String>, run: (CapturingProcessHandler) -> ProcessOutput): GoToolchainState {
+        // Inside the project, so a shim reads its .tool-versions and go.mod/go.work `toolchain` lines apply.
+        val workDir = project.basePath?.takeIf { Files.isDirectory(Path.of(it)) } ?: System.getProperty("java.io.tmpdir")
+        // GOROOT is dropped: go finds its own, and an inherited one from another install would be reported instead.
+        val commandLine = GoToolProcesses.commandLine(go, GoEnvParser.ARGUMENTS, extra, setOf(GoRootPolicy.GOROOT), workDir)
         val output = try {
-            CapturingProcessHandler(commandLine).runProcess(GO_ENV_TIMEOUT_MS, true)
+            run(CapturingProcessHandler(commandLine))
         } catch (e: ExecutionException) {
             thisLogger().info("go env failed to start", e)
             return GoToolchainState.NotFound(NotFoundReason.GO_ENV_FAILED, "Cannot run '$go env -json': ${e.message}")
@@ -187,9 +289,13 @@ class GoToolchainService(private val project: Project, private val scope: Corout
     }
 
     companion object {
+        private const val GOTOOLCHAIN = GoToolchainSetting.NAME
         private const val GO_ENV_TIMEOUT_MS = 5_000
+        private const val EFFECTIVE_TIMEOUT_MS = 10 * 60_000
         private const val STDERR_LIMIT = 500
         private const val TIMEOUT_RETRY_DELAY_MS = 30_000L
+        private const val PROGRESS_DELAY_MS = 2_500L
+        private const val PROGRESS_POLL_MS = 100L
 
         fun getInstance(project: Project): GoToolchainService = project.service()
     }

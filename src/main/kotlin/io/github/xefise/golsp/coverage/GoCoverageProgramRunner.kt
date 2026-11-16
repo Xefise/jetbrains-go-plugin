@@ -47,9 +47,8 @@ class GoCoverageProgramRunner : GenericProgramRunner<RunnerSettings>() {
             throw ExecutionException("Cannot delete the previous cover profile $profile: ${e.message}", e)
         }
         testState.coverProfile = profile
-        val result = state.execute(environment.executor, this) ?: return null
+        val result = withFreshSuite(configuration) { state.execute(environment.executor, this) } ?: return null
         // Not attachToProcess: it shows the gathered suite even when the build failed and no profile was written.
-        CoverageHelper.resetCoverageSuit(configuration)
         val runnerSettings = environment.runnerSettings
         result.processHandler.addProcessListener(object : ProcessListener {
             override fun processTerminated(event: ProcessEvent) {
@@ -79,8 +78,28 @@ class GoCoverageProgramRunner : GenericProgramRunner<RunnerSettings>() {
                 manager.processGatheredCoverage(configuration, runnerSettings)
                 return
             }
+            dropSuite(configuration)
+        }
+
+        /**
+         * Registers the run's suite before [start] launches go: replacing a suite deletes its profile, which go creates
+         * early and writes through its open handle. Nothing started, the suite is dropped again.
+         */
+        internal fun <R : Any> withFreshSuite(configuration: GoTestConfiguration, start: () -> R?): R? {
+            CoverageHelper.resetCoverageSuit(configuration)
+            val result = try {
+                start()
+            } catch (e: Throwable) {
+                dropSuite(configuration)
+                throw e
+            }
+            if (result == null) dropSuite(configuration)
+            return result
+        }
+
+        private fun dropSuite(configuration: GoTestConfiguration) {
             val coverage = CoverageEnabledConfiguration.getOrCreate(configuration)
-            coverage.currentCoverageSuite?.let(manager::unregisterCoverageSuite)
+            coverage.currentCoverageSuite?.let(CoverageDataManager.getInstance(configuration.project)::unregisterCoverageSuite)
             coverage.currentCoverageSuite = null
         }
 

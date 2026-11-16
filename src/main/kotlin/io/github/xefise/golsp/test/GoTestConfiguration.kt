@@ -8,9 +8,12 @@ import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.configurations.RuntimeConfigurationError
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ConsoleView
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.execution.ParametersListUtil
 import io.github.xefise.golsp.execution.GoRunConfigurationBase
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
@@ -23,6 +26,7 @@ import io.github.xefise.golsp.test.model.GoTestSelection
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.reflect.KMutableProperty0
 
 class GoTestConfiguration(project: Project, factory: ConfigurationFactory, name: String) :
     GoRunConfigurationBase<GoTestOptions>(project, factory, name), DumbAware {
@@ -91,6 +95,22 @@ class GoTestConfiguration(project: Project, factory: ConfigurationFactory, name:
         internal set
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = GoTestSettingsEditor(project)
+
+    override fun pathOptions(): List<KMutableProperty0<String>> = listOf(this::directory, this::filePath, this::envFile)
+
+    /** The test's full name, the file's name, `go test ./a/b` or `go test ./a/...`; null for a hand-made list of names. */
+    override fun suggestedName(): String? {
+        val names = testNames.filter { it.isNotBlank() }
+        return when (scope) {
+            GoTestScope.FILE -> if (names.isEmpty()) storedPath(filePath)?.fileName?.toString() else null
+            GoTestScope.PACKAGE -> when (names.size) {
+                0 -> storedPath(directory)?.let { "go test ${relativePath(project, it)}" }
+                1 -> names.single()
+                else -> null
+            }
+            GoTestScope.DIRECTORY -> if (names.isEmpty()) storedPath(directory)?.let { "go test ${relativePath(project, it)}/..." } else null
+        }
+    }
 
     override fun checkConfiguration() {
         when (scope) {
@@ -175,5 +195,16 @@ class GoTestConfiguration(project: Project, factory: ConfigurationFactory, name:
 
     companion object {
         const val TEST_FILE_SUFFIX: String = "_test.go"
+
+        /** "." for a content root, "./a/b" beneath one; by path alone, so it holds for a directory just renamed away. */
+        internal fun relativePath(project: Project, directory: Path): String {
+            val roots = ReadAction.computeBlocking<List<Path>, RuntimeException> {
+                ProjectRootManager.getInstance(project).contentRoots.map { Path.of(it.path).normalize() }
+            }
+            val root = roots.filter { directory.startsWith(it) }.maxByOrNull { it.nameCount }
+                ?: return "./${directory.fileName ?: directory}"
+            val relative = FileUtil.toSystemIndependentName(root.relativize(directory).toString())
+            return if (relative.isEmpty()) "." else "./$relative"
+        }
     }
 }

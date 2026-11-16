@@ -1,5 +1,6 @@
 package io.github.xefise.golsp.toolchain.model
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -20,6 +21,27 @@ class GoToolchainStateTest {
         assertFalse(ready().sameAs(ready(env = base + ("GOVERSION" to "go1.27.4"))))
         assertFalse(ready().sameAs(ready(env = base + ("GOBIN" to "/bin2"))))
         assertFalse(ready().sameAs(ready(go = "/other/go")))
+    }
+
+    @Test
+    fun `another local GOROOT behind the same binary is a different toolchain`() {
+        val shim = "/home/u/.asdf/shims/go"
+        assertFalse(
+            GoToolchain(shim, GoEnv(base), localGoRoot = "/asdf/1.24/go")
+                .sameAs(GoToolchain(shim, GoEnv(base), localGoRoot = "/asdf/1.25/go")),
+        )
+    }
+
+    @Test
+    fun `GOTOOLCHAIN alone does not change the identity`() {
+        assertTrue(ready().sameAs(ready(env = base + ("GOTOOLCHAIN" to "auto"))))
+    }
+
+    @Test
+    fun `goRoots lists the local and the effective GOROOT once each`() {
+        assertEquals(listOf("/sdk"), GoToolchain("/sdk/bin/go", GoEnv(base)).goRoots)
+        val switched = GoToolchain("/sdk/bin/go", GoEnv(base + ("GOROOT" to "/modcache/go1.28")), localGoRoot = "/sdk")
+        assertEquals(listOf("/sdk", "/modcache/go1.28"), switched.goRoots)
     }
 
     @Test

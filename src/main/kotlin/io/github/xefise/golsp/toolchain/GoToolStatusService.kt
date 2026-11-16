@@ -91,10 +91,11 @@ class GoToolStatusService(private val project: Project, private val scope: Corou
         val toolchainService = GoToolchainService.getInstance(project)
         val toolchain = (toolchainService.state as? GoToolchainState.Ready)?.toolchain ?: return GoToolStatusSnapshot.NOT_CHECKED
         val projectGo = GoVersion.parse(toolchain.env.goVersion)
-        val installGo = GoToolProcesses.localGoVersion(toolchain.goBinary)
+        val go = GoToolProcesses.realGo(toolchain)
+        val installGo = GoToolProcesses.localGoVersion(go)
         val statuses = GoToolStatusSnapshot.CHECKED_TOOLS.associateWith { tool ->
             val path = toolchainService.findTool(tool)
-            val info = path?.let { GoToolProcesses.binaryInfo(toolchain.goBinary, it) }
+            val info = path?.let { GoToolProcesses.binaryInfo(go, it) }
             GoToolStatuses.evaluate(GoToolRegistry.spec(tool)!!, path, info, projectGo, installGo)
         }
         return GoToolStatusSnapshot(statuses)

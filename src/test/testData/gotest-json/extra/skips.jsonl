@@ -1,0 +1,19 @@
+{"Time":"2026-11-14T16:54:50.816453+04:00","Action":"start","Package":"example.com/cap/skips"}
+{"Time":"2026-11-14T16:54:51.08649+04:00","Action":"run","Package":"example.com/cap/skips","Test":"TestSkipWithReason"}
+{"Time":"2026-11-14T16:54:51.086597+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipWithReason","Output":"=== RUN   TestSkipWithReason\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:51.086677+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipWithReason","Output":"    skip_test.go:6: setting up\n"}
+{"Time":"2026-11-14T16:54:51.086694+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipWithReason","Output":"    skip_test.go:7: needs a database\n"}
+{"Time":"2026-11-14T16:54:51.086707+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipWithReason","Output":"--- SKIP: TestSkipWithReason (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:51.086728+04:00","Action":"skip","Package":"example.com/cap/skips","Test":"TestSkipWithReason","Elapsed":0}
+{"Time":"2026-11-14T16:54:51.086742+04:00","Action":"run","Package":"example.com/cap/skips","Test":"TestSkipNow"}
+{"Time":"2026-11-14T16:54:51.086749+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipNow","Output":"=== RUN   TestSkipNow\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:51.086759+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipNow","Output":"--- SKIP: TestSkipNow (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:51.086767+04:00","Action":"skip","Package":"example.com/cap/skips","Test":"TestSkipNow","Elapsed":0}
+{"Time":"2026-11-14T16:54:51.086774+04:00","Action":"run","Package":"example.com/cap/skips","Test":"TestSkipf"}
+{"Time":"2026-11-14T16:54:51.086781+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipf","Output":"=== RUN   TestSkipf\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:51.086787+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipf","Output":"    skip_test.go:15: skipped on darwin\n"}
+{"Time":"2026-11-14T16:54:51.086793+04:00","Action":"output","Package":"example.com/cap/skips","Test":"TestSkipf","Output":"--- SKIP: TestSkipf (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:51.086805+04:00","Action":"skip","Package":"example.com/cap/skips","Test":"TestSkipf","Elapsed":0}
+{"Time":"2026-11-14T16:54:51.086811+04:00","Action":"output","Package":"example.com/cap/skips","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-14T16:54:51.087484+04:00","Action":"output","Package":"example.com/cap/skips","Output":"ok  \texample.com/cap/skips\t0.271s\n"}
+{"Time":"2026-11-14T16:54:51.089161+04:00","Action":"pass","Package":"example.com/cap/skips","Elapsed":0.273}

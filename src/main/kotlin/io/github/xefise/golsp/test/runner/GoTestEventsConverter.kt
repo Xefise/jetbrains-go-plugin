@@ -18,8 +18,13 @@ import jetbrains.buildServer.messages.serviceMessages.ServiceMessageVisitor
  *
  * With [test2JsonPackage] the input is a `dlv dap` process debugging that package's tests instead, see
  * [GoDelveTestStream]; the import path is resolved on the output reader thread, never on EDT.
+ * [stoppedByUser] turns true once Stop was pressed, before the process gets its signal.
  */
-class GoTestEventsConverter(testFrameworkName: String, test2JsonPackage: (() -> String)? = null) :
+class GoTestEventsConverter(
+    testFrameworkName: String,
+    private val stoppedByUser: () -> Boolean = { false },
+    test2JsonPackage: (() -> String)? = null,
+) :
     // Buffer until newline: a JSON event split across reads must reach the reducer whole. Attribute validation is off
     // as for any id-based tree: messages carry nodeId and an empty name.
     OutputToGeneralTestEventsConverter(testFrameworkName, false, false, false) {
@@ -31,6 +36,9 @@ class GoTestEventsConverter(testFrameworkName: String, test2JsonPackage: (() -> 
     private val lock = Any()
     private var lastVisitor: ServiceMessageVisitor? = null
     private var reporterAttached = false
+
+    // stderr of a go command that fails before its first event, e.g. outside a module; bounded.
+    private val earlyStderr = StringBuilder()
 
     // Its callbacks run inside write/finish, i.e. under the lock.
     private val delve = test2JsonPackage?.let { pkg ->
@@ -55,25 +63,37 @@ class GoTestEventsConverter(testFrameworkName: String, test2JsonPackage: (() -> 
                     acceptEvent(text, visitor)
                 }
                 // Text of the go command itself; the active node of a parallel run would be an arbitrary test.
-                else -> send(GoTestNodeEvent.Output(null, text, error = true), visitor)
+                else -> {
+                    lastVisitor = visitor
+                    if (!reporterAttached) earlyStderr.append(text, 0, minOf(text.length, MAX_EARLY_STDERR - earlyStderr.length))
+                    send(GoTestNodeEvent.Output(null, text, error = true), visitor)
+                }
             }
             true
         }
 
     private fun acceptEvent(line: String, visitor: ServiceMessageVisitor) {
-        if (!reporterAttached && looksLikeEvent(line)) {
-            reporterAttached = true
-            // A package reports wall-clock Elapsed; summing its parallel tests would overstate it.
-            send(ServiceMessageBuilder.testsStarted().addAttribute("durationStrategy", "manual"), visitor)
-        }
+        if (!reporterAttached && looksLikeEvent(line)) attachReporter(visitor)
+        if (stoppedByUser()) reducer.stop()
         mapper.map(reducer.accept(line)).forEach { send(it, visitor) }
+    }
+
+    private fun attachReporter(visitor: ServiceMessageVisitor) {
+        reporterAttached = true
+        // A package reports wall-clock Elapsed; summing its parallel tests would overstate it.
+        send(ServiceMessageBuilder.testsStarted().addAttribute("durationStrategy", "manual"), visitor)
     }
 
     override fun flushBufferOnProcessTermination(exitCode: Int) {
         super.flushBufferOnProcessTermination(exitCode)
         synchronized(lock) {
-            // No visitor means no stdout line was ever seen, so the reducer has nothing to close.
+            // No visitor means no output was ever seen, so the reducer has nothing to close.
             val visitor = lastVisitor ?: return
+            // Without a node the tree would only say that the test framework quit; a stopped build has no stderr.
+            if (delve == null && !reporterAttached && exitCode != 0 && earlyStderr.isNotBlank()) {
+                attachReporter(visitor)
+                GoTestNodeEventMapper.runFailure(earlyStderr.toString(), exitCode).forEach { send(it, visitor) }
+            }
             delve?.finish()
             mapper.mapAfterExit(reducer.finish()).forEach { send(it, visitor) }
         }
@@ -90,19 +110,27 @@ class GoTestEventsConverter(testFrameworkName: String, test2JsonPackage: (() -> 
                 .addAttribute(LOCATION, event.locationUrl)
             is GoTestNodeEvent.TestStarted -> ServiceMessageBuilder.testStarted(event.name)
                 .addAttribute(NODE_ID, event.id)
-                .addAttribute(PARENT_NODE_ID, event.parentId)
-                .addAttribute(LOCATION, event.locationUrl)
+                .addAttribute(PARENT_NODE_ID, event.parentId ?: TreeNodeEvent.ROOT_NODE_ID)
+                .apply { event.locationUrl?.let { addAttribute(LOCATION, it) } }
             is GoTestNodeEvent.Output -> (if (event.error) ServiceMessageBuilder.testStdErr("") else ServiceMessageBuilder.testStdOut(""))
                 .addAttribute(NODE_ID, event.id ?: TreeNodeEvent.ROOT_NODE_ID)
                 .addAttribute("out", event.text)
             // In the id-based tree testFinished closes suites too, with their state computed from the children.
             is GoTestNodeEvent.Finished -> ServiceMessageBuilder.testFinished("").addAttribute(NODE_ID, event.id)
                 .withDuration(event.durationMs)
+            // Stack trace filters (jump to "foo_test.go:42") only see details; expected with actual enable the diff.
             is GoTestNodeEvent.Failed -> ServiceMessageBuilder.testFailed("").addAttribute(NODE_ID, event.id)
                 .addAttribute("message", event.message)
+                .apply { if (event.details.isNotEmpty()) addAttribute("details", event.details) }
+                .apply {
+                    if (event.expected != null && event.actual != null) {
+                        addAttribute("expected", event.expected)
+                        addAttribute("actual", event.actual)
+                    }
+                }
                 .withDuration(event.durationMs)
             is GoTestNodeEvent.Ignored -> ServiceMessageBuilder.testIgnored("").addAttribute(NODE_ID, event.id)
-                .addAttribute("message", "")
+                .addAttribute("message", event.message)
         }
         send(message, visitor)
     }
@@ -117,5 +145,7 @@ class GoTestEventsConverter(testFrameworkName: String, test2JsonPackage: (() -> 
     private companion object {
         const val NODE_ID = "nodeId"
         const val PARENT_NODE_ID = "parentNodeId"
-        const val LOCATION = "locationHint"    }
+        const val LOCATION = "locationHint"
+        const val MAX_EARLY_STDERR = 64 * 1024
+    }
 }

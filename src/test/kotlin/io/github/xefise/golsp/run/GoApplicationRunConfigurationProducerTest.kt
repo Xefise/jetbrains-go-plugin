@@ -4,6 +4,10 @@ import com.intellij.execution.Location
 import com.intellij.execution.PsiLocation
 import com.intellij.execution.RunManager
 import com.intellij.execution.actions.ConfigurationContext
+import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -194,6 +198,62 @@ class GoApplicationRunConfigurationProducerTest : BasePlatformTestCase() {
         val file = add("scratch/main.go", "package main\n\nfunc main() {}\n")
         val stale = configWith { packageDirectory = dirPath(file) }
         assertFalse(producer.isConfigurationFromContext(stale, context(mainLeaf(file))))
+    }
+
+    // `go run gen.go` inside a library: `go build .` would build the library, not the generator.
+    fun testIgnoreConstrainedGeneratorInLibraryProducesFileConfiguration() {
+        add("pkg/lib/lib.go", "package lib\n\nfunc Lib() {}\n")
+        val gen = add("pkg/lib/gen.go", "//go:build ignore\n\npackage main\n\nfunc main() {}\n")
+        val config = produced(mainLeaf(gen))!!
+        assertEquals(GoRunKind.FILE, config.runKind)
+        assertEquals(gen.virtualFile.path, config.filePath)
+        assertEquals("gen.go", config.name)
+        assertTrue(producer.isConfigurationFromContext(config, context(gen)))
+    }
+
+    fun testIgnoreConstrainedGeneratorDoesNotMakeItsDirectoryAMainPackage() {
+        val gen = add("pkg/lib/gen.go", "//go:build ignore\n\npackage main\n\nfunc main() {}\n")
+        assertNull(produced(gen.containingDirectory))
+        val existing = configWith { packageDirectory = dirPath(gen) }
+        assertFalse(producer.isConfigurationFromContext(existing, context(mainLeaf(gen))))
+    }
+
+    fun testGeneratorBesideARealMainKeepsBothKinds() {
+        val main = add("cmd/app/main.go", "package main\n\nfunc main() {}\n")
+        val gen = add("cmd/app/gen.go", "// +build ignore\n\npackage main\n\nfunc main() {}\n")
+        assertEquals(GoRunKind.PACKAGE, produced(mainLeaf(main))!!.runKind)
+        assertEquals(GoRunKind.FILE, produced(mainLeaf(gen))!!.runKind)
+        assertEquals(GoRunKind.PACKAGE, produced(main.containingDirectory)!!.runKind)
+    }
+
+    // go skips `_x.go` / `.x.go` even when named on the command line, so neither form can run them.
+    fun testFilesGoIgnoresByNameProduceNothing() {
+        val underscore = add("tools/_gen.go", "package main\n\nfunc main() {}\n")
+        add("tools/.hidden.go", "package main\n\nfunc main() {}\n")
+        assertNull(produced(mainLeaf(underscore)))
+        assertNull(produced(underscore.containingDirectory))
+    }
+
+    fun testMultiSelectionProducesNothing() {
+        val a = add("cmd/a/main.go", "package main\n\nfunc main() {}\n")
+        val b = add("cmd/b/main.go", "package main\n\nfunc main() {}\n")
+        val dataContext = SimpleDataContext.builder()
+            .add(CommonDataKeys.PROJECT, project)
+            .add(Location.DATA_KEY, PsiLocation(a))
+            .add(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY, arrayOf(a, b))
+            .build()
+        assertNull(producer.createConfigurationFromContext(ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN)))
+        val single = SimpleDataContext.builder()
+            .add(CommonDataKeys.PROJECT, project)
+            .add(Location.DATA_KEY, PsiLocation(a))
+            .add(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY, arrayOf(a))
+            .build()
+        assertNotNull(producer.createConfigurationFromContext(ConfigurationContext.getFromContext(single, ActionPlaces.UNKNOWN)))
+    }
+
+    fun testUnparsableStoredPathIsNotReused() {
+        val file = add("cmd/app/main.go", "package main\n\nfunc main() {}\n")
+        assertFalse(producer.isConfigurationFromContext(configWith { packageDirectory = "bad\u0000dir" }, context(mainLeaf(file))))
     }
 
     private fun withExcluded(dir: VirtualFile, block: () -> Unit) {

@@ -87,7 +87,8 @@ class GoToolInstaller {
         if (!TrustedProjects.isProjectTrusted(project)) return
         indicator.isIndeterminate = true
         indicator.text = "Checking the local Go version"
-        val installGo = GoToolProcesses.localGoVersion(toolchain.goBinary)
+        val go = GoToolProcesses.realGo(toolchain)
+        val installGo = GoToolProcesses.localGoVersion(go)
         val projectGo = GoVersion.parse(toolchain.env.goVersion)
         val workDir = try {
             Files.createTempDirectory("golsp-tools")
@@ -96,7 +97,9 @@ class GoToolInstaller {
             return
         }
         try {
-            val command = GoToolInstall.command(spec, toolchain.goBinary, installGo, projectGo, workDir.toString(), toolchain.env)
+            val command = GoToolInstall.command(
+                spec, go, installGo, projectGo, workDir.toString(), toolchain.env, GoToolLocator.loadShellEnvironment(),
+            )
             indicator.text = "go ${command.arguments.joinToString(" ")}"
             val commandLine = GoToolProcesses.commandLine(
                 command.executable, command.arguments, command.environment, command.removedEnvironment, command.workingDirectory,

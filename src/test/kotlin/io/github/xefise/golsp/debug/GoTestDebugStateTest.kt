@@ -55,7 +55,7 @@ class GoTestDebugStateTest : BasePlatformTestCase() {
         assertEquals(packageDir, params["program"])
         assertEquals(packageDir, params["cwd"])
         assertEquals(listOf("-test.run", "^TestSubtests$/^with_space$", "-test.v=test2json"), params["args"])
-        assertEquals(listOf("-tags=x"), params["buildFlags"])
+        assertEquals("-tags=x", params["buildFlags"])
     }
 
     fun testFileScopeDebugsItsPackageLimitedToTheFileTests() {

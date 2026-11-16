@@ -3,6 +3,10 @@ package io.github.xefise.golsp.test
 import com.intellij.execution.Location
 import com.intellij.execution.PsiLocation
 import com.intellij.execution.actions.ConfigurationContext
+import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.WriteAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -11,6 +15,16 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
 class GoTestRunConfigurationProducerTest : BasePlatformTestCase() {
     private val producer = GoTestRunConfigurationProducer()
+    private lateinit var rootModule: PsiFile
+
+    override fun setUp() {
+        super.setUp()
+        rootModule = myFixture.addFileToProject("go.mod", "module example.com/calc\n\ngo 1.27\n")
+    }
+
+    private fun withoutRootModule() {
+        WriteAction.runAndWait<Throwable> { rootModule.virtualFile.delete(this) }
+    }
 
     private fun context(element: PsiElement): ConfigurationContext =
         ConfigurationContext.createEmptyContextForLocation(PsiLocation(element) as Location<*>)
@@ -172,6 +186,47 @@ class GoTestRunConfigurationProducerTest : BasePlatformTestCase() {
         val file = add("ign/_skip_test.go", subtests)
         add("ign/.hidden_test.go", subtests)
         assertNull(produced(file.containingDirectory))
+    }
+
+    // `go test` in a directory without go.mod fails with "go.mod file not found".
+    fun testOutsideAnyModuleNothingIsProduced() {
+        withoutRootModule()
+        val file = add("calc/calc_test.go", subtests)
+        assertNull(produced(leaf(file, "TestAdd")))
+        assertNull(produced(leaf(file, "helper")))
+        assertNull(produced(file))
+        assertNull(produced(file.containingDirectory))
+    }
+
+    fun testNestedModuleAboveMakesTestsRunnableWithoutARootModule() {
+        withoutRootModule()
+        myFixture.addFileToProject("svc/go.mod", "module svc\n")
+        val file = add("svc/calc/calc_test.go", subtests)
+        assertEquals(GoTestScope.PACKAGE, produced(leaf(file, "TestAdd"))!!.scope)
+        assertEquals(GoTestScope.PACKAGE, produced(file.containingDirectory)!!.scope)    }
+
+    fun testMultiSelectionProducesNothing() {
+        val a = add("calc/a_test.go", subtests)
+        val b = add("calc/b_test.go", subtests)
+        fun context(vararg selection: PsiElement) = ConfigurationContext.getFromContext(
+            SimpleDataContext.builder()
+                .add(CommonDataKeys.PROJECT, project)
+                .add(Location.DATA_KEY, PsiLocation(a))
+                .add(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY, arrayOf(*selection))
+                .build(),
+            ActionPlaces.UNKNOWN,
+        )
+        assertNull(producer.createConfigurationFromContext(context(a, b)))
+        assertEquals(GoTestScope.FILE, (producer.createConfigurationFromContext(context(a))!!.configuration as GoTestConfiguration).scope)
+    }
+
+    fun testUnparsableStoredPathIsNotReused() {
+        val file = add("calc/calc_test.go", subtests)
+        val stale = (producer.configurationFactory.createTemplateConfiguration(project) as GoTestConfiguration).apply {
+            scope = GoTestScope.FILE
+            filePath = "bad\u0000_test.go"
+        }
+        assertFalse(producer.isConfigurationFromContext(stale, context(file)))
     }
 
     // Past the scan bound the walk stops and assumes nested tests rather than costing seconds on a huge tree.

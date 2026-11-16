@@ -4,7 +4,9 @@ import com.intellij.execution.TestStateStorage
 import com.intellij.execution.lineMarker.RunLineMarkerContributor
 import com.intellij.execution.testframework.sm.runner.states.TestStateInfo
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.WriteAction
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.PsiTestUtil
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
@@ -15,6 +17,12 @@ import java.util.Date
 
 class GoTestRunLineMarkerContributorTest : BasePlatformTestCase() {
     private val contributor = GoTestRunLineMarkerContributor()
+    private lateinit var rootModule: PsiFile
+
+    override fun setUp() {
+        super.setUp()
+        rootModule = myFixture.addFileToProject("go.mod", "module example.com/m\n")
+    }
 
     private fun markedLeaves(text: String, name: String = "calc_test.go"): List<PsiElement> {
         val file = myFixture.configureByText(name, text)
@@ -263,14 +271,12 @@ class GoTestRunLineMarkerContributorTest : BasePlatformTestCase() {
     }
 
     fun testUrlUsesModuleImportPathAndPrintedName() {
-        myFixture.addFileToProject("go.mod", "module example.com/m\n")
         val file = myFixture.addFileToProject("calc/calc_test.go", test("func TestAdd(t *testing.T) {\n\tt.Run(\"sub case\", nil)\n}")) as GoFile
         val sub = GoTestDeclarations.of(file).single { it.fullName == "TestAdd/sub case" }
         assertEquals("gotest://example.com/m/calc#TestAdd/sub_case", GoTestRunLineMarkerContributor.testUrl(file, sub))
     }
 
     fun testIconShowsTheLastRunState() {
-        myFixture.addFileToProject("go.mod", "module example.com/m\n")
         val file = myFixture.addFileToProject("calc/calc_test.go", test("func TestAdd(t *testing.T) {}\nfunc TestSub(t *testing.T) {}"))
         val storage = TestStateStorage.getInstance(project)
         fun record(magnitude: TestStateInfo.Magnitude) = TestStateStorage.Record(magnitude.value, Date(), 0, 0, "", "", "")
@@ -285,8 +291,15 @@ class GoTestRunLineMarkerContributorTest : BasePlatformTestCase() {
         }
     }
 
-    fun testIconWithoutModuleIsPlainRun() {
+    fun testIconWithoutModulePathIsPlainRun() {
+        myFixture.addFileToProject("nomod/go.mod", "go 1.27\n")
         val file = myFixture.addFileToProject("nomod/x_test.go", test("func TestAdd(t *testing.T) {}"))
         assertSame(AllIcons.RunConfigurations.TestState.Run, contributor.getInfo(file.findElementAt(file.text.indexOf("TestAdd"))!!)!!.icon)
+    }
+
+    // No configuration can run a test outside a module, so the gutter offers none.
+    fun testTestOutsideAnyModuleIsNotMarked() {
+        WriteAction.runAndWait<Throwable> { rootModule.virtualFile.delete(this) }
+        assertEquals(emptyList<String>(), marked(test("func TestAdd(t *testing.T) {}")))
     }
 }

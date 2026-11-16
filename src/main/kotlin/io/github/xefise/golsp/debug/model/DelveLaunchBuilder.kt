@@ -20,9 +20,11 @@ object DelveLaunchBuilder {
 
     const val READY_PATTERN: String = "${DelveOutput.READY_PREFIX}\${address}:\${port}"
 
+    /** [output] is where dlv writes the binary it builds; without it dlv creates `__debug_bin*` in its cwd. */
     fun launchParameters(
         request: GoExecutionRequest,
         outputMode: DelveOutputMode = DEFAULT_OUTPUT_MODE,
+        output: String? = null,
     ): Map<String, Any> {
         val test = request.test
         val flags = if (test == null) DelveTestFlags.Split(request.buildFlags, emptyList()) else DelveTestFlags.split(request.buildFlags)
@@ -35,8 +37,9 @@ object DelveLaunchBuilder {
             "cwd" to request.workingDirectory,
             "env" to request.environment,
         )
-        // The array form is passed to `go build` verbatim, without dlv re-splitting quoted flags.
-        if (flags.buildFlags.isNotEmpty()) params["buildFlags"] = flags.buildFlags
+        // dlv older than 1.21.1 rejects the array form, so always send the string dlv splits itself.
+        if (flags.buildFlags.isNotEmpty()) params["buildFlags"] = quoteBuildFlags(flags.buildFlags)
+        output?.let { params["output"] = it }
         outputMode.dapValue?.let { params["outputMode"] = it }
         return params
     }
@@ -50,6 +53,15 @@ object DelveLaunchBuilder {
         // The test tree parses this framing; a user -test.v among the test arguments would switch it off.
         arguments += TEST2JSON_VERBOSE
         return arguments
+    }
+
+    /** Joins [flags] so that delve's `config.SplitQuotedFields(s, '\'')` yields them back unchanged. */
+    fun quoteBuildFlags(flags: List<String>): String = flags.joinToString(" ", transform = ::quoteFlag)
+
+    // Outside quotes a backslash is literal; inside them it escapes the next character. Go's unicode.IsSpace adds U+0085.
+    private fun quoteFlag(flag: String): String {
+        if (flag.isNotEmpty() && flag.none { it == '\'' || it == '\u0085' || it.isWhitespace() }) return flag
+        return "'" + flag.replace("\\", "\\\\").replace("'", "\\'") + "'"
     }
 
     private fun isVerboseFlag(argument: String): Boolean = VERBOSE_FLAG.matches(argument)

@@ -41,3 +41,23 @@ object GoEnvParser {
         return GoEnvParseResult.Success(GoEnv(values))
     }
 }
+
+/** GOTOOLCHAIN as `go` resolves it when detection does not force `local`. */
+object GoToolchainSetting {
+    const val NAME = "GOTOOLCHAIN"
+    private const val LOCAL = "local"
+
+    /** A non-empty process value wins, then the user's go env file, then `GOROOT/go.env`; null if none sets it. */
+    fun effective(processValue: String?, userEnvFile: String?, goRootEnvFile: String?): String? =
+        processValue?.takeIf { it.isNotEmpty() }
+            ?: userEnvFile?.let { parseEnvFile(it)[NAME] }
+            ?: goRootEnvFile?.let { parseEnvFile(it)[NAME] }
+
+    /** Only `local` can never switch to (or download) another toolchain; anything else must be resolved by `go env`. */
+    fun neverSwitches(effective: String?): Boolean = effective == LOCAL
+
+    // Mirrors cmd/go's readEnvFile: `KEY=value` lines, a key starts with A-Z, values are taken verbatim.
+    fun parseEnvFile(text: String): Map<String, String> = text.lineSequence()
+        .filter { it.isNotEmpty() && it[0] in 'A'..'Z' && '=' in it }
+        .associate { it.substringBefore('=') to it.substringAfter('=') }
+}

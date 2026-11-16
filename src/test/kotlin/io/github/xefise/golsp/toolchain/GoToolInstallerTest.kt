@@ -91,6 +91,23 @@ class GoToolInstallerTest : BasePlatformTestCase() {
         assertFalse(workDir!!.startsWith(File(project.basePath ?: "/nonexistent")))
     }
 
+    fun testInstallRunsTheRealGoOfTheDetectedGorootNotTheShim() {
+        val root = File(dir, "root").apply { File(this, "bin").mkdirs() }
+        val real = File(root, "bin/go").apply {
+            writeText("#!/bin/sh\necho '{\"GOROOT\":\"${root.path}\",\"GOVERSION\":\"go1.27.3\"}'\n")
+            setExecutable(true)
+        }
+        val shim = executable("shim-go", "exec '${real.path}' \"$@\"")
+        GoToolchainSettings.getInstance().update(shim.path, File(dir, "gopls").path, "")
+        val service = GoToolchainService.getInstance(project)
+        service.refresh()
+        waitUntil("toolchain from the shim") { (service.state as? GoToolchainState.Ready)?.toolchain?.goBinary == shim.path }
+        assertTrue(GoToolInstaller.getInstance().install(project, GoTool.DLV))
+        val install = commands.single { it.parametersList.list.firstOrNull() == "install" }
+        assertEquals(real.path, install.exePath)
+        assertEquals(File(root, "bin").path, service.pathWithGoFirst("/usr/bin:${shim.parent}")!!.substringBefore(':'))
+    }
+
     fun testFailedInstallNotifiesWithTheEscapedStderrTail() {
         onInstall = { output(1, stderr = "go: downloading x\ngo: module <bad> not found\n") }
         assertTrue(GoToolInstaller.getInstance().install(project, GoTool.GOPLS))
@@ -151,8 +168,9 @@ class GoToolInstallerTest : BasePlatformTestCase() {
             snapshot.status(GoTool.GOPLS)?.let { synchronized(seen) { seen += it.state; versions += it.version } }
         })
         onInstall = {
-            File(dir, "gopls").appendText("# rebuilt\n")
+            // The new version first: a concurrent check that sees the rebuilt file must not cache the old version under its stamp.
             onVersion = { output(0, VERSION_M.replace("BIN", it).replace("v0.24.0", "v0.25.0")) }
+            File(dir, "gopls").appendText("# rebuilt\n")
             output(0)
         }
         assertTrue(GoToolInstaller.getInstance().install(project, GoTool.GOPLS))

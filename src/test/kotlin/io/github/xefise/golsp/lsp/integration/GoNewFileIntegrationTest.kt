@@ -3,6 +3,7 @@ package io.github.xefise.golsp.lsp.integration
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.fileTemplates.FileTemplateManager
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDocumentManager
 import com.redhat.devtools.lsp4ij.LanguageServerManager
 import com.redhat.devtools.lsp4ij.ServerStatus
@@ -10,6 +11,8 @@ import io.github.xefise.golsp.lang.GoCreateFileAction
 import io.github.xefise.golsp.lsp.GoplsLanguageServerFactory
 import io.github.xefise.golsp.toolchain.integration.GoIntegrationTestCase
 import io.github.xefise.golsp.toolchain.model.GoTool
+import java.nio.file.Files
+import java.nio.file.Path
 
 class GoNewFileIntegrationTest : GoIntegrationTestCase() {
     override val requiredTools: List<GoTool> = listOf(GoTool.GO, GoTool.GOPLS)
@@ -41,7 +44,29 @@ class GoNewFileIntegrationTest : GoIntegrationTestCase() {
         assertTrue(document.text, document.text.startsWith("package order\n"))
     }
 
-    // A resolved definition proves gopls has loaded the package the new file joins.
+    fun testFileCreatedOutsideTheIdeJoinsItsPackageInAGoWorkspace() {
+        fixture.addFileToProject("go.work", "go 1.27\n\nuse ./app\n")
+        fixture.addFileToProject("app/go.mod", "module app\n\ngo 1.27\n")
+        val sibling = fixture.addFileToProject(
+            "app/order/order.go",
+            "package order\n\nfunc Total() int { return one() }\n\nfunc one() int { return 1 }\n",
+        )
+        fixture.configureFromExistingVirtualFile(sibling.virtualFile)
+        waitUntil("gopls to start") {
+            LanguageServerManager.getInstance(project).getServerStatus(GoplsLanguageServerFactory.SERVER_ID) == ServerStatus.started
+        }
+        awaitPackageLoaded(sibling.text.indexOf("one()"))
+
+        val text = "package order\n\nfunc Twice() int { return Total() * 2 }\n"
+        val path = Path.of(absolutePath("app/order/twice.go"))
+        Files.writeString(path, text)
+        val created = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path)!!
+        fixture.configureFromExistingVirtualFile(created)
+
+        awaitPackageLoaded(text.indexOf("Total()"))
+    }
+
+    // A resolved definition proves gopls has loaded the package the open file belongs to.
     private fun awaitPackageLoaded(offset: Int) {
         val file = fixture.file
         val editor = fixture.editor

@@ -10,6 +10,7 @@ import io.github.xefise.golsp.lsp.model.GoplsSnippets
 import org.eclipse.lsp4j.CompletionItem
 import org.eclipse.lsp4j.InitializeParams
 import org.eclipse.lsp4j.InsertTextFormat
+import org.eclipse.lsp4j.ServerCapabilities
 
 class GoplsClientFeatures : LSPClientFeatures() {
     init {
@@ -26,6 +27,13 @@ class GoplsClientFeatures : LSPClientFeatures() {
         // LSP4IJ declares only a few modifiers and gopls sends only declared ones (defaultLibrary, type kinds...).
         val semanticTokens = initializeParams.capabilities?.textDocument?.semanticTokens ?: return
         semanticTokens.tokenModifiers = GoplsSemanticTokens.withExtraModifiers(semanticTokens.tokenModifiers)
+    }
+
+    override fun setServerCapabilities(serverCapabilities: ServerCapabilities) {
+        // gopls caches a file announced by didCreateFiles and then never reloads its package ("No packages found" until
+        // restart). LSP4IJ passes this same instance to its file-operations filter after this call.
+        serverCapabilities.workspace?.fileOperations?.didCreate = null
+        super.setServerCapabilities(serverCapabilities)
     }
 }
 

@@ -15,6 +15,7 @@ import com.intellij.util.execution.ParametersListUtil
 import io.github.xefise.golsp.execution.GoConsoleFilter
 import io.github.xefise.golsp.execution.GoRunConfigurationBase
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
+import io.github.xefise.golsp.execution.model.GoRaceDetector
 import io.github.xefise.golsp.execution.model.GoRunTarget
 import kotlin.reflect.KMutableProperty0
 
@@ -71,6 +72,12 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
             options.buildFlags = value
         }
 
+    var raceDetector: Boolean
+        get() = options.raceDetector
+        set(value) {
+            options.raceDetector = value
+        }
+
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = GoApplicationSettingsEditor(project)
 
     override fun pathOptions(): List<KMutableProperty0<String>> =
@@ -119,7 +126,7 @@ class GoApplicationConfiguration(project: Project, factory: ConfigurationFactory
             programArguments = ParametersListUtil.parse(programArguments),
             environment = userEnvironment(envs, envFile),
             workingDirectory = resolvedWorkingDirectory(target),
-            buildFlags = ParametersListUtil.parse(buildFlags),
+            buildFlags = GoRaceDetector.withRaceFlag(ParametersListUtil.parse(buildFlags), raceDetector),
         )
     }
 

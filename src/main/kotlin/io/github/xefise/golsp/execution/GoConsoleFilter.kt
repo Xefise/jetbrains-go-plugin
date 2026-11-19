@@ -5,6 +5,7 @@ import com.intellij.execution.filters.Filter
 import com.intellij.execution.filters.HyperlinkInfo
 import com.intellij.execution.filters.LazyFileHyperlinkInfo
 import com.intellij.execution.filters.OpenFileHyperlinkInfo
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbService
@@ -19,11 +20,15 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.PathUtil
 import io.github.xefise.golsp.execution.model.GoConsoleLink
 import io.github.xefise.golsp.execution.model.GoConsoleLinks
+import io.github.xefise.golsp.execution.model.GoRaceDetector
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
-/** Links `file.go:line[:col]` in Run output; relative paths resolve against the run's directories, then the project. */
+/**
+ * Links `file.go:line[:col]` in Run output; relative paths resolve against the run's directories, then the project.
+ * Also marks the `-race` report header as an error.
+ */
 class GoConsoleFilter(
     private val project: Project,
     private val workingDirectory: String?,
@@ -33,6 +38,9 @@ class GoConsoleFilter(
     override fun applyFilter(line: String, entireLength: Int): Filter.Result? {
         val lineStart = entireLength - line.length
         val items = mutableListOf<Filter.ResultItem>()
+        GoRaceDetector.reportHeader(line)?.let {
+            items += Filter.ResultItem(lineStart + it.first, lineStart + it.last + 1, null, ConsoleViewContentType.ERROR_OUTPUT.attributes)
+        }
         var linkedUntil = 0
         for (link in GoConsoleLinks.find(line)) {
             // Overlapping candidates are alternatives: the first one that resolves wins.

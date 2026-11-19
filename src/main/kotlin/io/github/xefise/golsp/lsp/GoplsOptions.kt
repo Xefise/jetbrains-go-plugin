@@ -29,13 +29,26 @@ import org.eclipse.lsp4j.DidChangeConfigurationParams
 class GoplsOptions : SimplePersistentStateComponent<GoplsOptions.Options>(Options()) {
     class Options : BaseState() {
         var usePlaceholders by property(false)
+        var allStaticcheck by property(false)
     }
 
     val usePlaceholders: Boolean get() = state.usePlaceholders
 
+    val allStaticcheck: Boolean get() = state.allStaticcheck
+
     fun update(usePlaceholders: Boolean) {
         if (state.usePlaceholders == usePlaceholders) return
         state.usePlaceholders = usePlaceholders
+        notifyOpenProjects()
+    }
+
+    fun updateAllStaticcheck(enabled: Boolean) {
+        if (state.allStaticcheck == enabled) return
+        state.allStaticcheck = enabled
+        notifyOpenProjects()
+    }
+
+    private fun notifyOpenProjects() {
         ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach(::notifyGopls)
     }
 
@@ -62,6 +75,11 @@ class GoplsConfigurable : BoundSearchableConfigurable("gopls", ID, ID) {
             checkBox("Insert argument placeholders when completing functions")
                 .bindSelected({ GoplsOptions.getInstance().usePlaceholders }) { GoplsOptions.getInstance().update(it) }
                 .comment("Argument names are selected for overtyping; Tab or Enter moves to the next one. A <code>usePlaceholders</code> value in the gopls JSON configuration wins.")
+        }
+        row {
+            checkBox("Enable all staticcheck checks")
+                .bindSelected({ GoplsOptions.getInstance().allStaticcheck }) { GoplsOptions.getInstance().updateAllStaticcheck(it) }
+                .comment("Off: gopls runs its own subset of staticcheck checks. A <code>staticcheck</code> value in the gopls JSON configuration wins.")
         }
     }
 

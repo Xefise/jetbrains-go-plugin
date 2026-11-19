@@ -71,6 +71,12 @@ class GoApplicationConfigurationTest : BasePlatformTestCase() {
         assertEquals(emptyMap<String, String>(), options.envs)
         assertEquals("", options.envFile)
         assertEquals("", options.buildFlags)
+        assertFalse(options.raceDetector)
+    }
+
+    fun testRaceDetectorAppendsRaceToTheBuildFlags() {
+        val config = configuration("/abs").apply { buildFlags = "-tags=x"; raceDetector = true }
+        assertEquals(listOf("-tags=x", "-race"), config.toExecutionRequest().buildFlags)
     }
 
     fun testConfigurationSavedBeforeNewOptionsRunsThePackageInItsDirectory() {
@@ -103,6 +109,7 @@ class GoApplicationConfigurationTest : BasePlatformTestCase() {
             envs = linkedMapOf("B" to "2", "A" to "1")
             envFile = ".env"
             buildFlags = "-race"
+            raceDetector = true
         }
         val element = Element("configuration")
         saved.writeExternal(element)
@@ -113,6 +120,7 @@ class GoApplicationConfigurationTest : BasePlatformTestCase() {
         assertEquals(mapOf("A" to "1", "B" to "2"), loaded.envs)
         assertEquals(".env", loaded.envFile)
         assertEquals("-race", loaded.buildFlags)
+        assertTrue(loaded.raceDetector)
         assertEquals("/abs/pkg", loaded.packageDirectory)
     }
 

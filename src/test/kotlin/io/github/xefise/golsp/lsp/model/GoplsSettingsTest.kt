@@ -10,7 +10,7 @@ class GoplsSettingsTest {
     @Test
     fun `defaults are nested under the gopls section`() {
         assertEquals(
-            json("""{"gopls": {"semanticTokens": true, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false}, "newGoFileHeader": false}}"""),
+            json("""{"gopls": {"semanticTokens": true, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false}, "newGoFileHeader": false, "analyses": {"SA2003": true}}}"""),
             GoplsSettings.build(null, usePlaceholders = true),
         )
     }
@@ -19,7 +19,7 @@ class GoplsSettingsTest {
     fun `user values override defaults and nested objects merge`() {
         val user = json("""{"gopls": {"semanticTokens": false, "codelenses": {"tidy": false}, "staticcheck": true}}""")
         assertEquals(
-            json("""{"gopls": {"semanticTokens": false, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false, "tidy": false}, "newGoFileHeader": false, "staticcheck": true}}"""),
+            json("""{"gopls": {"semanticTokens": false, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false, "tidy": false}, "newGoFileHeader": false, "analyses": {"SA2003": true}, "staticcheck": true}}"""),
             GoplsSettings.build(user, usePlaceholders = true),
         )
     }
@@ -34,6 +34,21 @@ class GoplsSettingsTest {
     fun `user scalar replacing an object wins`() {
         val user = json("""{"gopls": {"codelenses": null}}""")
         assertEquals(true, GoplsSettings.build(user, usePlaceholders = true).getAsJsonObject("gopls").get("codelenses").isJsonNull)
+    }
+
+    @Test
+    fun `staticcheck key is absent unless all checks are enabled`() {
+        assertEquals(false, GoplsSettings.build(null, usePlaceholders = false).getAsJsonObject("gopls").has("staticcheck"))
+        assertEquals(true, GoplsSettings.build(null, usePlaceholders = false, allStaticcheck = true).getAsJsonObject("gopls").get("staticcheck").asBoolean)
+    }
+
+    @Test
+    fun `user analyses merge with the default and can turn it off`() {
+        val user = json("""{"gopls": {"analyses": {"SA2003": false, "unusedparams": true}}}""")
+        assertEquals(
+            json("""{"SA2003": false, "unusedparams": true}"""),
+            GoplsSettings.build(user, usePlaceholders = false).getAsJsonObject("gopls").get("analyses"),
+        )
     }
 
     @Test

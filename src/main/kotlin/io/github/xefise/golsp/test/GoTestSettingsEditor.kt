@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.SimpleListCellRenderer
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.ui.FormBuilder
@@ -57,8 +58,9 @@ class GoTestSettingsEditor(project: Project) : SettingsEditor<GoTestConfiguratio
         textField.toolTipText = "KEY=VALUE lines; Environment variables override it"
     }
     private val buildFlags = RawCommandLineEditor().apply {
-        editorField.toolTipText = "Flags of go test itself, e.g. -race -count=1 -timeout 30s"
+        editorField.toolTipText = "Flags of go test itself, e.g. -count=1 -timeout 30s"
     }
+    private val raceDetector = JBCheckBox("Race detector (-race)")
 
     private val panel: JComponent = FormBuilder.createFormBuilder()
         .addLabeledComponent("Test kind:", scope)
@@ -67,6 +69,7 @@ class GoTestSettingsEditor(project: Project) : SettingsEditor<GoTestConfiguratio
         .addLabeledComponent(filePathLabel, filePath)
         .addLabeledComponent("Test names:", testNames)
         .addLabeledComponent("Go test flags:", buildFlags)
+        .addComponentToRightColumn(raceDetector)
         .addLabeledComponent("Test arguments:", testArguments)
         .addLabeledComponent("Environment variables:", envs)
         .addLabeledComponent("Env file:", envFile)
@@ -94,6 +97,7 @@ class GoTestSettingsEditor(project: Project) : SettingsEditor<GoTestConfiguratio
         envs.envs = configuration.envs
         envFile.text = configuration.envFile
         buildFlags.text = configuration.buildFlags
+        raceDetector.isSelected = configuration.raceDetector
         updateTargetRows()
     }
 
@@ -106,6 +110,7 @@ class GoTestSettingsEditor(project: Project) : SettingsEditor<GoTestConfiguratio
         configuration.envs = envs.envs
         configuration.envFile = envFile.text.trim()
         configuration.buildFlags = buildFlags.text
+        configuration.raceDetector = raceDetector.isSelected
     }
 
     override fun createEditor(): JComponent = panel

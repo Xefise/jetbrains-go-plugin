@@ -15,6 +15,7 @@ class GoApplicationOptions : RunConfigurationOptions() {
     private val envsProperty = linkedMap<String, String>().provideDelegate(this, "envs")
     private val envFileProperty = string("").provideDelegate(this, "envFile")
     private val buildFlagsProperty = string("").provideDelegate(this, "buildFlags")
+    private val raceDetectorProperty = property(false).provideDelegate(this, "raceDetector")
 
     var packageDirectory: String
         get() = packageDirectoryProperty.getValue(this).orEmpty()
@@ -48,4 +49,9 @@ class GoApplicationOptions : RunConfigurationOptions() {
     var buildFlags: String
         get() = buildFlagsProperty.getValue(this).orEmpty()
         set(value) = buildFlagsProperty.setValue(this, value)
+
+    /** Adds `-race` to the build flags; kept apart from them so the flags field stays as typed. */
+    var raceDetector: Boolean
+        get() = raceDetectorProperty.getValue(this)
+        set(value) = raceDetectorProperty.setValue(this, value)
 }

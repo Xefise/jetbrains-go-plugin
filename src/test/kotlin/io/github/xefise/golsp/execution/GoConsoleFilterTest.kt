@@ -52,6 +52,22 @@ class GoConsoleFilterTest : BasePlatformTestCase() {
 
     private fun canonical(target: Target?) = target?.copy(path = path(File(target.path)))
 
+    fun testRaceReportFrameLinksFileAndLine() {
+        val file = diskFile("race/main.go")
+        val line = "      ${path(file)}:6 +0x3c\n"
+        val expectedStart = 100 + 6
+        assertEquals(Target(path(file), 5, 0, expectedStart, expectedStart + path(file).length + 2), canonical(apply(filter(), line)))
+    }
+
+    fun testRaceReportHeaderIsHighlightedWithoutALink() {
+        val line = "WARNING: DATA RACE\n"
+        val item = filter().applyFilter(line, 100 + line.length)!!.resultItems.single()
+        assertNull(item.hyperlinkInfo)
+        assertEquals(100, item.highlightStartOffset)
+        assertEquals(118, item.highlightEndOffset)
+        assertNotNull(item.highlightAttributes)
+    }
+
     fun testAbsolutePanicFrameLinksFileAndLine() {
         val file = diskFile("abs/main.go")
         val line = "\t${path(file)}:3 +0x1d\n"

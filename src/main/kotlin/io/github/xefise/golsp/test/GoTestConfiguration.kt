@@ -17,6 +17,7 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.execution.ParametersListUtil
 import io.github.xefise.golsp.execution.GoRunConfigurationBase
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
+import io.github.xefise.golsp.execution.model.GoRaceDetector
 import io.github.xefise.golsp.execution.model.GoRunTarget
 import io.github.xefise.golsp.execution.model.GoTestCommandBuilder
 import io.github.xefise.golsp.test.model.GoModules
@@ -79,6 +80,12 @@ class GoTestConfiguration(project: Project, factory: ConfigurationFactory, name:
         get() = options.buildFlags
         set(value) {
             options.buildFlags = value
+        }
+
+    var raceDetector: Boolean
+        get() = options.raceDetector
+        set(value) {
+            options.raceDetector = value
         }
 
     /** Where `go test` runs: the package directory (the file's for [GoTestScope.FILE]) or the root of `./...`. */
@@ -161,7 +168,7 @@ class GoTestConfiguration(project: Project, factory: ConfigurationFactory, name:
             target = GoRunTarget.Package(dir),
             programArguments = ParametersListUtil.parse(testArguments),
             environment = userEnvironment(envs, envFile),
-            buildFlags = ParametersListUtil.parse(buildFlags),
+            buildFlags = GoRaceDetector.withRaceFlag(ParametersListUtil.parse(buildFlags), raceDetector),
             test = GoTestSelection.spec(selectedNames(), recursive = isRecursive)
                 .copy(packages = if (isRecursive) packages else emptyList()),
         )

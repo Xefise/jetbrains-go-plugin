@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.SimpleListCellRenderer
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.FormBuilder
 import io.github.xefise.golsp.execution.GoEnvironmentVariablesField
@@ -51,6 +52,7 @@ class GoApplicationSettingsEditor(project: Project) : SettingsEditor<GoApplicati
         textField.toolTipText = "KEY=VALUE lines; Environment variables override it"
     }
     private val buildFlags = RawCommandLineEditor()
+    private val raceDetector = JBCheckBox("Race detector (-race)")
 
     private val panel: JComponent = FormBuilder.createFormBuilder()
         .addLabeledComponent("Run kind:", runKind)
@@ -61,6 +63,7 @@ class GoApplicationSettingsEditor(project: Project) : SettingsEditor<GoApplicati
         .addLabeledComponent("Environment variables:", envs)
         .addLabeledComponent("Env file:", envFile)
         .addLabeledComponent("Go build flags:", buildFlags)
+        .addComponentToRightColumn(raceDetector)
         .panel
 
     private fun selectedKind(): GoRunKind = runKind.selectedItem as? GoRunKind ?: GoRunKind.PACKAGE
@@ -82,6 +85,7 @@ class GoApplicationSettingsEditor(project: Project) : SettingsEditor<GoApplicati
         envs.envs = configuration.envs
         envFile.text = configuration.envFile
         buildFlags.text = configuration.buildFlags
+        raceDetector.isSelected = configuration.raceDetector
         updateTargetRows()
     }
 
@@ -94,6 +98,7 @@ class GoApplicationSettingsEditor(project: Project) : SettingsEditor<GoApplicati
         configuration.envs = envs.envs
         configuration.envFile = envFile.text.trim()
         configuration.buildFlags = buildFlags.text
+        configuration.raceDetector = raceDetector.isSelected
     }
 
     override fun createEditor(): JComponent = panel

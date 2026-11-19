@@ -55,6 +55,7 @@ class GoTestConfigurationTest : BasePlatformTestCase() {
         assertEquals(emptyMap<String, String>(), options.envs)
         assertEquals("", options.envFile)
         assertEquals("", options.buildFlags)
+        assertFalse(options.raceDetector)
     }
 
     fun testAllOptionsSurviveSaveAndLoad() {
@@ -67,6 +68,7 @@ class GoTestConfigurationTest : BasePlatformTestCase() {
             envs = linkedMapOf("B" to "2", "A" to "1")
             envFile = ".env"
             buildFlags = "-race -count=1"
+            raceDetector = true
         }
         val element = Element("configuration")
         saved.writeExternal(element)
@@ -83,6 +85,12 @@ class GoTestConfigurationTest : BasePlatformTestCase() {
         assertEquals(mapOf("A" to "1", "B" to "2"), loaded.envs)
         assertEquals(".env", loaded.envFile)
         assertEquals("-race -count=1", loaded.buildFlags)
+        assertTrue(loaded.raceDetector)
+    }
+
+    fun testRaceDetectorAppendsRaceToTheTestFlags() {
+        val request = configuration { directory = "/abs/pkg"; buildFlags = "-count=1"; raceDetector = true }.toExecutionRequest()
+        assertEquals(listOf("-count=1", "-race"), request.buildFlags)
     }
 
     fun testPackageRequestTargetsTheDirectoryWithFlagsAndArguments() {

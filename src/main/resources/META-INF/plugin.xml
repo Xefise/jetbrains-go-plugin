@@ -136,6 +136,7 @@
                              displayName="gopls"
                              nonDefaultProject="true"
                              instance="io.github.xefise.golsp.lsp.GoplsConfigurable"/>
+        <platform.lang.lsWidget.itemsProvider implementation="io.github.xefise.golsp.lsp.GoplsWidgetItemsProvider"/>
         <editorNotificationProvider implementation="io.github.xefise.golsp.toolchain.GoToolBannerProvider"/>
         <coverageEngine implementation="io.github.xefise.golsp.coverage.GoCoverageEngine"/>
         <coverageRunner implementation="io.github.xefise.golsp.coverage.GoCoverageRunner"/>

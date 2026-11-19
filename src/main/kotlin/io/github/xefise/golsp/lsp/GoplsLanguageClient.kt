@@ -18,7 +18,7 @@ class GoplsLanguageClient(project: Project) : LanguageClientImpl(project) {
 
     // The base returns the JSON the user typed in LSP4IJ's server settings; ours are defaults under it.
     override fun createSettings(): Any =
-        GoplsSettings.build(super.createSettings() as? JsonObject, GoplsOptions.getInstance().usePlaceholders)
+        GoplsOptions.getInstance().let { GoplsSettings.build(super.createSettings() as? JsonObject, it.usePlaceholders, it.allStaticcheck) }
 
     // LSP4IJ 0.21 drops a refresh when the document changed before it applied, and skips the refresh for an identical
     // follow-up report, so the editor could keep stale diagnostics until a different one; reapply once typing pauses.

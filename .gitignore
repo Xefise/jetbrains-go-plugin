@@ -9,3 +9,4 @@ CLAUDE.md
 local.properties
 __debug_bin*
 *.hprof
+hs_err_pid*.log

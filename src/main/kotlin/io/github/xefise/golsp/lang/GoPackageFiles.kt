@@ -28,4 +28,8 @@ object GoPackageFiles {
     // GOPATH mode (GO111MODULE=off) and GOWORK overrides are ignored: only the files decide, as for most setups.
     fun isInModule(directory: VirtualFile): Boolean =
         generateSequence(directory) { it.parent }.any { dir -> MODULE_FILES.any { dir.findChild(it) != null } }
+
+    /** Nearest directory with `go.mod` at or above [directory]. */
+    fun moduleRoot(directory: VirtualFile): VirtualFile? =
+        generateSequence(directory) { it.parent }.firstOrNull { it.findChild("go.mod") != null }
 }

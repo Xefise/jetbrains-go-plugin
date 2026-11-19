@@ -48,6 +48,30 @@ class GoApplicationRunConfigurationProducerTest : BasePlatformTestCase() {
         assertEquals("app", config.name)
     }
 
+    fun testPackageConfigurationWorksInTheModuleRoot() {
+        val file = add("cmd/app/main.go", "package main\n\nfunc main() {}\n")
+        assertEquals(dirPath(rootModule), produced(mainLeaf(file))!!.workingDirectory)
+        assertEquals(dirPath(rootModule), produced(file.containingDirectory)!!.workingDirectory)
+    }
+
+    fun testNestedModuleIsTheWorkingDirectory() {
+        val nested = add("svc/go.mod", "module svc\n")
+        val file = add("svc/cmd/app/main.go", "package main\n\nfunc main() {}\n")
+        assertEquals(dirPath(nested), produced(mainLeaf(file))!!.workingDirectory)
+    }
+
+    fun testGoWorkWithoutGoModKeepsTheDefaultWorkingDirectory() {
+        withoutRootModule()
+        add("ws/go.work", "go 1.27\n")
+        val file = add("ws/app/main.go", "package main\n\nfunc main() {}\n")
+        assertEquals("", produced(mainLeaf(file))!!.workingDirectory)
+    }
+
+    fun testFileConfigurationKeepsTheDefaultWorkingDirectory() {
+        val gen = add("pkg/lib/gen.go", "//go:build ignore\n\npackage main\n\nfunc main() {}\n")
+        assertEquals("", produced(mainLeaf(gen))!!.workingDirectory)
+    }
+
     fun testFileItselfProducesTheSamePackageConfiguration() {
         val file = add("cmd/app/main.go", "package main\n\nfunc main() {}\n")
         assertEquals(dirPath(file), produced(file)!!.packageDirectory)

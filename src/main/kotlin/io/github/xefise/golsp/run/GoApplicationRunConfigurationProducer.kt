@@ -30,7 +30,12 @@ class GoApplicationRunConfigurationProducer : LazyRunConfigurationProducer<GoApp
         configuration.runKind = target.kind
         // Absolute paths: workspace serialization collapses them to $PROJECT_DIR$ and resolve() expands them back.
         when (target.kind) {
-            GoRunKind.PACKAGE -> configuration.packageDirectory = target.directory.path
+            GoRunKind.PACKAGE -> {
+                configuration.packageDirectory = target.directory.path
+                // Like `go run ./cmd/app` from the module root, so `testdata/...` paths match the terminal.
+                GoPackageFiles.moduleRoot(target.directory)?.let { configuration.workingDirectory = it.path }
+            }
+            // `go run gen.go` and `go generate` run in the file's directory, so the default stays.
             GoRunKind.FILE -> configuration.filePath = target.file!!.path
         }
         configuration.name = configuration.suggestedName() ?: return false

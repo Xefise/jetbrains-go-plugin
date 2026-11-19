@@ -29,12 +29,9 @@ import org.eclipse.lsp4j.DidChangeConfigurationParams
 class GoplsOptions : SimplePersistentStateComponent<GoplsOptions.Options>(Options()) {
     class Options : BaseState() {
         var usePlaceholders by property(false)
-        var allStaticcheck by property(false)
     }
 
     val usePlaceholders: Boolean get() = state.usePlaceholders
-
-    val allStaticcheck: Boolean get() = state.allStaticcheck
 
     fun update(usePlaceholders: Boolean) {
         if (state.usePlaceholders == usePlaceholders) return
@@ -42,29 +39,23 @@ class GoplsOptions : SimplePersistentStateComponent<GoplsOptions.Options>(Option
         notifyOpenProjects()
     }
 
-    fun updateAllStaticcheck(enabled: Boolean) {
-        if (state.allStaticcheck == enabled) return
-        state.allStaticcheck = enabled
-        notifyOpenProjects()
-    }
-
     private fun notifyOpenProjects() {
         ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach(::notifyGopls)
     }
 
-    // gopls ignores the payload and pulls workspace/configuration again, which reaches GoplsLanguageClient.createSettings.
-    private fun notifyGopls(project: Project) {
-        if (!GoplsRequests.isStarted(project)) return
-        LanguageServerManager.getInstance(project).getLanguageServer(GoplsLanguageServerFactory.SERVER_ID).thenAccept { server ->
-            server?.workspaceService?.didChangeConfiguration(DidChangeConfigurationParams(JsonObject()))
-        }.exceptionally { error ->
-            logger<GoplsOptions>().info("gopls didChangeConfiguration failed", error)
-            null
-        }
-    }
-
     companion object {
         fun getInstance(): GoplsOptions = service()
+
+        // gopls ignores the payload and pulls workspace/configuration again, which reaches GoplsLanguageClient.createSettings.
+        fun notifyGopls(project: Project) {
+            if (!GoplsRequests.isStarted(project)) return
+            LanguageServerManager.getInstance(project).getLanguageServer(GoplsLanguageServerFactory.SERVER_ID).thenAccept { server ->
+                server?.workspaceService?.didChangeConfiguration(DidChangeConfigurationParams(JsonObject()))
+            }.exceptionally { error ->
+                logger<GoplsOptions>().info("gopls didChangeConfiguration failed", error)
+                null
+            }
+        }
     }
 }
 
@@ -77,9 +68,7 @@ class GoplsConfigurable : BoundSearchableConfigurable("gopls", ID, ID) {
                 .comment("Argument names are selected for overtyping; Tab or Enter moves to the next one. A <code>usePlaceholders</code> value in the gopls JSON configuration wins.")
         }
         row {
-            checkBox("Enable all staticcheck checks")
-                .bindSelected({ GoplsOptions.getInstance().allStaticcheck }) { GoplsOptions.getInstance().updateAllStaticcheck(it) }
-                .comment("Off: gopls runs its own subset of staticcheck checks. A <code>staticcheck</code> value in the gopls JSON configuration wins.")
+            comment("gopls analyzers are switched on and off in Editor | Inspections | Go.")
         }
     }
 

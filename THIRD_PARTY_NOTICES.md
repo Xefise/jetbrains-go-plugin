@@ -113,6 +113,21 @@ This project contains code modified from the following sources. Each ported file
   Changes: ported to Kotlin, events go to a callback as JSON lines (Gson), `SetFailedBuild` and the coverage /
   "no tests to run" suffixes of the summary line dropped.
 
+## gopls and staticcheck analyzer docs
+
+- Source: https://github.com/golang/tools, module `golang.org/x/tools/gopls` v0.24.0, `gopls/internal/doc/api.json`
+  (key `Analyzers`: name, documentation, URL, default state)
+- Licence: BSD 3-Clause — full text in [`licenses/BSD-3-Clause-Go.txt`](licenses/BSD-3-Clause-Go.txt)
+- Copyright: Copyright 2009 The Go Authors
+- The `SA`/`S`/`ST`/`QF` entries of that file carry check documentation from staticcheck
+  (https://github.com/dominikh/go-tools, module `honnef.co/go/tools` v0.8.1, the version gopls v0.24.0 requires).
+  Licence: MIT — full text in [`licenses/MIT-staticcheck.txt`](licenses/MIT-staticcheck.txt); Copyright (c) 2016
+  Dominik Honnef.
+- Data only, no code copied: the analyzer list and documentation texts are bundled as
+  `src/main/resources/golsp/gopls-analyzers.json` and turned into the inspections in
+  `src/main/resources/META-INF/golsp-gopls-analyzers.xml` (display names from the first line of each text) and
+  their descriptions (rendered as HTML at runtime).
+
 ## IntelliJ Community
 
 - Source: https://github.com/JetBrains/intellij-community

@@ -7,10 +7,12 @@ import org.junit.Test
 class GoplsSettingsTest {
     private fun json(text: String) = JsonParser.parseString(text).asJsonObject
 
+    private val DEFAULT_HINTS = """{"assignVariableTypes": true, "rangeVariableTypes": true, "compositeLiteralTypes": false, "functionTypeParameters": false, "parameterNames": false, "compositeLiteralFields": false, "constantValues": false, "ignoredError": false}"""
+
     @Test
     fun `defaults are nested under the gopls section`() {
         assertEquals(
-            json("""{"gopls": {"semanticTokens": true, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false}, "newGoFileHeader": false, "analyses": {"SA2003": true, "SA4006": true, "SA4017": true}}}"""),
+            json("""{"gopls": {"semanticTokens": true, "usePlaceholders": true, "hints": $DEFAULT_HINTS, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false}, "newGoFileHeader": false}}"""),
             GoplsSettings.build(null, usePlaceholders = true),
         )
     }
@@ -19,7 +21,7 @@ class GoplsSettingsTest {
     fun `user values override defaults and nested objects merge`() {
         val user = json("""{"gopls": {"semanticTokens": false, "codelenses": {"tidy": false}, "staticcheck": true}}""")
         assertEquals(
-            json("""{"gopls": {"semanticTokens": false, "usePlaceholders": true, "hints": {"assignVariableTypes": true, "rangeVariableTypes": true}, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false, "tidy": false}, "newGoFileHeader": false, "analyses": {"SA2003": true, "SA4006": true, "SA4017": true}, "staticcheck": true}}"""),
+            json("""{"gopls": {"semanticTokens": false, "usePlaceholders": true, "hints": $DEFAULT_HINTS, "directoryFilters": ["-**/node_modules"], "codelenses": {"test": false, "tidy": false}, "newGoFileHeader": false, "staticcheck": true}}"""),
             GoplsSettings.build(user, usePlaceholders = true),
         )
     }
@@ -37,17 +39,42 @@ class GoplsSettingsTest {
     }
 
     @Test
-    fun `staticcheck key is absent unless all checks are enabled`() {
-        assertEquals(false, GoplsSettings.build(null, usePlaceholders = false).getAsJsonObject("gopls").has("staticcheck"))
-        assertEquals(true, GoplsSettings.build(null, usePlaceholders = false, allStaticcheck = true).getAsJsonObject("gopls").get("staticcheck").asBoolean)
+    fun `analyses are sent as given including explicit false`() {
+        val analyses = linkedMapOf("SA4006" to true, "printf" to false)
+        assertEquals(
+            json("""{"SA4006": true, "printf": false}"""),
+            GoplsSettings.build(null, usePlaceholders = false, analyses = analyses).getAsJsonObject("gopls").get("analyses"),
+        )
     }
 
     @Test
-    fun `user analyses merge with the default and can turn it off`() {
+    fun `no analyses key when the map is empty`() {
+        assertEquals(false, GoplsSettings.build(null, usePlaceholders = false).getAsJsonObject("gopls").has("analyses"))
+    }
+
+    @Test
+    fun `staticcheck key is never sent by default`() {
+        val settings = GoplsSettings.build(null, usePlaceholders = false, analyses = mapOf("SA4006" to true))
+        assertEquals(false, settings.getAsJsonObject("gopls").has("staticcheck"))
+    }
+
+    @Test
+    fun `user analyses override profile analyses per key`() {
         val user = json("""{"gopls": {"analyses": {"SA2003": false, "unusedparams": true}}}""")
+        val profile = mapOf("SA2003" to true, "SA4006" to true, "unusedparams" to false, "printf" to false)
         assertEquals(
-            json("""{"SA2003": false, "SA4006": true, "SA4017": true, "unusedparams": true}"""),
-            GoplsSettings.build(user, usePlaceholders = false).getAsJsonObject("gopls").get("analyses"),
+            json("""{"SA2003": false, "SA4006": true, "unusedparams": true, "printf": false}"""),
+            GoplsSettings.build(user, usePlaceholders = false, analyses = profile).getAsJsonObject("gopls").get("analyses"),
+        )
+    }
+
+    @Test
+    fun `hints are sent as given and user hints override them per key`() {
+        val user = json("""{"gopls": {"hints": {"parameterNames": true, "assignVariableTypes": false}}}""")
+        val hints = GoplsInlayHints.DEFAULTS + ("constantValues" to true)
+        assertEquals(
+            json("""{"assignVariableTypes": false, "rangeVariableTypes": true, "compositeLiteralTypes": false, "functionTypeParameters": false, "parameterNames": true, "compositeLiteralFields": false, "constantValues": true, "ignoredError": false}"""),
+            GoplsSettings.build(user, usePlaceholders = false, hints = hints).getAsJsonObject("gopls").get("hints"),
         )
     }
 

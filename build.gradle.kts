@@ -124,6 +124,54 @@ intellijPlatformTesting.testIde.register("integrationTest") {
     }
 }
 
+// Regenerates the bundled gopls analyzer catalog and one inspection per analyzer from gopls' api.json:
+// ./gradlew generateGoplsAnalyzers -PgoplsDir="$(go env GOMODCACHE)/golang.org/x/tools/gopls@v0.24.0"
+tasks.register("generateGoplsAnalyzers") {
+    val goplsDir = providers.gradleProperty("goplsDir")
+    val catalogFile = layout.projectDirectory.file("src/main/resources/golsp/gopls-analyzers.json").asFile
+    val inspectionsFile = layout.projectDirectory.file("src/main/resources/META-INF/golsp-gopls-analyzers.xml").asFile
+    doLast {
+        val dir = File(goplsDir.orNull ?: throw GradleException("Pass -PgoplsDir=<module cache>/golang.org/x/tools/gopls@<version>"))
+        val version = Regex("""gopls@(v[^/\\]+)$""").find(dir.path.trimEnd('/', '\\'))?.groupValues?.get(1)
+            ?: throw GradleException("goplsDir must end with gopls@<version>: $dir")
+        @Suppress("UNCHECKED_CAST")
+        val analyzers = (groovy.json.JsonSlurper().parse(dir.resolve("internal/doc/api.json")) as Map<String, Any?>)["Analyzers"]
+            as List<Map<String, Any?>>
+        // Off in gopls' default staticcheck subset but worth having: `defer mu.Lock()` right after Lock (SA2003),
+        // dead stores like `s = strings.TrimSpace(s)` on a range copy (SA4006, SA4017).
+        val enabledByUs = setOf("SA2003", "SA4006", "SA4017")
+        val groups = listOf(
+            "QF" to "Staticcheck: quick fixes (QF)",
+            "SA" to "Staticcheck: bugs (SA)",
+            "ST" to "Staticcheck: style (ST)",
+            "S" to "Staticcheck: simplifications (S)",
+        )
+        fun attr(text: String) = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+        val catalog = mapOf(
+            "goplsVersion" to version,
+            "analyzers" to analyzers.map { mapOf("name" to it["Name"], "doc" to it["Doc"], "url" to it["URL"], "default" to it["Default"]) },
+        )
+        catalogFile.parentFile.mkdirs()
+        catalogFile.writeText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(catalog)) + "\n")
+        val entries = analyzers.joinToString("\n") { analyzer ->
+            val name = analyzer["Name"] as String
+            // First sentence only: staticcheck titles run up to ~170 chars and get clipped in the inspections tree.
+            val title = (analyzer["Doc"] as String).lineSequence().first().trim()
+                .split(Regex("""(?<=[.;?])\s+""")).first().trimEnd('.', ';')
+                .let { if (it.substringBefore(' ').contains('.')) it else it.replaceFirstChar(Char::uppercase) }
+            val group = groups.firstOrNull { (prefix, _) -> Regex("${prefix}\\d+").matches(name) }?.second ?: "gopls"
+            val enabled = analyzer["Default"] == true || name in enabledByUs
+            """        <localInspection language="golsp.go" shortName="Gopls_${attr(name)}" displayName="${attr("$name: $title")}"
+                         groupPath="Go" groupName="${attr(group)}" enabledByDefault="$enabled" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>"""
+        }
+        inspectionsFile.writeText(
+            "<!-- Generated from gopls $version internal/doc/api.json by `./gradlew generateGoplsAnalyzers`; do not edit. -->\n" +
+                "<idea-plugin>\n    <extensions defaultExtensionNs=\"com.intellij\">\n$entries\n    </extensions>\n</idea-plugin>\n",
+        )
+    }
+}
+
 tasks.processResources {
     from("THIRD_PARTY_NOTICES.md") { into("META-INF") }
     from("licenses") { into("META-INF/licenses") }

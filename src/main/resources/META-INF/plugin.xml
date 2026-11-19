@@ -1,5 +1,5 @@
 <!-- Modified from go-language-helper (cag11), commit 556c274, Apache-2.0: extension registrations -->
-<idea-plugin>
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
     <id>io.github.xefise.golsp</id>
     <name>Go (gopls)</name>
     <vendor>Xefise</vendor>
@@ -137,11 +137,52 @@
                              nonDefaultProject="true"
                              instance="io.github.xefise.golsp.lsp.GoplsConfigurable"/>
         <platform.lang.lsWidget.itemsProvider implementation="io.github.xefise.golsp.lsp.GoplsWidgetItemsProvider"/>
+        <!-- gopls hint kinds: providerId and optionId values are persisted in editor.xml; option ids are gopls `hints` keys. -->
+        <codeInsight.declarativeInlayProvider language="golsp.go" providerId="go.gopls.types" group="TYPES_GROUP"
+                                              isEnabledByDefault="true" bundle="messages.GoLspBundle"
+                                              nameKey="inlay.gopls.types.name" descriptionKey="inlay.gopls.types.description"
+                                              implementationClass="io.github.xefise.golsp.lsp.GoplsInlayHintsProvider">
+            <option optionId="assignVariableTypes" enabledByDefault="true" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.assignVariableTypes.name" descriptionKey="inlay.gopls.assignVariableTypes.description"/>
+            <option optionId="rangeVariableTypes" enabledByDefault="true" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.rangeVariableTypes.name" descriptionKey="inlay.gopls.rangeVariableTypes.description"/>
+            <option optionId="compositeLiteralTypes" enabledByDefault="false" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.compositeLiteralTypes.name" descriptionKey="inlay.gopls.compositeLiteralTypes.description"/>
+            <option optionId="functionTypeParameters" enabledByDefault="false" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.functionTypeParameters.name" descriptionKey="inlay.gopls.functionTypeParameters.description"/>
+        </codeInsight.declarativeInlayProvider>
+        <codeInsight.declarativeInlayProvider language="golsp.go" providerId="go.gopls.parameters" group="PARAMETERS_GROUP"
+                                              isEnabledByDefault="true" bundle="messages.GoLspBundle"
+                                              nameKey="inlay.gopls.parameters.name" descriptionKey="inlay.gopls.parameters.description"
+                                              implementationClass="io.github.xefise.golsp.lsp.GoplsInlayHintsProvider">
+            <option optionId="parameterNames" enabledByDefault="false" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.parameterNames.name" descriptionKey="inlay.gopls.parameterNames.description"/>
+            <option optionId="compositeLiteralFields" enabledByDefault="false" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.compositeLiteralFields.name" descriptionKey="inlay.gopls.compositeLiteralFields.description"/>
+        </codeInsight.declarativeInlayProvider>
+        <codeInsight.declarativeInlayProvider language="golsp.go" providerId="go.gopls.values" group="VALUES_GROUP"
+                                              isEnabledByDefault="true" bundle="messages.GoLspBundle"
+                                              nameKey="inlay.gopls.values.name" descriptionKey="inlay.gopls.values.description"
+                                              implementationClass="io.github.xefise.golsp.lsp.GoplsInlayHintsProvider">
+            <option optionId="constantValues" enabledByDefault="false" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.constantValues.name" descriptionKey="inlay.gopls.constantValues.description"/>
+            <option optionId="ignoredError" enabledByDefault="false" bundle="messages.GoLspBundle"
+                    nameKey="inlay.gopls.ignoredError.name" descriptionKey="inlay.gopls.ignoredError.description"/>
+        </codeInsight.declarativeInlayProvider>
+        <codeInsight.declarativeInlayProviderCustomSettingsProvider language="golsp.go" providerId="go.gopls.types"
+                                                                    implementationClass="io.github.xefise.golsp.lsp.GoplsInlayHintsApplyListener"/>
+        <codeInsight.declarativeInlayProviderCustomSettingsProvider language="golsp.go" providerId="go.gopls.parameters"
+                                                                    implementationClass="io.github.xefise.golsp.lsp.GoplsInlayHintsApplyListener"/>
+        <codeInsight.declarativeInlayProviderCustomSettingsProvider language="golsp.go" providerId="go.gopls.values"
+                                                                    implementationClass="io.github.xefise.golsp.lsp.GoplsInlayHintsApplyListener"/>
         <editorNotificationProvider implementation="io.github.xefise.golsp.toolchain.GoToolBannerProvider"/>
         <coverageEngine implementation="io.github.xefise.golsp.coverage.GoCoverageEngine"/>
         <coverageRunner implementation="io.github.xefise.golsp.coverage.GoCoverageRunner"/>
         <programRunner implementation="io.github.xefise.golsp.coverage.GoCoverageProgramRunner"/>
     </extensions>
+
+    <!-- One inspection per gopls analyzer, generated by `./gradlew generateGoplsAnalyzers`. -->
+    <xi:include href="/META-INF/golsp-gopls-analyzers.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
     <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
         <server id="gopls"
@@ -195,5 +236,7 @@
                   topic="io.github.xefise.golsp.toolchain.GoToolInstallListener"/>
         <listener class="io.github.xefise.golsp.lsp.GoParameterInfoLookupListener"
                   topic="com.intellij.codeInsight.lookup.LookupManagerListener"/>
+        <listener class="io.github.xefise.golsp.lsp.GoplsInspectionProfileListener"
+                  topic="com.intellij.profile.ProfileChangeAdapter"/>
     </projectListeners>
 </idea-plugin>

@@ -1,0 +1,749 @@
+<!-- Generated from gopls v0.24.0 internal/doc/api.json by `./gradlew generateGoplsAnalyzers`; do not edit. -->
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection language="golsp.go" shortName="Gopls_QF1001" displayName="QF1001: Apply De Morgan's law"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1002" displayName="QF1002: Convert untagged switch to tagged switch"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1003" displayName="QF1003: Convert if/else-if chain to tagged switch"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1004" displayName="QF1004: Use strings.ReplaceAll instead of strings.Replace with n == -1"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1005" displayName="QF1005: Expand call to math.Pow"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1006" displayName="QF1006: Lift if+break into loop condition"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1007" displayName="QF1007: Merge conditional assignment into variable declaration"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1008" displayName="QF1008: Omit embedded fields from selector expression"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1009" displayName="QF1009: Use time.Time.Equal instead of == operator"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1010" displayName="QF1010: Convert slice of bytes to string when printing it"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1011" displayName="QF1011: Omit redundant type from variable declaration"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_QF1012" displayName="QF1012: Use fmt.Fprintf(x, ...) instead of x.Write(fmt.Sprintf(...))"
+                         groupPath="Go" groupName="Staticcheck: quick fixes (QF)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1000" displayName="S1000: Use plain channel send or receive instead of single-case select"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1001" displayName="S1001: Replace for loop with call to copy"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1002" displayName="S1002: Omit comparison with boolean constant"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1003" displayName="S1003: Replace call to strings.Index with strings.Contains"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1004" displayName="S1004: Replace call to bytes.Compare with bytes.Equal"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1005" displayName="S1005: Drop unnecessary use of the blank identifier"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1006" displayName="S1006: Use 'for { "
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1007" displayName="S1007: Simplify regular expression by using raw string literal"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1008" displayName="S1008: Simplify returning boolean expression"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1009" displayName="S1009: Omit redundant nil check on slices, maps, and channels"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1010" displayName="S1010: Omit default slice index"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1011" displayName="S1011: Use a single append to concatenate two slices"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1012" displayName="S1012: Replace time.Now().Sub(x) with time.Since(x)"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1016" displayName="S1016: Use a type conversion instead of manually copying struct fields"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1017" displayName="S1017: Replace manual trimming with strings.TrimPrefix"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1018" displayName="S1018: Use 'copy' for sliding elements"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1019" displayName="S1019: Simplify 'make' call by omitting redundant arguments"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1020" displayName="S1020: Omit redundant nil check in type assertion"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1021" displayName="S1021: Merge variable declaration and assignment"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1023" displayName="S1023: Omit redundant control flow"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1024" displayName="S1024: Replace x.Sub(time.Now()) with time.Until(x)"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1025" displayName="S1025: Don't use fmt.Sprintf(&quot;%s&quot;, x) unnecessarily"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1028" displayName="S1028: Simplify error construction with fmt.Errorf"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1029" displayName="S1029: Range over the string directly"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1030" displayName="S1030: Use bytes.Buffer.String or bytes.Buffer.Bytes"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1031" displayName="S1031: Omit redundant nil check around loop"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1032" displayName="S1032: Use sort.Ints(x), sort.Float64s(x), and sort.Strings(x)"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1033" displayName="S1033: Unnecessary guard around call to 'delete'"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1034" displayName="S1034: Use result of type assertion to simplify cases"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1035" displayName="S1035: Redundant call to net/http.CanonicalHeaderKey in method call on net/http.Header"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1036" displayName="S1036: Unnecessary guard around map access"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1037" displayName="S1037: Elaborate way of sleeping"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1038" displayName="S1038: Unnecessarily complex way of printing formatted string"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1039" displayName="S1039: Unnecessary use of fmt.Sprint"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_S1040" displayName="S1040: Type assertion to current type"
+                         groupPath="Go" groupName="Staticcheck: simplifications (S)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1000" displayName="SA1000: Invalid regular expression"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1001" displayName="SA1001: Invalid template"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1002" displayName="SA1002: Invalid format in time.Parse"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1003" displayName="SA1003: Unsupported argument to functions in encoding/binary"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1004" displayName="SA1004: Suspiciously small untyped constant in time.Sleep"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1005" displayName="SA1005: Invalid first argument to exec.Command"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1007" displayName="SA1007: Invalid URL in net/url.Parse"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1008" displayName="SA1008: Non-canonical key in http.Header map"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1010" displayName="SA1010: (*regexp.Regexp).FindAll called with n == 0, which will always return zero results"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1011" displayName="SA1011: Various methods in the 'strings' package expect valid UTF-8, but invalid input is provided"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1012" displayName="SA1012: A nil context.Context is being passed to a function, consider using context.TODO instead"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1013" displayName="SA1013: io.Seeker.Seek is being called with the whence constant as the first argument, but it should be the second"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1014" displayName="SA1014: Non-pointer value passed to Unmarshal or Decode"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1015" displayName="SA1015: Using time.Tick in a way that will leak"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1016" displayName="SA1016: Trapping a signal that cannot be trapped"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1017" displayName="SA1017: Channels used with os/signal.Notify should be buffered"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1018" displayName="SA1018: strings.Replace called with n == 0, which does nothing"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1020" displayName="SA1020: Using an invalid host:port pair with a net.Listen-related function"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1021" displayName="SA1021: Using bytes.Equal to compare two net.IP"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1023" displayName="SA1023: Modifying the buffer in an io.Writer implementation"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1024" displayName="SA1024: A string cutset contains duplicate characters"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1025" displayName="SA1025: It is not possible to use (*time.Timer).Reset's return value correctly"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1026" displayName="SA1026: Cannot marshal channels or functions"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1027" displayName="SA1027: Atomic access to 64-bit variable must be 64-bit aligned"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1028" displayName="SA1028: sort.Slice can only be used on slices"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1029" displayName="SA1029: Inappropriate key in call to context.WithValue"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1030" displayName="SA1030: Invalid argument in call to a strconv function"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1031" displayName="SA1031: Overlapping byte slices passed to an encoder"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA1032" displayName="SA1032: Wrong order of arguments to errors.Is"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA2001" displayName="SA2001: Empty critical section, did you mean to defer the unlock?"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA2002" displayName="SA2002: Called testing.T.FailNow or SkipNow in a goroutine, which isn't allowed"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA2003" displayName="SA2003: Deferred Lock right after locking, likely meant to defer Unlock instead"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA3000" displayName="SA3000: TestMain doesn't call os.Exit, hiding test failures"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA3001" displayName="SA3001: Assigning to b.N in benchmarks distorts the results"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4000" displayName="SA4000: Binary operator has identical expressions on both sides"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4001" displayName="SA4001: &amp;*x gets simplified to x, it does not copy x"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4003" displayName="SA4003: Comparing unsigned values against negative values is pointless"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4004" displayName="SA4004: The loop exits unconditionally after one iteration"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4005" displayName="SA4005: Field assignment that will never be observed"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4006" displayName="SA4006: A value assigned to a variable is never read before being overwritten"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4008" displayName="SA4008: The variable in the loop condition never changes, are you incrementing the wrong variable?"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4009" displayName="SA4009: A function argument is overwritten before its first use"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4010" displayName="SA4010: The result of append will never be observed anywhere"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4011" displayName="SA4011: Break statement with no effect"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4012" displayName="SA4012: Comparing a value against NaN even though no value is equal to NaN"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4013" displayName="SA4013: Negating a boolean twice (!!b) is the same as writing b"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4014" displayName="SA4014: An if/else if chain has repeated conditions and no side-effects"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4015" displayName="SA4015: Calling functions like math.Ceil on floats converted from integers doesn't do anything useful"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4016" displayName="SA4016: Certain bitwise operations, such as x ^ 0, do not do anything useful"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4017" displayName="SA4017: Discarding the return values of a function without side effects, making the call pointless"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4018" displayName="SA4018: Self-assignment of variables"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4019" displayName="SA4019: Multiple, identical build constraints in the same file"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4020" displayName="SA4020: Unreachable case clause in a type switch"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4022" displayName="SA4022: Comparing the address of a variable against nil"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4023" displayName="SA4023: Impossible comparison of interface value with untyped nil"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4024" displayName="SA4024: Checking for impossible return value from a builtin function"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4025" displayName="SA4025: Integer division of literals that results in zero"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4026" displayName="SA4026: Go constants cannot express negative zero"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4027" displayName="SA4027: (*net/url.URL).Query returns a copy, modifying it doesn't change the URL"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4028" displayName="SA4028: X % 1 is always zero"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4029" displayName="SA4029: Ineffective attempt at sorting slice"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4030" displayName="SA4030: Ineffective attempt at generating random number"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4031" displayName="SA4031: Checking never-nil value against nil"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA4032" displayName="SA4032: Comparing runtime.GOOS or runtime.GOARCH against impossible value"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5000" displayName="SA5000: Assignment to nil map"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5001" displayName="SA5001: Deferring Close before checking for a possible error"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5002" displayName="SA5002: The empty for loop ('for {}') spins and can block the scheduler"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5003" displayName="SA5003: Defers in infinite loops will never execute"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5004" displayName="SA5004: 'for { select { ...' with an empty default branch spins"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5005" displayName="SA5005: The finalizer references the finalized object, preventing garbage collection"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5007" displayName="SA5007: Infinite recursive call"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5008" displayName="SA5008: Invalid struct tag"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5010" displayName="SA5010: Impossible type assertion"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA5012" displayName="SA5012: Passing odd-sized slice to function expecting even size"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA6000" displayName="SA6000: Using regexp.Match or related in a loop, should use regexp.Compile"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA6001" displayName="SA6001: Missing an optimization opportunity when indexing maps by byte slices"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA6002" displayName="SA6002: Storing non-pointer values in sync.Pool allocates memory"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA6003" displayName="SA6003: Converting a string to a slice of runes before ranging over it"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA6005" displayName="SA6005: Inefficient string comparison with strings.ToLower or strings.ToUpper"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA6006" displayName="SA6006: Using io.WriteString to write []byte"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9001" displayName="SA9001: Defers in range loops may not run when you expect them to"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9002" displayName="SA9002: Using a non-octal os.FileMode that looks like it was meant to be in octal"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9003" displayName="SA9003: Empty body in an if or else branch"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9004" displayName="SA9004: Only the first constant has an explicit type"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9005" displayName="SA9005: Trying to marshal a struct with no public fields nor custom marshaling"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9006" displayName="SA9006: Dubious bit shifting of a fixed size integer value"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9007" displayName="SA9007: Deleting a directory that shouldn't be deleted"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9008" displayName="SA9008: Else branch of a type assertion is probably not reading the right value"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9009" displayName="SA9009: Ineffectual Go compiler directive"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_SA9010" displayName="SA9010: Returned function should be called in defer"
+                         groupPath="Go" groupName="Staticcheck: bugs (SA)" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1000" displayName="ST1000: Incorrect or missing package comment"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1001" displayName="ST1001: Dot imports are discouraged"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1003" displayName="ST1003: Poorly chosen identifier"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1005" displayName="ST1005: Incorrectly formatted error string"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1006" displayName="ST1006: Poorly chosen receiver name"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1008" displayName="ST1008: A function's error value should be its last return value"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1011" displayName="ST1011: Poorly chosen name for variable of type time.Duration"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1012" displayName="ST1012: Poorly chosen name for error variable"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1013" displayName="ST1013: Should use constants for HTTP error codes, not magic numbers"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1015" displayName="ST1015: A switch's default case should be the first or last case"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1016" displayName="ST1016: Use consistent method receiver names"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1017" displayName="ST1017: Don't use Yoda conditions"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1018" displayName="ST1018: Avoid zero-width and control characters in string literals"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1019" displayName="ST1019: Importing the same package multiple times"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1020" displayName="ST1020: The documentation of an exported function should start with the function's name"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1021" displayName="ST1021: The documentation of an exported type should start with type's name"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1022" displayName="ST1022: The documentation of an exported variable or constant should start with variable's name"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ST1023" displayName="ST1023: Redundant type in variable declaration"
+                         groupPath="Go" groupName="Staticcheck: style (ST)" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_any" displayName="any: Replace interface{} with any"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_appendclipped" displayName="appendclipped: Simplify append chains using slices.Concat"
+                         groupPath="Go" groupName="gopls" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_appends" displayName="appends: Check for missing values after append"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_asmdecl" displayName="asmdecl: Report mismatches between assembly files and Go declarations"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_assign" displayName="assign: Check for useless assignments"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_atomic" displayName="atomic: Check for common mistakes using the sync/atomic package"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_atomicalign" displayName="atomicalign: Check for non-64-bits-aligned arguments to sync/atomic functions"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_atomictypes" displayName="atomictypes: Replace basic types in sync/atomic calls with atomic types"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_bloop" displayName="bloop: Replace for-range over b.N with b.Loop"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_bools" displayName="bools: Check for common mistakes involving boolean operators"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_buildtag" displayName="buildtag: Check //go:build and // +build directives"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_cgocall" displayName="cgocall: Detect some violations of the cgo pointer passing rules"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_composites" displayName="composites: Check for unkeyed composite literals"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_copylocks" displayName="copylocks: Check for locks erroneously passed by value"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_deepequalerrors" displayName="deepequalerrors: Check for calls of reflect.DeepEqual on error values"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_defers" displayName="defers: Report common mistakes in defer statements"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_deprecated" displayName="deprecated: Check for use of deprecated identifiers"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_directive" displayName="directive: Check Go toolchain directives such as //go:debug"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_embed" displayName="embed: Check //go:embed directive usage"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_embedlit" displayName="embedlit: Simplify references to embedded fields in composite literals"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_errorsas" displayName="errorsas: Report passing non-pointer or non-error values to errors.As"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_errorsastype" displayName="errorsastype: Replace errors.As with errors.AsType[T]"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_errorsastypeshadow" displayName="errorsastypeshadow: Report shadowing of errors.AsType[T] in if/else chains"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_fieldalignment" displayName="fieldalignment: Find structs that would use less memory if their fields were sorted"
+                         groupPath="Go" groupName="gopls" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_fillreturns" displayName="fillreturns: Suggest fixes for errors due to an incorrect number of return values"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_fmtappendf" displayName="fmtappendf: Replace []byte(fmt.Sprintf) with fmt.Appendf"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_forvar" displayName="forvar: Remove redundant re-declaration of loop variables"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_framepointer" displayName="framepointer: Report assembly that clobbers the frame pointer before saving it"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_hostport" displayName="hostport: Check format of addresses passed to net.Dial"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_httpresponse" displayName="httpresponse: Check for mistakes using HTTP responses"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ifaceassert" displayName="ifaceassert: Detect impossible interface-to-interface type assertions"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_importcomment" displayName="importcomment: Remove obsolete comments specifying canonical import path"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_infertypeargs" displayName="infertypeargs: Check for unnecessary type arguments in call expressions"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_inline" displayName="inline: Apply fixes based on 'go:fix inline' comment directives"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_loopclosure" displayName="loopclosure: Check references to loop variables from within nested functions"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_lostcancel" displayName="lostcancel: Check cancel func returned by context.WithCancel is called"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_maprange" displayName="maprange: Checks for unnecessary calls to maps.Keys and maps.Values in range statements"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_mapsloop" displayName="mapsloop: Replace explicit loops over maps with calls to maps package"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_minmax" displayName="minmax: Replace if/else statements with calls to min or max"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_newexpr" displayName="newexpr: Simplify code by using go1.26's new(expr)"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_nilfunc" displayName="nilfunc: Check for useless comparisons between functions and nil"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_nilness" displayName="nilness: Check for redundant or impossible nil comparisons"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_nonewvars" displayName="nonewvars: Suggested fixes for &quot;no new vars on left side of :=&quot;"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_noresultvalues" displayName="noresultvalues: Suggested fixes for unexpected return values"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_omitzero" displayName="omitzero: Suggest replacing omitempty with omitzero for struct fields"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_plusbuild" displayName="plusbuild: Remove obsolete //+build comments"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_printf" displayName="printf: Check consistency of Printf format strings and arguments"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_ptrtoerror" displayName="ptrtoerror: Detect inconsistent conversions of concrete types to error"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_rangeint" displayName="rangeint: Replace 3-clause for loops with for-range over integers"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_recursiveiter" displayName="recursiveiter: Check for inefficient recursive iterators"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_reflecttypeassert" displayName="reflecttypeassert: Replace v.Interface().(T) with reflect.TypeAssert[T](v)"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_reflecttypefor" displayName="reflecttypefor: Replace reflect.TypeOf(x) with TypeFor[T]()"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_scannererr" displayName="scannererr: Scannererr: report failure to check bufio.Scanner.Err"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_shadow" displayName="shadow: Check for possible unintended shadowing of variables"
+                         groupPath="Go" groupName="gopls" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_shift" displayName="shift: Check for shifts that equal or exceed the width of the integer"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_sigchanyzer" displayName="sigchanyzer: Check for unbuffered channel of os.Signal"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_simplifycompositelit" displayName="simplifycompositelit: Check for composite literal simplifications"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_simplifyrange" displayName="simplifyrange: Check for range statement simplifications"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_simplifyslice" displayName="simplifyslice: Check for slice simplifications"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_slicesbackward" displayName="slicesbackward: Replace backward loops over slices with slices.Backward"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_slicesclip" displayName="slicesclip: Replace three-index slice expressions with slices.Clip"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_slicescontains" displayName="slicescontains: Replace loops with slices.Contains or slices.ContainsFunc"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_slicesdelete" displayName="slicesdelete: Replace append-based slice deletion with slices.Delete"
+                         groupPath="Go" groupName="gopls" enabledByDefault="false" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_slicessort" displayName="slicessort: Replace sort.Slice with slices.Sort for basic types"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_slog" displayName="slog: Check for invalid structured logging calls"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_sortslice" displayName="sortslice: Check the argument type of sort.Slice"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_sqlrowserr" displayName="sqlrowserr: Sqlrowserr: report failure to check sql.Rows.Err"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stditerators" displayName="stditerators: Use iterators instead of Len/At-style APIs"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stdmethods" displayName="stdmethods: Check signature of methods of well-known interfaces"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stdversion" displayName="stdversion: Report uses of too-new standard library symbols"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stringintconv" displayName="stringintconv: Check for string(int) conversions"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stringsbuilder" displayName="stringsbuilder: Replace += with strings.Builder"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stringscut" displayName="stringscut: Replace strings.Index etc"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stringscutprefix" displayName="stringscutprefix: Replace HasPrefix/TrimPrefix with CutPrefix"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_stringsseq" displayName="stringsseq: Replace ranging over Split/Fields with SplitSeq/FieldsSeq"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_structtag" displayName="structtag: Check that struct field tags conform to reflect.StructTag.Get"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_testingcontext" displayName="testingcontext: Replace context.WithCancel with t.Context in tests"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_testinggoroutine" displayName="testinggoroutine: Report calls to (*testing.T).Fatal from goroutines started by a test"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_tests" displayName="tests: Check for common mistaken usages of tests and examples"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_timeformat" displayName="timeformat: Check for calls of (time.Time).Format or time.Parse with 2006-02-01"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unmarshal" displayName="unmarshal: Report passing non-pointer or non-interface values to unmarshal"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unreachable" displayName="unreachable: Check for unreachable code"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unsafefuncs" displayName="unsafefuncs: Replace unsafe pointer arithmetic with function calls"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unsafeptr" displayName="unsafeptr: Check for invalid conversions of uintptr to unsafe.Pointer"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unusedfunc" displayName="unusedfunc: Check for unused functions, methods, etc"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unusedparams" displayName="unusedparams: Check for unused parameters of functions"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unusedresult" displayName="unusedresult: Check for unused results of calls to some functions"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unusedvariable" displayName="unusedvariable: Check for unused variables and suggest fixes"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_unusedwrite" displayName="unusedwrite: Checks for unused writes"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_waitgroup" displayName="waitgroup: Check for misuses of sync.WaitGroup"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_waitgroupgo" displayName="waitgroupgo: Replace wg.Add(1)/go/wg.Done() with wg.Go"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_writestring" displayName="writestring: Detect inefficient string concatenation in uses of WriteString"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+        <localInspection language="golsp.go" shortName="Gopls_yield" displayName="yield: Report calls to yield where the result is ignored"
+                         groupPath="Go" groupName="gopls" enabledByDefault="true" level="WARNING"
+                         hasStaticDescription="true" implementationClass="io.github.xefise.golsp.lsp.GoplsAnalyzerInspection"/>
+    </extensions>
+</idea-plugin>

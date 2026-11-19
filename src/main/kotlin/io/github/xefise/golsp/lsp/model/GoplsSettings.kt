@@ -9,34 +9,31 @@ object GoplsSettings {
     const val SECTION: String = "gopls"
 
     // gopls keys are flat names; vscode-go's "ui."/"build." prefixes are only its own grouping.
-    fun defaults(usePlaceholders: Boolean, allStaticcheck: Boolean = false): JsonObject = JsonObject().apply {
+    fun defaults(
+        usePlaceholders: Boolean,
+        analyses: Map<String, Boolean> = emptyMap(),
+        hints: Map<String, Boolean> = GoplsInlayHints.DEFAULTS,
+    ): JsonObject = JsonObject().apply {
         addProperty("semanticTokens", true)
         // Completed calls get tab stops for their arguments; gopls' own default is off.
         addProperty("usePlaceholders", usePlaceholders)
-        // Rider-style type hints after `x :=` and range variables; gopls ships every hint off.
-        add("hints", JsonObject().apply {
-            addProperty("assignVariableTypes", true)
-            addProperty("rangeVariableTypes", true)
-        })
+        add("hints", JsonObject().apply { hints.forEach { (name, on) -> addProperty(name, on) } })
         add("directoryFilters", JsonArray().apply { add("-**/node_modules") })
         // Tests run from our own gutter markers; gopls' test code lenses would duplicate them.
         add("codelenses", JsonObject().apply { addProperty("test", false) })
         // didCreateFiles arrives while a template-created file is still empty on disk, so gopls' clause lands on top of ours.
         addProperty("newGoFileHeader", false)
-        // Off in gopls' default staticcheck subset: `defer mu.Lock()` right after Lock (SA2003);
-        // dead stores like `s = strings.TrimSpace(s)` on a range copy (SA4006, SA4017).
-        add("analyses", JsonObject().apply {
-            addProperty("SA2003", true)
-            addProperty("SA4006", true)
-            addProperty("SA4017", true)
-        })
-        // Only `true` is ever sent: `false` would also drop the subset gopls enables when the key is absent.
-        if (allStaticcheck) addProperty("staticcheck", true)
+        if (analyses.isNotEmpty()) add("analyses", JsonObject().apply { analyses.forEach { (name, on) -> addProperty(name, on) } })
     }
 
     /** `{"gopls": defaults}` with [user] (the whole settings object) deep-merged on top; user values win. */
-    fun build(user: JsonObject?, usePlaceholders: Boolean, allStaticcheck: Boolean = false): JsonObject {
-        val result = JsonObject().apply { add(SECTION, defaults(usePlaceholders, allStaticcheck)) }
+    fun build(
+        user: JsonObject?,
+        usePlaceholders: Boolean,
+        analyses: Map<String, Boolean> = emptyMap(),
+        hints: Map<String, Boolean> = GoplsInlayHints.DEFAULTS,
+    ): JsonObject {
+        val result = JsonObject().apply { add(SECTION, defaults(usePlaceholders, analyses, hints)) }
         return if (user == null) result else deepMerge(result, user)
     }
 

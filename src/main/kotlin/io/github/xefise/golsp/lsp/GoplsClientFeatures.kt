@@ -20,6 +20,7 @@ class GoplsClientFeatures : LSPClientFeatures() {
             override fun isEnabled(file: PsiFile): Boolean = false
         })
         setCompletionFeature(GoplsCompletionFeature())
+        setDiagnosticFeature(GoplsDiagnosticFeature())
     }
 
     override fun initializeParams(initializeParams: InitializeParams) {

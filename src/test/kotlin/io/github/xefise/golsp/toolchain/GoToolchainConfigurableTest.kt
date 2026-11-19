@@ -52,6 +52,15 @@ class GoToolchainConfigurableTest : BasePlatformTestCase() {
         assertFalse(configurable.isModified)
     }
 
+    fun testRaceActionCheckboxStartsOffAndApplyStoresIt() {
+        assertFalse(configurable.raceActionBox.isSelected)
+        configurable.raceActionBox.isSelected = true
+        assertTrue(configurable.isModified)
+        configurable.apply()
+        assertTrue(GoToolchainSettings.getInstance().showRunWithRaceDetector)
+        assertFalse(configurable.isModified)
+    }
+
     fun testResetDiscardsEditsAndPicksUpExternalChanges() {
         configurable.goplsField.text = "/edited"
         GoToolchainSettings.getInstance().setBannerHidden(GoTool.GO, true)

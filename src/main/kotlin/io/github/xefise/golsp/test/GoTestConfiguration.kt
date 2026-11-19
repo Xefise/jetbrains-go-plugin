@@ -148,8 +148,8 @@ class GoTestConfiguration(project: Project, factory: ConfigurationFactory, name:
 
     override fun buildFlagsError(buildFlags: List<String>): String? = GoTestCommandBuilder.testFlagsError(buildFlags)
 
-    override fun createRunState(environment: ExecutionEnvironment, goExecutable: String): RunProfileState =
-        GoTestRunProfileState(environment, this, goExecutable, ::launchRequest)
+    override fun createRunState(environment: ExecutionEnvironment, goExecutable: String, request: () -> GoExecutionRequest): RunProfileState =
+        GoTestRunProfileState(environment, this, goExecutable, request)
 
     override fun createDebugConsole(executor: Executor, default: () -> ConsoleView?): ConsoleView? = createDebugTestConsole(executor)
 

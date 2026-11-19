@@ -36,6 +36,7 @@ class GoToolchainConfigurable(private val project: Project) : BoundSearchableCon
     internal lateinit var goplsField: TextFieldWithBrowseButton
     internal lateinit var dlvField: TextFieldWithBrowseButton
     internal val bannerBoxes = mutableMapOf<GoTool, JBCheckBox>()
+    internal lateinit var raceActionBox: JBCheckBox
 
     override fun getHelpTopic(): String? = null
 
@@ -73,6 +74,14 @@ class GoToolchainConfigurable(private val project: Project) : BoundSearchableCon
                 bannerRow(GoTool.GO, "Warn when Go is not found")
                 bannerRow(GoTool.GOPLS, "Suggest installing or updating gopls")
                 bannerRow(GoTool.DLV, "Suggest installing or updating dlv")
+            }
+            group("Run") {
+                row {
+                    raceActionBox = checkBox("Show 'Run with Race Detector' in run actions")
+                        .bindSelected(settings::showRunWithRaceDetector)
+                        .comment("Runs with -race for that launch only; the configuration stays unchanged")
+                        .component
+                }
             }
         }
         subscribe(result)

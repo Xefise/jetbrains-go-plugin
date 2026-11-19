@@ -28,6 +28,7 @@ import com.redhat.devtools.lsp4ij.dap.configurations.DAPRunConfigurationBase
 import com.redhat.devtools.lsp4ij.dap.definitions.DebugAdapterServerDefinition
 import io.github.xefise.golsp.execution.model.GoEnvironmentLayers
 import io.github.xefise.golsp.execution.model.GoExecutionRequest
+import io.github.xefise.golsp.execution.model.GoRaceDetector
 import io.github.xefise.golsp.execution.model.GoRunCommandBuilder
 import io.github.xefise.golsp.toolchain.GoToolchainService
 import io.github.xefise.golsp.toolchain.model.GoTool
@@ -80,12 +81,19 @@ abstract class GoRunConfigurationBase<T : RunConfigurationOptions>(
     @Throws(ExecutionException::class)
     abstract fun toExecutionRequest(): GoExecutionRequest
 
-    /** What Run and Debug launch: [toExecutionRequest] plus checks that only make sense at launch time. */
+    /**
+     * What Run and Debug launch: [toExecutionRequest] plus checks that only make sense at launch time. Under
+     * [GoRaceExecutor] `-race` is added to this launch only, never to the stored flags.
+     */
     @Throws(ExecutionException::class)
-    fun launchRequest(): GoExecutionRequest {
+    fun launchRequest(): GoExecutionRequest = launchRequest(executorId = null)
+
+    @Throws(ExecutionException::class)
+    fun launchRequest(executorId: String?): GoExecutionRequest {
         val request = toExecutionRequest()
         buildFlagsError(request.buildFlags)?.let { throw ExecutionException(it) }
-        return request
+        val race = executorId == GoRaceExecutor.EXECUTOR_ID
+        return request.copy(buildFlags = GoRaceDetector.withRaceFlag(request.buildFlags, race))
     }
 
     /** Checked both in [checkConfiguration] and at launch. */
@@ -101,8 +109,11 @@ abstract class GoRunConfigurationBase<T : RunConfigurationOptions>(
     protected open fun createDebugConsole(executor: Executor, default: () -> ConsoleView?): ConsoleView? = default()
 
     /** The process behind every executor except Debug. */
-    protected open fun createRunState(environment: ExecutionEnvironment, goExecutable: String): RunProfileState =
-        GoRunProfileState(environment, goExecutable, ::launchRequest)
+    protected open fun createRunState(
+        environment: ExecutionEnvironment,
+        goExecutable: String,
+        request: () -> GoExecutionRequest,
+    ): RunProfileState = GoRunProfileState(environment, goExecutable, request)
 
     // The base delegates the editor to the DAP factory; Go configurations own their editor.
     abstract override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration>
@@ -122,7 +133,7 @@ abstract class GoRunConfigurationBase<T : RunConfigurationOptions>(
         }
         val go = GoToolchainService.getInstance(project).findTool(GoTool.GO)
             ?: throw ExecutionException("Go executable not found in PATH, ~/go/bin or GOROOT")
-        return createRunState(environment, go)
+        return createRunState(environment, go) { launchRequest(executor.id) }
     }
 
     /** Explicit variables over the env file, read at launch so its edits apply without touching the configuration. */

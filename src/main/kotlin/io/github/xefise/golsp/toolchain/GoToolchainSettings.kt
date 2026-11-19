@@ -32,11 +32,19 @@ class GoToolchainSettings : SimplePersistentStateComponent<GoToolchainSettings.O
         var hideGoBanner by property(false)
         var hideGoplsBanner by property(false)
         var hideDlvBanner by property(false)
+        var showRunWithRaceDetector by property(false)
     }
 
     val goBinary: String get() = state.goBinary.orEmpty()
     val goplsPath: String get() = state.goplsPath.orEmpty()
     val dlvPath: String get() = state.dlvPath.orEmpty()
+
+    // Read on every run-action update, so a change applies without a restart.
+    var showRunWithRaceDetector: Boolean
+        get() = state.showRunWithRaceDetector
+        set(value) {
+            state.showRunWithRaceDetector = value
+        }
 
     /** Stores the values and notifies every open project once if anything changed. */
     fun update(goBinary: String, goplsPath: String, dlvPath: String) {

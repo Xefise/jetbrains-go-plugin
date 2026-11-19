@@ -13,6 +13,15 @@ class GoEditorSupportTest : BasePlatformTestCase() {
         assertTrue(all.toString(), all.all { it.startsWith("GOLSP_") })
     }
 
+    fun testDemoTagsAreRegisteredAndDescribed() {
+        val page = GoColorSettingsPage()
+        val tags = page.additionalHighlightingTagToDescriptorMap
+        val used = Regex("<(\\w+)>").findAll(page.demoText).map { it.groupValues[1] }.toSet()
+        assertEquals(tags.keys, used)
+        val described = page.attributeDescriptors.map { it.key }.toSet()
+        assertTrue(described.containsAll(tags.values))
+    }
+
     fun testLineComment() {
         myFixture.configureByText("a.go", "package p\n<caret>var x = 1\n")
         myFixture.performEditorAction(IdeActions.ACTION_COMMENT_LINE)

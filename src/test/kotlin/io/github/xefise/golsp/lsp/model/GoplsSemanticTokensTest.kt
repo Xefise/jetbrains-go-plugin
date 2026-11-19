@@ -32,6 +32,27 @@ class GoplsSemanticTokensTest {
     }
 
     @Test
+    fun `chan modifier selects channel styles`() {
+        assertEquals(GoTokenStyle.CHANNEL_VARIABLE, GoTokenStyles.styleOf("variable", listOf("definition", "chan")))
+        assertEquals(GoTokenStyle.CHANNEL_PARAMETER, GoTokenStyles.styleOf("parameter", listOf("chan")))
+        assertEquals(GoTokenStyle.CHANNEL_FIELD, GoTokenStyles.styleOf("property", listOf("chan")))
+    }
+
+    @Test
+    fun `non-chan identifiers keep plain styles`() {
+        assertEquals(GoTokenStyle.VARIABLE, GoTokenStyles.styleOf("variable", listOf("slice")))
+        assertEquals(GoTokenStyle.PARAMETER, GoTokenStyles.styleOf("parameter", listOf("pointer")))
+        assertEquals(GoTokenStyle.FIELD, GoTokenStyles.styleOf("property", listOf("map")))
+        assertEquals(GoTokenStyle.TYPE, GoTokenStyles.styleOf("type", listOf("chan")))
+    }
+
+    @Test
+    fun `defaultLibrary and readonly win over chan`() {
+        assertEquals(GoTokenStyle.BUILTIN, GoTokenStyles.styleOf("variable", listOf("defaultLibrary", "chan")))
+        assertEquals(GoTokenStyle.CONSTANT, GoTokenStyles.styleOf("variable", listOf("readonly", "chan")))
+    }
+
+    @Test
     fun `declarations and calls differ`() {
         assertEquals(GoTokenStyle.FUNCTION_DECLARATION, GoTokenStyles.styleOf("function", listOf("definition", "signature")))
         assertEquals(GoTokenStyle.FUNCTION_CALL, GoTokenStyles.styleOf("function", listOf("signature")))

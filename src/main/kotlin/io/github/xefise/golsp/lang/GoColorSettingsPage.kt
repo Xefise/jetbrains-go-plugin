@@ -15,7 +15,7 @@ class GoColorSettingsPage : ColorSettingsPage {
 
     override fun getDemoText(): String = DEMO
 
-    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? = null
+    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey> = TAGS
 
     override fun getAttributeDescriptors(): Array<AttributesDescriptor> = DESCRIPTORS
 
@@ -37,7 +37,18 @@ class GoColorSettingsPage : ColorSettingsPage {
                 Greet(name string) (string, error)
             }
 
+            type worker struct {
+                <chanField>jobs</chanField> chan int
+            }
+
+            func drain(<chanParam>results</chanParam> <-chan string) {
+                for r := range <chanParam>results</chanParam> {
+                    fmt.Println(r)
+                }
+            }
+
             func main() {
+                <chanVar>done</chanVar> := make(chan bool)
                 names := []string{"world", `gopher`}
                 for i, name := range names {
                     if i > 0 && name != "" {
@@ -45,10 +56,16 @@ class GoColorSettingsPage : ColorSettingsPage {
                     }
                 }
                 var ok bool = true
-                _, _ = ok, nil;
+                _, _, _ = ok, <chanVar>done</chanVar>, nil;
                 @
             }
         """.trimIndent()
+
+        val TAGS = mapOf(
+            "chanParam" to GoColors.CHANNEL_PARAMETER,
+            "chanVar" to GoColors.CHANNEL_VARIABLE,
+            "chanField" to GoColors.CHANNEL_FIELD,
+        )
 
         val DESCRIPTORS = arrayOf(
             AttributesDescriptor("Comments//Line comment", GoColors.LINE_COMMENT),
@@ -57,6 +74,9 @@ class GoColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Predeclared identifier", GoColors.BUILTIN),
             AttributesDescriptor("Predeclared constant", GoColors.CONSTANT),
             AttributesDescriptor("Identifier", GoColors.IDENTIFIER),
+            AttributesDescriptor("Channel//Parameter", GoColors.CHANNEL_PARAMETER),
+            AttributesDescriptor("Channel//Variable", GoColors.CHANNEL_VARIABLE),
+            AttributesDescriptor("Channel//Field", GoColors.CHANNEL_FIELD),
             AttributesDescriptor("String//Interpreted string", GoColors.STRING),
             AttributesDescriptor("String//Raw string", GoColors.RAW_STRING),
             AttributesDescriptor("String//Rune", GoColors.RUNE),

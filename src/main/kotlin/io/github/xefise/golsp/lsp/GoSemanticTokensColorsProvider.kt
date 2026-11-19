@@ -19,6 +19,9 @@ class GoSemanticTokensColorsProvider : SemanticTokensColorsProvider {
             GoTokenStyle.TYPE_PARAMETER -> DefaultLanguageHighlighterColors.CLASS_REFERENCE
             GoTokenStyle.PARAMETER -> DefaultLanguageHighlighterColors.PARAMETER
             GoTokenStyle.VARIABLE -> DefaultLanguageHighlighterColors.LOCAL_VARIABLE
+            GoTokenStyle.CHANNEL_PARAMETER -> GoColors.CHANNEL_PARAMETER
+            GoTokenStyle.CHANNEL_VARIABLE -> GoColors.CHANNEL_VARIABLE
+            GoTokenStyle.CHANNEL_FIELD -> GoColors.CHANNEL_FIELD
             GoTokenStyle.FUNCTION_DECLARATION -> DefaultLanguageHighlighterColors.FUNCTION_DECLARATION
             GoTokenStyle.FUNCTION_CALL -> DefaultLanguageHighlighterColors.FUNCTION_CALL
             GoTokenStyle.METHOD_DECLARATION -> DefaultLanguageHighlighterColors.INSTANCE_METHOD

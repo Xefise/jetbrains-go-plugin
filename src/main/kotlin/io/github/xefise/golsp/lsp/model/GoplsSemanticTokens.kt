@@ -21,6 +21,9 @@ enum class GoTokenStyle {
     TYPE_PARAMETER,
     PARAMETER,
     VARIABLE,
+    CHANNEL_PARAMETER,
+    CHANNEL_VARIABLE,
+    CHANNEL_FIELD,
     FUNCTION_DECLARATION,
     FUNCTION_CALL,
     METHOD_DECLARATION,
@@ -33,17 +36,19 @@ object GoTokenStyles {
     fun styleOf(tokenType: String, modifiers: List<String>): GoTokenStyle {
         val defaultLibrary = "defaultLibrary" in modifiers
         val declaration = "definition" in modifiers || "declaration" in modifiers
+        val channel = "chan" in modifiers
         return when (tokenType) {
             "namespace" -> GoTokenStyle.PACKAGE
             "type", "interface", "struct", "class", "enum" -> if (defaultLibrary) GoTokenStyle.BUILTIN else GoTokenStyle.TYPE
             "typeParameter" -> GoTokenStyle.TYPE_PARAMETER
-            "parameter" -> GoTokenStyle.PARAMETER
+            "parameter" -> if (channel) GoTokenStyle.CHANNEL_PARAMETER else GoTokenStyle.PARAMETER
             "variable" -> when {
                 defaultLibrary -> GoTokenStyle.BUILTIN
                 "readonly" in modifiers -> GoTokenStyle.CONSTANT
+                channel -> GoTokenStyle.CHANNEL_VARIABLE
                 else -> GoTokenStyle.VARIABLE
             }
-            "property" -> GoTokenStyle.FIELD
+            "property" -> if (channel) GoTokenStyle.CHANNEL_FIELD else GoTokenStyle.FIELD
             "function" -> when {
                 defaultLibrary -> GoTokenStyle.BUILTIN
                 declaration -> GoTokenStyle.FUNCTION_DECLARATION

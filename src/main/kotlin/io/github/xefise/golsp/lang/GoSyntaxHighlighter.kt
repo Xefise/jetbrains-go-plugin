@@ -37,6 +37,11 @@ object GoColors {
     val DOT: TextAttributesKey = key("DOT", DefaultLanguageHighlighterColors.DOT)
     val BAD_CHARACTER: TextAttributesKey = key("BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)
     val MOD_VERSION: TextAttributesKey = key("MOD_VERSION", DefaultLanguageHighlighterColors.NUMBER)
+
+    // Applied from gopls semantic tokens; fallbacks match the plain parameter/variable/field colours.
+    val CHANNEL_PARAMETER: TextAttributesKey = key("CHANNEL_PARAMETER", DefaultLanguageHighlighterColors.PARAMETER)
+    val CHANNEL_VARIABLE: TextAttributesKey = key("CHANNEL_VARIABLE", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
+    val CHANNEL_FIELD: TextAttributesKey = key("CHANNEL_FIELD", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
 }
 
 class GoSyntaxHighlighter(

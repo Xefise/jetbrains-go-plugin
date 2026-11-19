@@ -1,13 +1,21 @@
 package io.github.xefise.golsp.lsp
 
 import com.intellij.codeInsight.daemon.HighlightDisplayKey
+import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.intention.PriorityAction
 import com.intellij.codeInspection.InspectionProfile
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ex.DisableInspectionToolAction
+import com.intellij.codeInspection.ex.EditInspectionToolsSettingsAction
+import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Document
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Iconable
 import com.intellij.profile.ProfileChangeAdapter
 import com.intellij.profile.codeInspection.InspectionProjectProfileManager
 import com.intellij.psi.PsiFile
@@ -18,6 +26,7 @@ import io.github.xefise.golsp.lsp.model.GoplsAnalyzer
 import io.github.xefise.golsp.lsp.model.GoplsAnalyzerCatalog
 import io.github.xefise.golsp.lsp.model.GoplsAnalyzerDocs
 import org.eclipse.lsp4j.Diagnostic
+import javax.swing.Icon
 
 /** The inspection profile is the source of truth for which gopls analyzers run; one inspection per analyzer. */
 internal object GoplsAnalyzerInspections {
@@ -64,6 +73,30 @@ internal object GoplsAnalyzerInspections {
     }
 
     private fun profile(project: Project): InspectionProfile = InspectionProjectProfileManager.getInstance(project).currentProfile
+
+    /** Alt+Enter entries on an analyzer diagnostic: open its inspection settings or turn it off. */
+    fun profileActions(analyzer: GoplsAnalyzer): List<IntentionAction> {
+        val key = HighlightDisplayKey.find(shortName(analyzer.name)) ?: return emptyList()
+        return listOf(
+            GoplsAnalyzerProfileAction(EditInspectionToolsSettingsAction(key), "Edit '${analyzer.name}' inspection settings", PriorityAction.Priority.LOW),
+            GoplsAnalyzerProfileAction(DisableInspectionToolAction(key), "Disable '${analyzer.name}' inspection", PriorityAction.Priority.BOTTOM),
+        )
+    }
+}
+
+// The platform's texts don't say which inspection, and its settings action is high priority: gopls fixes must stay on top.
+// Not an IntentionActionDelegate: the hover tooltip unwraps delegates, then looks the fix up by the delegate's text and misses.
+private class GoplsAnalyzerProfileAction(
+    private val action: IntentionAction,
+    private val text: String,
+    private val priority: PriorityAction.Priority,
+) :
+    IntentionAction by action, PriorityAction, Iconable, DumbAware {
+    override fun getText(): String = text
+
+    override fun getPriority(): PriorityAction.Priority = priority
+
+    override fun getIcon(flags: Int): Icon? = (action as? Iconable)?.getIcon(flags)
 }
 
 /** Registered many times from the generated `golsp-gopls-analyzers.xml`; each instance gets its short name from its EP. */
@@ -84,6 +117,11 @@ internal class GoplsDiagnosticFeature : LSPDiagnosticFeature() {
     // Compiler and type errors stay with LSP4IJ's own "Diagnostics" inspection.
     override fun isInspectionApplicableFor(diagnostic: Diagnostic, inspection: LocalInspectionTool): Boolean =
         if (inspection is GoplsAnalyzerInspection) diagnostic.source == inspection.analyzerName else analyzerOf(diagnostic) == null
+
+    override fun createAnnotation(diagnostic: Diagnostic, document: Document, fixes: List<IntentionAction>, holder: AnnotationHolder) {
+        val actions = analyzerOf(diagnostic)?.let(GoplsAnalyzerInspections::profileActions).orEmpty()
+        super.createAnnotation(diagnostic, document, fixes + actions, holder)
+    }
 
     override fun getHighlightSeverity(diagnostic: Diagnostic): HighlightSeverity? {
         val analyzer = analyzerOf(diagnostic) ?: return super.getHighlightSeverity(diagnostic)

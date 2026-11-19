@@ -1,5 +1,7 @@
 package io.github.xefise.golsp.lsp
 
+import com.intellij.codeInsight.intention.IntentionActionDelegate
+import com.intellij.codeInsight.intention.PriorityAction
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.testFramework.disableInspections
@@ -70,5 +72,15 @@ class GoplsAnalyzerInspectionsTest : BasePlatformTestCase() {
         assertTrue(feature.isInspectionApplicableFor(diagnostic(null), other))
         assertFalse(feature.isInspectionApplicableFor(diagnostic("printf"), other))
         assertFalse(feature.isInspectionApplicableFor(diagnostic("compiler"), tool("printf")))
+    }
+
+    fun testAnalyzerDiagnosticOffersSettingsThenDisableBelowGoplsFixes() {
+        myFixture.enableInspections(tool("ST1000"))
+        val actions = GoplsAnalyzerInspections.profileActions(GoplsAnalyzerInspections.catalog["ST1000"]!!)
+        assertEquals(listOf("Edit 'ST1000' inspection settings", "Disable 'ST1000' inspection"), actions.map { it.text })
+        assertEquals(listOf(PriorityAction.Priority.LOW, PriorityAction.Priority.BOTTOM), actions.map { (it as PriorityAction).priority })
+        // The hover tooltip runs a fix by its unwrapped text; a delegate would make the link a no-op.
+        assertTrue(actions.none { it is IntentionActionDelegate })
+        assertFalse(actions[0].startInWriteAction())
     }
 }

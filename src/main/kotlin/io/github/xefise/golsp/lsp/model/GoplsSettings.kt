@@ -23,8 +23,13 @@ object GoplsSettings {
         add("codelenses", JsonObject().apply { addProperty("test", false) })
         // didCreateFiles arrives while a template-created file is still empty on disk, so gopls' clause lands on top of ours.
         addProperty("newGoFileHeader", false)
-        // `defer mu.Lock()` right after Lock; off in gopls' default staticcheck subset.
-        add("analyses", JsonObject().apply { addProperty("SA2003", true) })
+        // Off in gopls' default staticcheck subset: `defer mu.Lock()` right after Lock (SA2003);
+        // dead stores like `s = strings.TrimSpace(s)` on a range copy (SA4006, SA4017).
+        add("analyses", JsonObject().apply {
+            addProperty("SA2003", true)
+            addProperty("SA4006", true)
+            addProperty("SA4017", true)
+        })
         // Only `true` is ever sent: `false` would also drop the subset gopls enables when the key is absent.
         if (allStaticcheck) addProperty("staticcheck", true)
     }

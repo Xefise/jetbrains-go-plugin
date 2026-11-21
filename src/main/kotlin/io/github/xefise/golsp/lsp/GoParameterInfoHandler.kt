@@ -57,7 +57,11 @@ class GoParameterInfoHandler : LSPParameterInfoHandler() {
         // The popup keeps the signature it opened with; the latest reply carries the current active parameter.
         val signature = help?.signatures?.singleOrNull { it.label == shownSignature.label } ?: shownSignature
         val parameters = signature.parameters
-        if (context.isSingleParameterInfo || parameters.isNullOrEmpty()) return super.updateUI(shownSignature, context)
+        if (context.isSingleParameterInfo || parameters.isNullOrEmpty()) {
+            // gopls omits `parameters` for `func f()`, and LSP4IJ dereferences the list unchecked.
+            if (shownSignature.parameters == null) shownSignature.parameters = emptyList()
+            return super.updateUI(shownSignature, context)
+        }
 
         // LSP falls back to the first parameter; a struct literal may be at no field at all.
         val fallback = if (owner is GoStructLiteralElement) -1 else 0

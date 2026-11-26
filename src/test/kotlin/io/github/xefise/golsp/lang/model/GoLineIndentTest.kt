@@ -59,6 +59,41 @@ class GoLineIndentTest {
     }
 
     @Test
+    fun `after select brace keeps the select line indent`() {
+        assertEquals("\t", indent("\tselect {\n<caret>"))
+    }
+
+    @Test
+    fun `after expression switch brace keeps the switch line indent`() {
+        assertEquals("\t", indent("\tswitch x := f(); x {\n<caret>"))
+    }
+
+    @Test
+    fun `after type switch brace keeps the switch line indent`() {
+        assertEquals("\t", indent("\tswitch v := x.(type) {\n<caret>"))
+    }
+
+    @Test
+    fun `empty line between split select braces keeps the select line indent`() {
+        assertEquals("\t", indent("\tselect {\n<caret>\n\t}"))
+    }
+
+    @Test
+    fun `func literal brace inside switch header still indents`() {
+        assertEquals("\t\t", indent("\tswitch f(func() {\n<caret>"))
+    }
+
+    @Test
+    fun `brace on a line after a switch line indents`() {
+        assertEquals("\t\t\t", indent("\tswitch {\n\tcase ok:\n\t\tif x {\n<caret>"))
+    }
+
+    @Test
+    fun `identifier containing switch is not a switch`() {
+        assertEquals("\t\t", indent("\tif switched {\n<caret>"))
+    }
+
+    @Test
     fun `case clause body indents one level deeper than case`() {
         assertEquals("\t\t", indent("\tswitch x {\n\tcase 1, 2:\n<caret>"))
     }

@@ -35,7 +35,8 @@ object GoLineIndent {
 
         val last = backward.firstOrNull { it.end <= offset && it.kind.isSignificant() } ?: return ""
         return when {
-            last.kind == GoIndentTokenKind.OPEN -> plusUnit(lineIndent(text, last.start), style)
+            last.kind == GoIndentTokenKind.OPEN ->
+                if (isSwitchBrace(text, last, backward)) lineIndent(text, last.start) else plusUnit(lineIndent(text, last.start), style)
             last.kind == GoIndentTokenKind.CLOSE -> {
                 val opener = findOpener(text, backward, last.start, text[last.start]) ?: return null
                 lineIndent(text, opener.start)
@@ -89,6 +90,27 @@ object GoLineIndent {
         }
         val word = first?.takeIf { it.kind == GoIndentTokenKind.CODE }?.let { text.substring(it.start, it.end) }
         return word == "case" || word == "default"
+    }
+
+    // gofmt keeps `case`/`default` at the level of `switch`/`select`, so their `{` does not indent.
+    private fun isSwitchBrace(text: CharSequence, brace: GoIndentToken, backward: Sequence<GoIndentToken>): Boolean {
+        if (text[brace.start] != '{') return false
+        val lineStart = lineStartOf(text, brace.start)
+        var depth = 0
+        for (token in backward.take(MAX_SCAN_TOKENS)) {
+            if (token.start >= brace.start) continue
+            if (token.start < lineStart) return false
+            when (token.kind) {
+                GoIndentTokenKind.CLOSE -> depth++
+                GoIndentTokenKind.OPEN -> if (--depth < 0) return false
+                GoIndentTokenKind.CODE -> if (depth == 0) {
+                    val word = text.substring(token.start, token.end)
+                    if (word == "switch" || word == "select") return true
+                }
+                else -> Unit
+            }
+        }
+        return false
     }
 
     private fun lineStartOf(text: CharSequence, pos: Int): Int = text.lastIndexOf('\n', pos - 1) + 1

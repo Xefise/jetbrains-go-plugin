@@ -30,6 +30,11 @@ class GoLineIndentProviderTest : BasePlatformTestCase() {
         myFixture.checkResult("package main\n\nfunc f(x int) {\n\tswitch x {\n\tcase 1:\n\t\t<caret>\n\t}\n}\n")
     }
 
+    fun testEnterBetweenSelectBracesDoesNotIndent() {
+        enter("package main\n\nfunc f() {\n\tselect {<caret>}\n}\n")
+        myFixture.checkResult("package main\n\nfunc f() {\n\tselect {\n\t<caret>\n\t}\n}\n")
+    }
+
     fun testEnterAfterMultiLineCallReturnsToStatementIndent() {
         enter("package main\n\nfunc f() {\n\tfoo(\n\t\t1,\n\t)<caret>\n}\n")
         myFixture.checkResult("package main\n\nfunc f() {\n\tfoo(\n\t\t1,\n\t)\n\t<caret>\n}\n")

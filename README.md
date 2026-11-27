@@ -6,7 +6,7 @@ Language features come from [gopls](https://go.dev/gopls/) over LSP (via [LSP4IJ
 debugging from [Delve](https://github.com/go-delve/delve) over DAP. The plugin adds run configurations, gutter icons,
 a test runner, coverage and toolchain setup on top.
 
-> **Status: alpha (0.1.x).** Used daily by the author, but expect rough edges. Bug reports are welcome in
+> **Status: beta (0.1.x).** Feature-complete for everyday use and used daily by the author; some rough edges remain. Bug reports are welcome in
 > [Issues](https://github.com/Xefise/jetbrains-go-plugin/issues).
 >
 > Maintained in spare time on a best-effort basis: issues get read, but fixes and new features may take a while.
